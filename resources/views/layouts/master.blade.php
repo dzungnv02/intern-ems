@@ -144,7 +144,7 @@
           </a>
           <ul class="treeview-menu">
             <li><a href="{{asset('teacher-list')}}"><i class="fa fa-circle-o"></i> Danh sách giáo viên</a></li>
-            <li><a href="{{asset('teacher-add')}}"><i class="fa fa-circle-o"></i> Thêm giáo viên</a></li>
+            {{--  <li><a href="{{asset('teacher-add')}}"><i class="fa fa-circle-o"></i> Thêm giáo viên</a></li>  --}}
           </ul>
         </li>
         <li class="treeview">
