@@ -1,7 +1,5 @@
  @extends('layouts.master')
  @section('header')
- {{-- <link rel="stylesheet" href="{{asset('css/staff.css')}}"> --}}
- {{-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"> --}}
  @endsection
  @section('title')
  Hoá đơn thu tiền
@@ -94,12 +92,7 @@
  @endsection
  @section('footer')
  <script>
- $('SELECT.select2[id="student_id"]').select2();
-$('SELECT.select2[id="class_id"]').select2();
-
+ 	$('SELECT.select2[id="student_id"]').select2();
+	$('SELECT.select2[id="class_id"]').select2();
  </script>
- {{-- <script src="{{asset('js/staff.js')}}"> --}}
- {{--  </script>  --}}
- {{-- <script src="{{asset('js/staff/add.js')}}"> --}}
- {{-- </script> --}}
  @endsection

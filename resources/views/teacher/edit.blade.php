@@ -16,7 +16,7 @@
 </li>
 @endsection
 @section('content')
-<form class="add-teacher" id="formEdit">
+<form class="edit-teacher" id="formEdit">
 	<div class="form-group">
 		<label for="name">Tên:</label>
 		<input type="text" class="form-control" id="name" placeholder="Tên" name="name">

@@ -21,15 +21,16 @@ return [
             'ZOHO_MODULE_PARENTS_X' => 'Ph_huynh_X_Accounts'
     ],
     'MAPPING' => [
-        'ZOHO_MODULE_STUDENTS' => [
-            'Email',
-            'Qu_c_t_ch',
-            'i_n_tho_i_kh_c',
-            'Name',
-            'Tr_nh',
-            'Phone',
-            'Record_Image',
-            'Tag'
+        'ZOHO_MODULE_EMS_TEACHER' => [
+            'Email' => 'email',
+            'Qu_c_t_ch' => 'nationality',
+            'i_n_tho_i_kh_c' => '',
+            'Name' => 'name',
+            'Tr_nh' => '',
+            'Phone' => 'mobile',
+            'Record_Image' => '',
+            'Tag' => '',
+            'EMS_ID' => 'id'
         ]
     ]
 ];

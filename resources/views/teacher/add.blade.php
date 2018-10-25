@@ -22,6 +22,10 @@
 		<input type="text" class="form-control" id="name" placeholder="Tên">
 	</div>
 	<div class="form-group">
+		<label for="nationality">Quốc tịch: </label>
+		<select class="form-control select2" name="nationality" id="nationality" style="width: 100%;"></select>
+	</div>
+	<div class="form-group">
 		<label for="name">Email:</label>
 		<input type="email" class="form-control" id="email" placeholder="Email">
 	</div>
@@ -46,7 +50,7 @@
 		</select>
 	</div>
 	<div class="form-group">
-		<label for="name">Kinh nghiem</label>
+		<label for="name">Kinh nghiệm:</label>
 		<input type="text" class="form-control" id="exp_1" placeholder="Kinh nghiệm tính theo năm">
 	</div>
 	<div class="form-group">
@@ -55,12 +59,10 @@
 	</div>
 	<div class="form-group">
 		<label for="name">Thông tin thêm</label>
-		{{-- <input type="text" id="description"> --}}
-
 		<input type="text" class="form-control description-1" id="err-description" placeholder="Thông tin thêm" >
 	</div>
 	<div class="center-block">
-		<a href="#" class="btn btn-success" id="addTeacher">Thêm</a>
+		<a class="btn btn-success" id="btnAddTeacher">Thêm</a>
 		<a href="{{asset('teacher/list')}}" class="btn btn-danger">Hủy</a>
 	</div>
 
@@ -68,5 +70,7 @@
 
 @endsection 
 @section('footer')
-{{-- <script src="{{ asset('js/teacher.js') }}"></script> --}}
+ <script>
+ 	$('SELECT.select2[id="nationality"]').select2();
+ </script>
 @endsection

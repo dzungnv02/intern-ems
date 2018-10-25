@@ -215,7 +215,7 @@
 </div>
 <!-- ./wrapper -->
 <!-- jQuery 3 -->
-<script src="{{asset('admin/js/jquery.min.js')}}"></script>
+{{--  <script src="{{asset('admin/js/jquery.min.js')}}"></script>  --}}
 {{-- momentjs --}}
 <script>
   var asset = "{{asset('')}}";

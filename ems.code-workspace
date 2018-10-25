@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "/Users/dungnv/projects/docker/Laravel Docker"
+		},
+		{
+			"path": "/Users/dungnv/projects/AdminLTE-2.4.5"
+		}
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true
+	}
+}

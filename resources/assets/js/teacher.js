@@ -1,240 +1,201 @@
 $(function () {
-     // $('.text-danger').css('display', 'none');
-     $('#list-teacher').DataTable();
-     $('.btn-danger').click(function(){
-        swal({
-            title: "Bạn có chắc muốn xóa?",
-            text: "Bạn sẽ không thể khôi phục lại bản ghi này!",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-        })
-        .then((willDelete) => {
-            if (willDelete) {
-                alert('ok')
-            }else{
-                toastr.warning('Bạn đã hủy!');
-            }
-        });
-    })
-    // $('.text-danger').css('display', 'none');
-    $('.btn-success').click(function(event) {
-        /* Act on the event */
-        var name = $("#name").val();
-        var email = $("#email").val();
-        var address= $("#address").val();
-        var mobile = $("#mobile").val();
-        var birthday = $("#birthday").val();
-        var exp = $("#exp").val();
-        var certificate = $("#certificate").val();
-        var description = $("#description").val();
-        if(name == ""){
-            $('#err-name').css('display','block');
-        }else{
-            $('#err-name').css('display','none');
-        }
-        if(email == ""){
-            $('#err-email').css('display','block');
-        }else{
-            $('#err-email').css('display','none');
-        }
-        if(address == ""){
-            $('#err-address').css('display','block');
-        }else{
-            $('#err-address').css('display','none');
-        }
-        if(mobile == ""){
-            $('#err-mobile').css('display','block');
-        }else{
-            $('#err-mobile').css('display','none');
-        }
-        if(birthday == ""){
-            $('#err-birthday').css('display','block');
-        }else{
-            $('#err-birthday').css('display','none');
-        }
-        if(exp == ""){
-            $('#err-exp').css('display','block');
-        }else{
-            $('#err-exp').css('display','none');
-        }
-        if(certificate == ""){
-            $('#err-certifidate').css('display','block');
-        }else{
-            $('#err-certifidate').css('display','none');
-        }
-        if(description == ""){
-            $('#err-description_1').css('display','block');
-        }else{
-            $('#err-description_1').css('display','none');
-        }
-    })
-    /**
-     * add teacher
-     */
-     $('#addTeacher').click(function(event) {
-        /1* Act on the event */
-        var name = $('#name').val();
-        var email = $('#email').val();
-        var address = $('#address').val();
-        var mobile = $('#mobile').val();
-        var birthDate = $('#birthday').val();
-        var gender = $('#gender').val();
-        var exp = $('#exp_1').val();
-        var certificate = $('#certificate').val();
-        var description = $('#err-description').val();
-        if ( name != "" && email != "" && address !="" 
-            && mobile != "" && birthDate != "" && gender != ""
-            && exp !="" && certificate !="" && certificate !="") {
-            var formData = new FormData();
-        formData.append("name", name);
-        formData.append("email", email);
-        formData.append("address", address);
-        formData.append("mobile", mobile);
-        formData.append("birthDate", birthDate);
-        formData.append("gender", gender);
-        formData.append("exp", exp);
-        formData.append("certificate", certificate);
-        formData.append('description', description);
-        $.ajax({
-            url: 'api/add-teacher',
-            type: 'POST',
-            contentType: false,
-            processData: false,
-            data: formData,
-            success: function(response) {
-                alert(response.message);
-                location.reload();
-            },
-            error: function(response) {
-                alert("error");
-            }
-        })
-    }
-});
 
-    /**
-     * get list teacher
-     */
-     $('#list-teacher-1').DataTable( {
-        "ajax": 'api/list-teachers',
-        "responsive": true,
-        "columns": [
-        { "data": null },
-        { "data": "name" },
-        { "data": "address" },
-        { "data": "mobile"},
-        { "data": "birthdate" },
-        { "data": "nationality" },
-        { "data": "description" },
-        { "data": null }
-        ],
-        "columnDefs": [ ],
-        "order": [[ 1, 'asc' ]],
-        "columnDefs": [ {
-            // "order": [[ 1, 'asc' ]],
-            "searchable": false,
-            "orderable": false,
-            "targets": 0
-        } ,{
-            "targets": -1,
-            "data": null,
-            "defaultContent": `
-            <a title="sửa thông tin" href="${asset}/teacher-edit" class="btn btn-warning edit-teacher" id="edit-go" 
-            onclick="{
-                var table = $('#list-teacher-1').DataTable();
-                var data = table.row($(this).closest('tr')).data();
-                localStorage.setItem('id', data.id);
-            }">
-            <i class="fa fa-pencil" aria-hidden="true"></i>
-            </a>
-            <button title="xóa giao vien" class="btn btn-danger" onclick="{
-                var table = $('#list-teacher-1').DataTable();
-                var id = table.row($(this).closest('tr')).data().id;
-                _delete(id);
-            }" id="delete"><i class="fa fa-trash" aria-hidden="true"></i></button>
-            `
-        } ]
-    });
-     var t = $('#list-teacher-1').DataTable()
-     t.on( 'order.dt search.dt', function () {
-        t.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-            cell.innerHTML = i+1;
-        } );
-    } ).draw();
- });
- /**
-     *  edit teacher
-     */
-     $('#edit-teacher').click(function(event) {
-        /* Act on the event */
-        var id  = localStorage.getItem('id');
-        var name  = $('#name').val();
-        var address  = $('#address').val();
-        var mobile = $('#mobile').val();
-        var birthDate  = $('#birthday').val();
-        var exp = $('#exp').val();
-        var certifycate = $('#certifycate').val();
-        var description  = $('#err-description').val();
-        if (name != "" && address !="" && mobile !="" && birthDate
-            && exp != "" && certifycate !="" && description !=""  && id !=""
-            ) {
-            var formData = new FormData();
-        formData.append('id', id)
-        formData.append("name", name);
-        formData.append("address", address);
-        formData.append("mobile", mobile);
-        formData.append("birthDate", birthDate);
-        formData.append("exp", exp);
-        formData.append("certifycate", certifycate);
-        formData.append("description", description);
-        $.ajax({
-            url: 'api/edit-teacher',
-            type: "POST",
-            contentType: false, 
-            processData: false,
-            data: formData,
-            success: function(response){
-                alert(response.message);
-                location.reload();
+    var table_teachers = $('TABLE#teacher-list');
+    var table = null;
+
+    var getTeacherList = (mode) => {
+        var url = '/api/list-teachers';
+        $.ajax(url, {
+            method: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                var list = response.data;
+                if (mode == 'load') {
+                    renderTeacherList(list);
+                } else if (mode == 'reload') {
+                    table.ajax.data(list);
+                    table.draw();
+                }
             },
-            error: function(){
-                alert("can not edit teacher info !!");
-            }
         });
     }
-});
-     window._delete=function(id){
-        if (id !="") {
-            var formData = new FormData();
-            formData.append('id', id);
-            swal({
-                title: "Bạn có chắc muốn xóa?",
-                text: "Bạn sẽ không thể khôi phục lại bản ghi này!",
-                icon: "warning",
-                buttons: true,
-                dangerMode: true,
-            })
-            .then((willDelete, data) => {
-                if (willDelete) {
-                    $.ajax({
-                        url: '/api/delete-teacher',
-                        type: 'POST',
-                        contentType: false, 
-                        processData: false,
-                        data: formData,
-                        success: function (response) {
-                            alert(response.message);
-                            location.reload();
-                        },
-                        error: function (response) {
-                            toastr.warning("can not delete teacher !!");
+
+    var renderTeacherList = (list) => {
+        table = $('TABLE#teacher-list').DataTable({
+            data: list,
+            columns: [{
+                    data: null
+                },
+                {
+                    data: 'name'
+                },
+                {
+                    data: 'email'
+                },
+                {
+                    data: 'mobile'
+                },
+                {
+                    data: 'address'
+                },
+                {
+                    data: 'nationality'
+                },
+                {
+                    data: null
+                }
+            ],
+            "columnDefs": [{
+                "targets": -1,
+                "data": null,
+                "defaultContent": '<a class="edit">Edit</a>&nbsp;&nbsp;<a class="delete">Delete</a>'
+            }]
+        });
+
+        table.on('order.dt search.dt', function () {
+            table.column(0, {
+                search: 'applied',
+                order: 'applied'
+            }).nodes().each(function (cell, i) {
+                cell.innerHTML = i + 1;
+            });
+        }).draw();
+
+        table.on('click', 'a.delete', function () {
+            var data = table.row($(this).parents('tr')).data();
+            alert(data.name + " is deleted!");
+        });
+
+        table.on('click', 'a.edit', function () {
+            var data = table.row($(this).parents('tr')).data();
+            $('FORM#frmTeacher INPUT#id').val(data.id);
+            showTeacherModal('edit');
+        });
+    };
+
+    var getCountries = () => {
+        var nationality = $('SELECT.select2[id="nationality"]');
+        $.ajax('/api/countries', {
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (response) {
+                if (response.code == 1) {
+                    if (response.data != undefined) {
+
+                        for (var n in response.data) {
+                            var national = response.data[n];
+                            var opt = $('<option></option>', {
+                                value: national.name,
+                                text: national.name
+                            });
+                            $(nationality).append(opt);
                         }
-                    });
+
+                        $($(nationality).find('OPTION')[0]).attr('selected', 'selected');
+                    }
                 }
-                else{
-                    toastr.warning('Bạn đã hủy!');
+
+            }
+        });
+    };
+
+    var getTeacher = (id, callback) => {
+        var url = '/api/get-teacher/?id=' + id;
+        $.ajax(url, {
+            method: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                if (response.code == 1) {
+                    var teacher = response.data[0];
+                    console.log(teacher);
+                    $('DIV#modal-teacher-form FORM INPUT#crm_id').val(teacher.crm_id);
+                    $('DIV#modal-teacher-form FORM INPUT#name').val(teacher.name);
+                    $('DIV#modal-teacher-form FORM SELECT#nationality').val(teacher.nationality).change();
+                    $('DIV#modal-teacher-form FORM INPUT#email').val(teacher.email);
+                    $('DIV#modal-teacher-form FORM INPUT#address').val(teacher.address);
+                    $('DIV#modal-teacher-form FORM INPUT#mobile').val(teacher.mobile);
+                    $('DIV#modal-teacher-form FORM INPUT#birthdate').val(teacher.birthdate);
+                    $('DIV#modal-teacher-form FORM SELECT#gender').val(teacher.gender).change();
+                    $('DIV#modal-teacher-form FORM INPUT#experience').val(teacher.experience);
+                    $('DIV#modal-teacher-form FORM INPUT#certificate').val(teacher.certificate);
+                    $('DIV#modal-teacher-form FORM TEXTAREA#description').html(teacher.description);
+                    callback();
                 }
-            })
-        }
+            },
+        });
     }
+
+    var save = (mode) => {
+        var data = {
+            'id': $('FORM#frmTeacher INPUT#id').val().trim(),
+            'crm_id': $('FORM#frmTeacher INPUT#crm_id').val().trim(),
+            'name': $('FORM#frmTeacher INPUT#name').val().trim(),
+            'nationality': $('FORM#frmTeacher SELECT#nationality').val().trim(),
+            'email': $('FORM#frmTeacher INPUT#email').val().trim(),
+            'address': $('FORM#frmTeacher INPUT#address').val().trim(),
+            'mobile': $('FORM#frmTeacher INPUT#mobile').val().trim(),
+            'birthdate': $('FORM#frmTeacher INPUT#birthdate').val().trim(),
+            'gender': $('FORM#frmTeacher SELECT#gender').val().trim(),
+            'experience': $('FORM#frmTeacher INPUT#experience').val().trim(),
+            'certificate': $('FORM#frmTeacher INPUT#certificate').val().trim(),
+            'description': $('FORM#frmTeacher TEXTAREA#description').val().trim(),
+        };
+
+        var url = mode == 'new' ? '/api/add-teacher' : '/api/edit-teacher';
+
+        $.ajax(url, {
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function (response) {
+                if (response.code == 1) {
+                    $('DIV#modal-teacher-form').modal('hide');
+                    getTeacherList('reload');
+                }
+
+            }
+        });
+
+    }
+
+    var showTeacherModal = (mode) => {
+
+        if (mode == 'new') {
+            $('DIV#modal-teacher-form DIV.modal-header H2.modal-title').text('Thêm giáo viên');
+            $('DIV#modal-teacher-form FORM')[0].reset();
+            $('DIV#modal-teacher-form').modal('show');
+        } else if (mode == 'edit') {
+            $('DIV#modal-teacher-form DIV.modal-header H2.modal-title').text('Thay đổi thông tin giáo viên');
+            getTeacher($('FORM#frmTeacher INPUT#id').val().trim(), () => {
+                $('DIV#modal-teacher-form').modal('show');
+            });
+        }
+    };
+
+    if (table_teachers.length > 0) {
+        getTeacherList('load');
+
+        $('#btnOpenModalTeacher').on('click', (e) => {
+            showTeacherModal('new');
+            e.preventDefault();
+        });
+
+        $('#modal-teacher-form').on('show.bs.modal', () => {
+
+        });
+    }
+
+    if ($('FORM#frmTeacher').length > 0) {
+        getCountries();
+
+        $('FORM#frmTeacher input#birthdate').datetimepicker({
+            format: 'Y-m-d'
+        });
+
+        $('DIV#modal-teacher-form DIV.modal-footer BUTTON#btnSave').on('click', (e) => {
+            var mode = $('FORM#frmTeacher INPUT#id').val().trim() !== '' ? 'edit' : 'new';
+            save(mode);
+        });
+    }
+
+});
