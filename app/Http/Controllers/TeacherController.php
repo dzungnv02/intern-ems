@@ -58,6 +58,7 @@ class TeacherController extends Controller
                 'experience' => $request->experience,
                 'certificate' => $request->certificate,
                 'gender' => $request->gender,
+                'created_by' => $request->logged_user->id,
                 'created_at' => date("Y-m-d H:i:s"),
             );
 
@@ -80,6 +81,8 @@ class TeacherController extends Controller
                 foreach ($crm_mapping as $key => $field) {
                     if ($key == 'EMS_ID') {
                         $crm_data['data'][0][$key] = '' . $id;
+                    } else if ($key == 'EMS_SYNC_TIME') {
+                        $crm_data['data'][0][$key] = date('Y-m-d H:i:s');
                     } else if ($field != '') {
                         $crm_data['data'][0][$key] = $data[$field];
                     } else {
@@ -177,7 +180,9 @@ class TeacherController extends Controller
 
             foreach ($crm_mapping as $key => $field) {
                 if ($key == 'EMS_ID') {
-                    $crm_data['data'][0][$key] = '' . $data['id'];
+                    $crm_data['data'][0][$key] = '' . $id;
+                } else if ($key == 'EMS_SYNC_TIME') {
+                    $crm_data['data'][0][$key] = date('Y-m-d H:i:s');
                 } else if ($field != '') {
                     $crm_data['data'][0][$key] = $data[$field];
                 } else {

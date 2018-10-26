@@ -8,6 +8,10 @@
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.7 -->
   <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta name="user-id" content="{{ Auth::user()->id }}">
+  <meta name="user-name" content="{{ Auth::user()->name }}">
+  <meta name="user-email" content="{{ Auth::user()->email }}">
+  <meta name="user-branch_id" content="{{ Auth::user()->branch_id }}">
   <link rel="stylesheet" href="{{asset('admin/bootstrap/css/bootstrap.min.css')}}">
   <!-- Font Awesome -->
   <link rel="stylesheet" href="{{ asset('admin/font-awesome/css/font-awesome.min.css') }}">

@@ -51,7 +51,7 @@ class ZohoCrmConnect
     {
         $records = [];
         if ($module !== '') {
-            $uri = '/crm/v2/' . $module;
+            $uri = '/crm/v2/' . $module . '?page=%d&per_page=%d';
             $access_token = $this->getAccessToken();
 
             $options = [
@@ -61,14 +61,30 @@ class ZohoCrmConnect
                 ],
             ];
 
-            $response = $this->zoho_crm_client->request('GET', $uri, $options);
-            if ($response->getStatusCode() == 200) {
-                $data = json_decode($response->getBody());
-                $records = $data->data;
-                return $records;
-            } else {
-                return false;
-            }
+            $rec_per_page = 100;
+            $page = 1;
+            $record_count = $rec_per_page;
+
+            while($record_count <= $rec_per_page && $record_count > 0) {
+                $endpoint = sprintf($uri, $page, $rec_per_page);
+                
+                $response = $this->zoho_crm_client->request('GET', $endpoint, $options);
+                $page++;
+
+                if ($response->getStatusCode() == 200) {
+                    $data = json_decode($response->getBody());
+                    $record_count = isset($data->data) ? count($data->data) : 0;
+                    $records = $record_count > 0 ? array_merge($records, $data->data) : $records;
+                }
+                else if ($response->getStatusCode() == 204){
+                    break;
+                }
+                else {
+                    return false;
+                }
+            } 
+
+            return $records;
         } else {
             return false;
         }

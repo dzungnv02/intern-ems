@@ -30,7 +30,8 @@ return [
             'Phone' => 'mobile',
             'Record_Image' => '',
             'Tag' => '',
-            'EMS_ID' => 'id'
+            'EMS_ID' => 'id',
+            'EMS_SYNC_TIME' => ''
         ]
     ]
 ];
