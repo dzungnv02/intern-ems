@@ -23,6 +23,20 @@ $(function () {
     var renderTeacherList = (list) => {
         table = $('TABLE#teacher-list').DataTable({
             data: list,
+            language: {
+                "paginate": {
+                  "previous": "Trước",
+                  "next": "Sau",
+                  "first": "Đầu tiên",
+                  "last": "Cuối cùng"
+                },
+                "emptyTable" : "Không có bản ghi nào!",
+                "info" : "Hiển thị từ _START_ đến _END_ trong tổng số _TOTAL_ bản ghi",
+                "infoEmpty": "Hiển thị 0 bản ghi",
+                "search": "Tìm kiếm:",
+                "zeroRecords": "Không tìm thấy bản ghi nào phù hợp!",
+                "lengthMenu":     "Hiển thị _MENU_ bản ghi"
+            },
             columns: [{
                     data: null
                 },
@@ -48,7 +62,7 @@ $(function () {
             "columnDefs": [{
                 "targets": -1,
                 "data": null,
-                "defaultContent": '<a class="edit">Edit</a>&nbsp;&nbsp;<a class="delete">Delete</a>'
+                "defaultContent": '<a class="edit">Sửa</a>&nbsp;&nbsp;<a class="delete">Xoá</a>'
             }]
         });
 
@@ -85,8 +99,8 @@ $(function () {
                         for (var n in response.data) {
                             var national = response.data[n];
                             var opt = $('<option></option>', {
-                                value: national.name,
-                                text: national.name
+                                value: national.citizenship,
+                                text: national.citizenship
                             });
                             $(nationality).append(opt);
                         }

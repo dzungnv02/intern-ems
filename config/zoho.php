@@ -26,7 +26,7 @@ return [
             'Qu_c_t_ch' => 'nationality',
             'i_n_tho_i_kh_c' => '',
             'Name' => 'name',
-            'Tr_nh' => '',
+            'Tr_nh' => 'certificate',
             'Phone' => 'mobile',
             'Record_Image' => '',
             'Tag' => '',

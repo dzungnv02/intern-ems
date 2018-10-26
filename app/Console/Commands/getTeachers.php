@@ -72,6 +72,7 @@ class getTeachers extends Command
                             'email' => $teacher->Email,
                             'nationality' => $teacher->Qu_c_t_ch,
                             'mobile' => $teacher->Phone,
+                            'certificate' => $teacher->Tr_nh,
                             'created_by' => $teacher->Owner->name,
                             'created_at' => $now,
                             'crm_id' => $teacher->id,
@@ -97,6 +98,7 @@ class getTeachers extends Command
                         $old_teacher->email = $teacher->Email;
                         $old_teacher->nationality = $teacher->Qu_c_t_ch;
                         $old_teacher->mobile = $teacher->Phone;
+                        $old_teacher->certificate = $teacher->Tr_nh;
                         $old_teacher->updated_at = $now;
                         $old_teacher->crm_id = $teacher->id;
                         $old_teacher->update();

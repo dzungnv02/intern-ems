@@ -162,7 +162,9 @@ class TeacherController extends Controller
             $teacher->birthdate = $data['birthdate'];
             $teacher->description = $data['description'];
             $teacher->experience = $data['experience'];
+            $teacher->certificate = $data['certificate'];
             $teacher->gender = $data['gender'];
+            
             $teacher->updated_at = $data['updated_at'];
             $teacher->update();
 
@@ -180,7 +182,7 @@ class TeacherController extends Controller
 
             foreach ($crm_mapping as $key => $field) {
                 if ($key == 'EMS_ID') {
-                    $crm_data['data'][0][$key] = '' . $id;
+                    $crm_data['data'][0][$key] = '' . $data['id'];
                 } else if ($key == 'EMS_SYNC_TIME') {
                     $crm_data['data'][0][$key] = date('Y-m-d H:i:s');
                 } else if ($field != '') {

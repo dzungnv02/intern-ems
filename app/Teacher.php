@@ -21,7 +21,8 @@ class Teacher extends Model
     public static function search($keyword, $record, $page = 1)
     {
         $start = ($page - 1) * $record;
-        $search = Teacher::orderBy('id', 'desc')->where('name', 'like', '%' . $keyword . '%')
+        $search = Teacher::orderBy('id', 'desc')->where('del_flg', 0)
+            ->orwhere('name', 'like', '%' . $keyword . '%')
             ->orwhere('birthdate', 'like', '%' . $keyword . '%')
             ->orwhere('experience', 'like', '%' . $keyword . '%')
             ->orwhere('address', 'like', '%' . $keyword . '%')
@@ -29,8 +30,8 @@ class Teacher extends Model
             ->orwhere('email', 'like', '%' . $keyword . '%')
             ->orwhere('nationality', 'like', '%' . $keyword . '%')
             ->orwhere('certificate', 'like', '%' . $keyword . '%')
-            ->orwhere('description', 'like', '%' . $keyword . '%')
-            ->offset($start)->limit($record)->get();
+            ->orwhere('description', 'like', '%' . $keyword . '%')->get();
+            //->offset($start)->limit($record)->get();
         return $search;
     }
 
