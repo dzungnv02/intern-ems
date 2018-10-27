@@ -12751,7 +12751,9 @@ $(function () {
                 if (mode == 'load') {
                     renderTeacherList(list);
                 } else if (mode == 'reload') {
-                    table.ajax.data(list);
+                    console.log(mode);
+                    table.clear();
+                    table.rows.add(list);
                     table.draw();
                 }
             }
@@ -12808,7 +12810,11 @@ $(function () {
 
         table.on('click', 'a.delete', function () {
             var data = table.row($(this).parents('tr')).data();
-            alert(data.name + " is deleted!");
+            modalConfirm(function (confirm) {
+                if (confirm) {
+                    del(data.id);
+                }
+            }, 'Bạn có muốn xoá giáo viên <strong>' + data.name + '</strong> không?');
         });
 
         table.on('click', 'a.edit', function () {
@@ -12900,6 +12906,18 @@ $(function () {
         });
     };
 
+    var del = function del(id) {
+        var url = '/api/delete-teacher';
+        $.ajax(url, {
+            method: 'POST',
+            dataType: 'json',
+            data: { "id": id },
+            success: function success(response) {
+                getTeacherList('reload');
+            }
+        });
+    };
+
     var showTeacherModal = function showTeacherModal(mode) {
 
         if (mode == 'new') {
@@ -12922,7 +12940,22 @@ $(function () {
             e.preventDefault();
         });
 
-        $('#modal-teacher-form').on('show.bs.modal', function () {});
+        var modalConfirm = function modalConfirm(callback, message) {
+            if (message != undefined) {
+                $("#confirm-delete DIV.modal-header H5.modal-title").html(message);
+            }
+            $("#confirm-delete").modal('show');
+
+            $("#modal-btn-yes").unbind('click').bind("click", function () {
+                callback(true);
+                $("#confirm-delete").modal('hide');
+            });
+
+            $("#modal-btn-no").unbind('click').bind("click", function () {
+                callback(false);
+                $("#confirm-delete").modal('hide');
+            });
+        };
     }
 
     if ($('FORM#frmTeacher').length > 0) {

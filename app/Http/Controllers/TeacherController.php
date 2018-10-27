@@ -164,7 +164,7 @@ class TeacherController extends Controller
             $teacher->experience = $data['experience'];
             $teacher->certificate = $data['certificate'];
             $teacher->gender = $data['gender'];
-            
+
             $teacher->updated_at = $data['updated_at'];
             $teacher->update();
 
@@ -193,7 +193,6 @@ class TeacherController extends Controller
             }
 
             $result = $zoho_crm->upsertRecord($crm_module, $crm_data);
-           
 
             return response()->json(['code' => 1, 'message' => 'Sua thanh cong', 'data' => $result], 200);
         } catch (Exception $e) {
@@ -208,19 +207,21 @@ class TeacherController extends Controller
      */
     public function deleteTeacher(Request $request)
     {
-        $teacher_id = $request->id;
-        if ($teacher_id) {
-            if (Teacher::find($teacher_id) == null) {
-                return response()->json(['code' => 0, 'message' => 'khong ton tai nhan vien nay'], 200);
-            } else {
-                Teacher::deleteTeacher($teacher_id);
+        try {
+            $teacher_id = $request->id;
+            if ($teacher_id) {
+                $teacher = Teacher::find($teacher_id);
+                if ($teacher == null) {
+                    return response()->json(['code' => 0, 'message' => 'Giao vien khong ton tai!'], 200);
+                }
+
+                $teacher->del_flg = 1;
+                $teacher->update();
                 return response()->json(['code' => 1, 'message' => 'Xoa thanh cong'], 200);
             }
+        } catch (Exception $e) {
+            return response()->json(['code' => 0, 'message' => $e->getMessage()], 200);
         }
-    }
-
-    private function insertZohoCem($data)
-    {
 
     }
 }

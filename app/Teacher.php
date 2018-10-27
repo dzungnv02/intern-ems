@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Teacher extends Model
 {
     protected $table = 'teachers';
-    protected $fillable = ['name', 'birthdate', 'mobile', 'email', 'address', 'experience', 'certificate', 'description', 'nationality'];
+    protected $fillable = ['name', 'del_flg','birthdate', 'mobile', 'email', 'address', 'experience', 'certificate', 'description', 'nationality'];
 
     /**
 
@@ -21,16 +21,20 @@ class Teacher extends Model
     public static function search($keyword, $record, $page = 1)
     {
         $start = ($page - 1) * $record;
-        $search = Teacher::orderBy('id', 'desc')->where('del_flg', 0)
-            ->orwhere('name', 'like', '%' . $keyword . '%')
-            ->orwhere('birthdate', 'like', '%' . $keyword . '%')
-            ->orwhere('experience', 'like', '%' . $keyword . '%')
-            ->orwhere('address', 'like', '%' . $keyword . '%')
-            ->orwhere('mobile', 'like', '%' . $keyword . '%')
-            ->orwhere('email', 'like', '%' . $keyword . '%')
-            ->orwhere('nationality', 'like', '%' . $keyword . '%')
-            ->orwhere('certificate', 'like', '%' . $keyword . '%')
-            ->orwhere('description', 'like', '%' . $keyword . '%')->get();
+        $search = Teacher::orderBy('id', 'desc')
+            ->where('del_flg', '=', 0)
+            ->where(function ($query) use ($keyword){
+                $query->where('name', 'like', '%' . $keyword . '%')
+                ->orwhere('birthdate', 'like', '%' . $keyword . '%')
+                ->orwhere('experience', 'like', '%' . $keyword . '%')
+                ->orwhere('address', 'like', '%' . $keyword . '%')
+                ->orwhere('mobile', 'like', '%' . $keyword . '%')
+                ->orwhere('email', 'like', '%' . $keyword . '%')
+                ->orwhere('nationality', 'like', '%' . $keyword . '%')
+                ->orwhere('certificate', 'like', '%' . $keyword . '%')
+                ->orwhere('description', 'like', '%' . $keyword . '%');
+            })->get();
+           
             //->offset($start)->limit($record)->get();
         return $search;
     }

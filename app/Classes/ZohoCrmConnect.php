@@ -65,9 +65,9 @@ class ZohoCrmConnect
             $page = 1;
             $record_count = $rec_per_page;
 
-            while($record_count <= $rec_per_page && $record_count > 0) {
+            while ($record_count <= $rec_per_page && $record_count > 0) {
                 $endpoint = sprintf($uri, $page, $rec_per_page);
-                
+
                 $response = $this->zoho_crm_client->request('GET', $endpoint, $options);
                 $page++;
 
@@ -75,14 +75,12 @@ class ZohoCrmConnect
                     $data = json_decode($response->getBody());
                     $record_count = isset($data->data) ? count($data->data) : 0;
                     $records = $record_count > 0 ? array_merge($records, $data->data) : $records;
-                }
-                else if ($response->getStatusCode() == 204){
+                } else if ($response->getStatusCode() == 204) {
                     break;
-                }
-                else {
+                } else {
                     return false;
                 }
-            } 
+            }
 
             return $records;
         } else {
@@ -184,7 +182,7 @@ class ZohoCrmConnect
                 if ($response->getStatusCode() == 201) {
                     $data = json_decode($response->getBody());
                     $record = $data->data[0];
-                    Log::info('RESULT - ' .var_export(json_encode($data), true));
+                    Log::info('RESULT - ' . var_export(json_encode($data), true));
                     return $record;
                 } else {
                     return false;
@@ -192,6 +190,35 @@ class ZohoCrmConnect
             } else {
                 return false;
             }
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return false;
+        }
+    }
+
+    public function deleteRecord($module, $IDs = [])
+    {
+        try {
+            if ($module !== '' && is_array($IDs)) {
+                $params = '?ids=';
+                if (count($IDs)) {
+                    $params .= implode(',',$IDs);
+                }
+                $uri = '/crm/v2/' . $module . $params;
+                $access_token = $this->getAccessToken();
+
+                $options = [
+                    'http_errors' => true,
+                    'json' => $data,
+                    'headers' => [
+                        'Authorization' => 'Zoho-oauthtoken ' . $access_token->access_token,
+                    ],
+                ];
+
+                $response = $this->zoho_crm_client->request('DELETE', $uri, $options);
+                return $response->getStatusCode();
+            }
+
         } catch (Exception $e) {
             Log::error($e->getMessage());
             return false;

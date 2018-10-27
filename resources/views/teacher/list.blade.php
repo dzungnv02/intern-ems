@@ -29,6 +29,20 @@
 	</div>
 	@endsection
 	@section('footer')
+	<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="confirm-delete">
+		<div class="modal-dialog modal-sm"  style="width:400px">
+			<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h5 class="modal-title" id="myModalLabel">Bạn có muốn xoá giáo viên %s không?</h5>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" id="modal-btn-yes">Có</button>
+				<button type="button" class="btn btn-primary" id="modal-btn-no">Không</button>
+			</div>
+			</div>
+		</div>
+	</div>
 
 	<div class="modal fade" id="modal-teacher-form" role="dialog" aria-hidden="true">
 		<div class="modal-dialog" role="document" style="width:800px">
@@ -146,6 +160,8 @@
 			</div>
 		</div>
 		</div>
+	
+	
 	<script>
 		var base_url = "{{ url('/') }}/";
 		$('SELECT.select2[id="nationality"]').select2();
