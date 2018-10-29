@@ -28,6 +28,21 @@ class ZohoCrmConnect
 
     public function getAccessToken()
     {
+        $session_file_path = config('zoho.ZOHO_SESSION_FILE');
+        $fsize = file_exists($session_file_path) ? filesize($session_file_path) : 0;
+
+        $f_handle = fopen($session_file_path, 'r');
+        $content = fgets($f_handle);
+        fclose($f_handle);
+
+        $session = strlen($content) > 0 ? json_decode($content) : null;
+
+        $is_expired = $session != null ? (time() >= $session->expired) : true;
+
+        Log::info('SIZE: '. var_export($fsize, true));
+
+        Log::info('SESSION: '. var_export($content, true));
+
         $options = [
             'http_errors' => true,
             'query' => [
@@ -39,28 +54,49 @@ class ZohoCrmConnect
         ];
 
         try {
-            $response = $this->zoho_account_client->request('POST', '/oauth/v2/token', $options);
-            if ($response->getStatusCode() == 200) {
-                $data = json_decode($response->getBody());
-                return $data;
-            } else {
-                $retry = config('zoho.ZOHO_API_GET_ACCESS_TOKEN_RETRY_ATTEMPT');
-                $retry_count = 0;
-                $access_token = false;
+            if ($session == null || $is_expired) {
+                $session = new \stdClass;
 
-                while (($retry_count < $retry) || !$access_token) {
-                    $retry_count ++;
-                    $access_token = $this->getAccessToken();
+                $response = $this->zoho_account_client->request('POST', '/oauth/v2/token', $options);
+                $status_code = $response->getStatusCode();
+                $retry = (int) config('zoho.ZOHO_API_GET_ACCESS_TOKEN_RETRY_ATTEMPT');
+                $retry_count = 0;
+                $obj = null;
+
+                while ($status_code != 200 || $retry_count < $retry) {
+                    $retry_count++;
+                    $response = $this->zoho_account_client->request('POST', '/oauth/v2/token', $options);
+                    $status_code = $response->getStatusCode();
+                    $obj = json_decode($response->getBody());
+                    if ($status_code == 200 && !property_exists($obj, 'error')) {
+                        $retry_count = $retry;
+                    }
+                    
+                    Log::info('Get access token attempt: '. $retry_count. "\n". 'Status code: '. $status_code. "\n". ' - OBJ: ' . var_export($obj, true));
                 }
 
-                return $access_token != NULL ? $access_token : false;
+                $session->access_token = $obj->access_token;
+                $session->expired = time() + $obj->expires_in;
+
+                Log::info('New session '. $session->access_token);
+                Log::info('Expired at '. date('Y-m-d H:i:s', $session->expired));
+
+                $f_handle = fopen($session_file_path, 'w');
+                fwrite($f_handle, json_encode($session));
+                fclose($f_handle);
+
+                return $status_code == 200 ? $obj : false;
             }
-        }
-        catch (Exception $e) {
+            else {
+                Log::info('From session '. $session->access_token);
+                Log::info('Expired at '. date('Y-m-d H:i:s', $session->expired));
+                return $session;
+            }
+        } catch (Exception $e) {
             Log::error($e->getMessage());
             return false;
         }
-        
+
     }
 
     public function getAllRecords($module)
@@ -70,49 +106,47 @@ class ZohoCrmConnect
             if ($module !== '') {
                 $uri = '/crm/v2/' . $module . '?page=%d&per_page=%d';
                 $access_token = $this->getAccessToken();
-                if ($access_token == false) return false;
+                if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
+                    Log::error(var_export($access_token, true));
+                    return false;
+                }
+
                 $options = [
                     'http_errors' => true,
                     'headers' => [
                         'Authorization' => 'Zoho-oauthtoken ' . $access_token->access_token,
                     ],
                 ];
-    
+
                 $rec_per_page = 200;
                 $page = 1;
                 $record_count = $rec_per_page;
-                //echo '$options: ', json_encode($options), "\n";
-    
+
                 while ($record_count <= $rec_per_page && $record_count > 0) {
-                    //echo  "\n", 'Reading page: ', $page, "\n";
                     $endpoint = sprintf($uri, $page, $rec_per_page);
-    
                     $response = $this->zoho_crm_client->request('GET', $endpoint, $options);
                     $page++;
-                    //echo 'Response code: ', $response->getStatusCode() , "\n";
                     if ($response->getStatusCode() == 200) {
                         $data = json_decode($response->getBody());
                         $record_count = isset($data->data) ? count($data->data) : 0;
                         $records = $record_count > 0 ? array_merge($records, $data->data) : $records;
-                        //echo 'Record count: ', $record_count , "\n";
-                        sleep(1);
+                        usleep(500);
                     } else if ($response->getStatusCode() == 204) {
                         break;
                     } else {
                         return false;
                     }
                 }
-    
+
                 return $records;
             } else {
                 return false;
             }
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             Log::error($e->getMessage());
             return false;
         }
-        
+
     }
 
     public function getRecordById($module, $id)
@@ -121,6 +155,10 @@ class ZohoCrmConnect
         if ($module !== '' && $id !== '') {
             $uri = '/crm/v2/' . $module . '/' . $id;
             $access_token = $this->getAccessToken();
+            if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
+                Log::error(var_export($access_token, true));
+                return false;
+            }
 
             $options = [
                 'http_errors' => true,
@@ -192,6 +230,17 @@ class ZohoCrmConnect
                 $uri = '/crm/v2/' . $module;
                 $access_token = $this->getAccessToken();
 
+                if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
+                    Log::error(var_export($access_token, true));
+                    return false;
+                }
+
+                if (count($data['data']) > 100) {
+                    $error = 'data too large';
+                    throw new Exception($error);
+                    return false;
+                }
+
                 $options = [
                     'http_errors' => true,
                     'json' => $data,
@@ -215,7 +264,7 @@ class ZohoCrmConnect
             }
         } catch (Exception $e) {
             Log::error($e->getMessage());
-            Log::debug('DATA: '. var_export($data, TRUE));
+            Log::debug('DATA: ' . var_export($data, true));
             return false;
         }
     }
@@ -226,7 +275,7 @@ class ZohoCrmConnect
             if ($module !== '' && is_array($IDs)) {
                 $params = '?ids=';
                 if (count($IDs)) {
-                    $params .= implode(',',$IDs);
+                    $params .= implode(',', $IDs);
                 }
                 $uri = '/crm/v2/' . $module . $params;
                 $access_token = $this->getAccessToken();

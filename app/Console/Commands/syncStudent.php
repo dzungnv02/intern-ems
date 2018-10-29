@@ -40,6 +40,11 @@ class syncStudent extends Command
      */
     public function handle()
     {
+        $defaultTimeZone = 'Asia/Saigon';
+        if(date_default_timezone_get() != $defaultTimeZone) {
+            date_default_timezone_set($defaultTimeZone);
+        }
+
         $option = $this->option('getlist');
         if ($option) {
             $crm_module = config('zoho.MODULES.ZOHO_MODULE_STUDENTS');
@@ -48,6 +53,10 @@ class syncStudent extends Command
 
             $zoho_crm = new ZohoCrmConnect();
             $list = $zoho_crm->getAllRecords($crm_module);
+            if (!$list) {
+                $this->info('Can not get any record!');
+                exit();
+            }
 
             $update_list = [];
             $insert_list = [];
@@ -97,12 +106,15 @@ class syncStudent extends Command
             }
 
             for ($i = 1; $i <= count($data); $i ++) {
+                $this->info('FROM: '.$data[$i]['data'][0]['id']);
+                $this->info('TO: '.$data[$i]['data'][count($data[$i]['data']) - 1]['id']);
+
                 $zoho_crm->upsertRecord($crm_module, $data[$i]);
-                Log::debug(var_export($data[$i]));
-                sleep(1);
-            } */
+                Log::debug(var_export($data[$i], true));
+                usleep(500);
+            }
             
-            //die();
+            die(); */
 
             if (count($insert_list) > 0) {
                 $data_mapping = [
@@ -144,7 +156,6 @@ class syncStudent extends Command
                     $data['name'] =  is_null($data['name']) ? $student->Deal_Name : $data['name'];
 
                     $id = Student::insert($data);
-                    $this->info('inserted ID: '.$id . ' - NAME: ' . $data['name']);
 
                     array_push($update_sync_status_crm['data'], [
                         'id' => $student->id,
@@ -189,6 +200,7 @@ class syncStudent extends Command
                             $data[$field] = $crm_student->$crm_field;
                         }
                     }
+
                     $old_student = Student::find($crm_student->EMS_ID);
                     if (is_object($old_student)) {
                         foreach($data as $field => $value) {
@@ -211,11 +223,12 @@ class syncStudent extends Command
             $start_offset = 0;
             $total_page = count($update_sync_status_crm['data']) <= $max_record ? 1 : ceil(count($update_sync_status_crm['data'])/$max_record);
             for ($i = 1; $i <= $total_page; $i ++) {
-                $ar = array_slice($update_sync_status_crm['data'], $start_offset, $max_record, true);
+                $ar = array_slice($update_sync_status_crm['data'], $start_offset, $max_record);
                 $data['data'] = $ar;
 
                 $this->info('UPDATE CRM: '. count($data['data']));
-                
+                $this->info('FROM: '.$data['data'][0]['id'] . ' -- TO: '.$data['data'][count($data['data']) - 1]['id']);
+
                 try {
                     $zoho_crm->upsertRecord($crm_module, $data);
                 }

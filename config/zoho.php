@@ -6,6 +6,7 @@ return [
     'ZOHO_APP_CLIENT_ID' => env('ZOHO_CRM_CLIENT_ID', '1000.79WBYRQ5XDKI81127J5K63S6ZRJMZ8'),
     'ZOHO_APP_CLIENT_SECRET' => env('ZOHO_CRM_SECRET', 'e24348d2b3e867e9dfc4b6352cde4caeedbd517a09'),
     'ZOHO_API_GET_ACCESS_TOKEN_RETRY_ATTEMPT' => env('ZOHO_API_GET_ACCESS_TOKEN_RETRY_ATTEMPT', '4'),
+    'ZOHO_SESSION_FILE' => storage_path('framework/sessions') . '/zoho_session',
     'MODULES' => [
             'ZOHO_MODULE_LEADS'=>'Leads',
             'ZOHO_MODULE_PARENTS'=>'Accounts',
