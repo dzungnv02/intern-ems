@@ -175,7 +175,15 @@ class syncStudent extends Command
         }
 
         if (count($update_sync_status_crm['data']) > 0) {
-            $zoho_crm->upsertRecord($crm_module, $update_sync_status_crm);
+            $max_record = 100;
+            $start_offset = 0;
+            $total_page = count($update_sync_status_crm['data']) <= $max_record ? 1 : ceil(count($update_sync_status_crm['data'])/$max_record);
+            for ($i = 1; $i <= $total_page; $i ++) {
+                $data['data'] = array();
+                $data['data'] = array_slice($update_sync_status_crm['data'], $start_offset, $max_record, true);
+                $zoho_crm->upsertRecord($crm_module, $data);
+                $start_offset = $start_offset == 0 ? $max_record : $max_record*$i;
+            }
         }
     }
 }
