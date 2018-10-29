@@ -61,7 +61,7 @@ class ZohoCrmConnect
                 ],
             ];
 
-            $rec_per_page = 100;
+            $rec_per_page = 200;
             $page = 1;
             $record_count = $rec_per_page;
 

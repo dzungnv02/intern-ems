@@ -1,5 +1,6 @@
 $(function () {
     var tableStudent = $('#list-student').DataTable({
+		language: datatable_language,
     	"columnDefs": [ {
             "searchable": false,
             "orderable": false,
@@ -16,10 +17,10 @@ $(function () {
             { data: 'email', name: 'email'},
             { data: 'address', name: 'address'},
             { data: 'mobile', name: 'mobile'},
-            { data: 'birthday', name: 'birthday'},
+            { data: 'birthyear', name: 'birthyear'},
             { data: 'gender', name: 'gender',
             	render : function(data) {
-			        return data == '0' ? 'Nam' : 'Nữ';
+			        return data != null ? ( data == '1' ? 'Nam' : 'Nữ') : '';
 			    }
         	},
             {

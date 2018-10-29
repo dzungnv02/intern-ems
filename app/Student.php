@@ -61,7 +61,19 @@ class Student extends Model
     		],
 		]);
 		return $student;
-	}
+    }
+    
+        /**
+     * Thêm mới một bản ghi.
+     *
+     * @param  array $data
+     * @return void
+     */
+    public static function insert($data)
+    {
+        $id = DB::table('students')->insertGetId($data);
+        return $id;
+    }
 
     /**
      * Hiển thị danh sách các bản ghi.

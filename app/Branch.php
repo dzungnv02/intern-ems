@@ -7,25 +7,39 @@ use Illuminate\Support\Facades\DB;
 
 class Branch extends Model
 {
-    public static function getBranchs() {
+    protected $table = 'branch';
+
+    public static function getBranchs()
+    {
         return DB::table('branch')->select('*')->get()->toArray();
     }
 
-    public static function getBranch($branch_id) {
+    public static function getBranch($branch_id)
+    {
         return DB::table('branch')->select('*')
-        ->where('id', $branch_id)
+            ->where('id', $branch_id)
+            ->get()->toArray();
+    }
+
+    public static function getBranchByCrmId($crm_id)
+    {
+        return DB::table('branch')->select('*')
+        ->where('crm_id', $crm_id)
         ->get()->toArray();
     }
 
-    public static function insertBranch ($ary_data) {
+    public static function insertBranch($ary_data)
+    {
         return DB::table('branch')->insertGetId($ary_data);
     }
 
-    public static function updateBranch ($branch_id, $ary_data) {
+    public static function updateBranch($branch_id, $ary_data)
+    {
         return DB::table('branch')->where('id', $branch_id)->update($ary_data);
     }
 
-    public static function deleteBranch ($branch_id) {
+    public static function deleteBranch($branch_id)
+    {
         return DB::table('branch')->where('id', $branch_id)->delete();
     }
 

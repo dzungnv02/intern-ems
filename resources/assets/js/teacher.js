@@ -25,20 +25,7 @@ $(function () {
     var renderTeacherList = (list) => {
         table = $('TABLE#teacher-list').DataTable({
             data: list,
-            language: {
-                "paginate": {
-                  "previous": "Trước",
-                  "next": "Sau",
-                  "first": "Đầu tiên",
-                  "last": "Cuối cùng"
-                },
-                "emptyTable" : "Không có bản ghi nào!",
-                "info" : "Hiển thị từ _START_ đến _END_ trong tổng số _TOTAL_ bản ghi",
-                "infoEmpty": "Hiển thị 0 bản ghi",
-                "search": "Tìm kiếm:",
-                "zeroRecords": "Không tìm thấy bản ghi nào phù hợp!",
-                "lengthMenu":     "Hiển thị _MENU_ bản ghi"
-            },
+            language: datatable_language,
             columns: [{
                     data: null
                 },
@@ -46,7 +33,11 @@ $(function () {
                     data: 'name'
                 },
                 {
-                    data: 'email'
+                    data: 'email',
+                    render: (data, type, row) => {
+                        console.log(data);
+                        return data != null ? '<a href="mailto:'+data+'">'+data+'</a>' : '';
+                    }
                 },
                 {
                     data: 'mobile'

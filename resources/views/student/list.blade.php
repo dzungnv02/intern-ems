@@ -16,7 +16,7 @@
 					<th data-field="email">Email</th>
 					<th data-field="address">Địa chỉ</th>
 					<th data-field="mobile">Số điện thoại</th>
-					<th data-field="birthday">Ngày sinh</th>
+					<th data-field="birthyear">Năm sinh</th>
 					<th data-field="gender">Giới tính</th>
 					<th>Action</th>
 				</tr>
@@ -28,7 +28,7 @@
 					<th data-field="email">Email</th>
 					<th data-field="address">Địa chỉ</th>
 					<th data-field="mobile">Số điện thoại</th>
-					<th data-field="birthday">Ngày sinh</th>
+					<th data-field="birthyear">Năm sinh</th>
 					<th data-field="gender">Giới tính</th>
 					<th>Action</th>
 				</tr>

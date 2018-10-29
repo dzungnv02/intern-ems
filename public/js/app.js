@@ -10519,6 +10519,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 $(function () {
 	var tableStudent = $('#list-student').DataTable({
+		language: datatable_language,
 		"columnDefs": [{
 			"searchable": false,
 			"orderable": false,
@@ -10529,9 +10530,9 @@ $(function () {
 			url: 'api/get-list-student',
 			dataSrc: 'data'
 		},
-		columns: [{ data: null }, { data: 'name', name: 'name' }, { data: 'email', name: 'email' }, { data: 'address', name: 'address' }, { data: 'mobile', name: 'mobile' }, { data: 'birthday', name: 'birthday' }, { data: 'gender', name: 'gender',
+		columns: [{ data: null }, { data: 'name', name: 'name' }, { data: 'email', name: 'email' }, { data: 'address', name: 'address' }, { data: 'mobile', name: 'mobile' }, { data: 'birthyear', name: 'birthyear' }, { data: 'gender', name: 'gender',
 			render: function render(data) {
-				return data == '0' ? 'Nam' : 'Nữ';
+				return data != null ? data == '1' ? 'Nam' : 'Nữ' : '';
 			}
 		}, {
 			'data': null,
@@ -12763,26 +12764,17 @@ $(function () {
     var renderTeacherList = function renderTeacherList(list) {
         table = $('TABLE#teacher-list').DataTable({
             data: list,
-            language: {
-                "paginate": {
-                    "previous": "Trước",
-                    "next": "Sau",
-                    "first": "Đầu tiên",
-                    "last": "Cuối cùng"
-                },
-                "emptyTable": "Không có bản ghi nào!",
-                "info": "Hiển thị từ _START_ đến _END_ trong tổng số _TOTAL_ bản ghi",
-                "infoEmpty": "Hiển thị 0 bản ghi",
-                "search": "Tìm kiếm:",
-                "zeroRecords": "Không tìm thấy bản ghi nào phù hợp!",
-                "lengthMenu": "Hiển thị _MENU_ bản ghi"
-            },
+            language: datatable_language,
             columns: [{
                 data: null
             }, {
                 data: 'name'
             }, {
-                data: 'email'
+                data: 'email',
+                render: function render(data, type, row) {
+                    console.log(data);
+                    return data != null ? '<a href="mailto:' + data + '">' + data + '</a>' : '';
+                }
             }, {
                 data: 'mobile'
             }, {
@@ -13127,23 +13119,43 @@ $(function () {
 /***/ (function(module, exports) {
 
 $(function () {
-    var tableClass = $('#branch-list').DataTable({
-        "columnDefs": [{
-            "searchable": false,
-            "orderable": false,
-            "targets": 0
-        }],
+    var tableBranch = $('#branch-list').DataTable({
+        language: datatable_language,
         ajax: {
-            url: 'api/branch/list',
-            dataSrc: function dataSrc(json) {
-                var data = [];
-                for (var i = 0; i < json.data.length; i++) {
-                    data[i] = [json.data[i].id, json.data[i].branch_name, json.data[i].address, json.data[i].phone_1, json.data[i].phone_2, json.data[i].email, json.data[i].leader > 0 ? json.data[i].leader : ''];
-                }
-                return data;
+            url: 'api/branch/list'
+        },
+        columns: [{
+            data: null
+        }, {
+            data: 'branch_name'
+        }, {
+            data: 'address'
+        }, {
+            data: 'email',
+            render: function render(data, type, row) {
+                return data != '' ? '<a href="mailto:' + data + '">' + data + '</a>' : '';
             }
-        }
+        }, {
+            data: 'phone_1'
+        }, {
+            data: null
+        }],
+        "columnDefs": [{
+            "targets": -1,
+            "data": null,
+            //"defaultContent": '<a class="edit">Sửa</a>&nbsp;&nbsp;<a class="delete">Xoá</a>'
+            "defaultContent": ''
+        }]
     });
+
+    tableBranch.on('order.dt search.dt', function () {
+        tableBranch.column(0, {
+            search: 'applied',
+            order: 'applied'
+        }).nodes().each(function (cell, i) {
+            cell.innerHTML = i + 1;
+        });
+    }).draw();
 });
 
 /***/ }),

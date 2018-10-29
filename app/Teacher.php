@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Teacher extends Model
 {
     protected $table = 'teachers';
-    protected $fillable = ['name', 'del_flg','birthdate', 'mobile', 'email', 'address', 'experience', 'certificate', 'description', 'nationality'];
+    protected $fillable = ['name', 'del_flg', 'birthdate', 'mobile', 'email', 'address', 'experience', 'certificate', 'description', 'nationality'];
 
     /**
 
@@ -23,19 +23,19 @@ class Teacher extends Model
         $start = ($page - 1) * $record;
         $search = Teacher::orderBy('id', 'desc')
             ->where('del_flg', '=', 0)
-            ->where(function ($query) use ($keyword){
+            ->where(function ($query) use ($keyword) {
                 $query->where('name', 'like', '%' . $keyword . '%')
-                ->orwhere('birthdate', 'like', '%' . $keyword . '%')
-                ->orwhere('experience', 'like', '%' . $keyword . '%')
-                ->orwhere('address', 'like', '%' . $keyword . '%')
-                ->orwhere('mobile', 'like', '%' . $keyword . '%')
-                ->orwhere('email', 'like', '%' . $keyword . '%')
-                ->orwhere('nationality', 'like', '%' . $keyword . '%')
-                ->orwhere('certificate', 'like', '%' . $keyword . '%')
-                ->orwhere('description', 'like', '%' . $keyword . '%');
+                    ->orwhere('birthdate', 'like', '%' . $keyword . '%')
+                    ->orwhere('experience', 'like', '%' . $keyword . '%')
+                    ->orwhere('address', 'like', '%' . $keyword . '%')
+                    ->orwhere('mobile', 'like', '%' . $keyword . '%')
+                    ->orwhere('email', 'like', '%' . $keyword . '%')
+                    ->orwhere('nationality', 'like', '%' . $keyword . '%')
+                    ->orwhere('certificate', 'like', '%' . $keyword . '%')
+                    ->orwhere('description', 'like', '%' . $keyword . '%');
             })->get();
-           
-            //->offset($start)->limit($record)->get();
+
+        //->offset($start)->limit($record)->get();
         return $search;
     }
 
@@ -45,7 +45,7 @@ class Teacher extends Model
         return $result;
     }
 
-    // public static function update($id, $aryData) 
+    // public static function update($id, $aryData)
     // {
     //     return DB::table('teachers')->where('id', $id)->update($aryData);
     // }

@@ -245,6 +245,21 @@
   $(document).ready(function () {
     $('.sidebar-menu').tree();
   })
+
+  var datatable_language = {
+                "paginate": {
+                  "previous": "Trước",
+                  "next": "Sau",
+                  "first": "Đầu tiên",
+                  "last": "Cuối cùng"
+                },
+                "emptyTable" : "Không có bản ghi nào!",
+                "info" : "Hiển thị từ _START_ đến _END_ trong tổng số _TOTAL_ bản ghi",
+                "infoEmpty": "Hiển thị 0 bản ghi",
+                "search": "Tìm kiếm:",
+                "zeroRecords": "Không tìm thấy bản ghi nào phù hợp!",
+                "lengthMenu":     "Hiển thị _MENU_ bản ghi"
+            };
 </script>
 @yield('footer')
 </body>

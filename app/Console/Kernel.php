@@ -13,7 +13,9 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\getTeachers::class
+        Commands\getTeachers::class,
+        Commands\syncBranch::class,
+        Commands\syncStudent::class,
     ];
 
     /**
