@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use \App\Classes\ZohoCrmConnect;
 use \App\Student;
+use Illuminate\Support\Facades\Log;
 
 class syncStudent extends Command
 {
@@ -43,6 +44,8 @@ class syncStudent extends Command
         if ($option) {
             $crm_module = config('zoho.MODULES.ZOHO_MODULE_STUDENTS');
             $crm_mapping = config('zoho.MAPPING.ZOHO_MODULE_STUDENTS');
+            $this->info('Start sync module: '.$crm_module);
+
             $zoho_crm = new ZohoCrmConnect();
             $list = $zoho_crm->getAllRecords($crm_module);
 
@@ -73,6 +76,33 @@ class syncStudent extends Command
                     }
                 }
             }
+
+            $this->info('INSERT LIST: '. count($insert_list));
+            $this->info('UPDATE LIST: '. count($update_list));
+            
+            /* $max_record = 100;
+            $page = 1;
+            $data = [$page => ['data'=>[]]];
+            foreach ($update_list as $crm_student) {
+                if (count($data[$page]['data']) >= $max_record) {
+                    $page++;
+                    $data[$page]['data'] = [];
+                }
+
+                array_push($data[$page]['data'], [
+                    'id' => $crm_student->id,
+                    'EMS_ID' => NULL,
+                    'EMS_SYNC_TIME' => NULL
+                ]);
+            }
+
+            for ($i = 1; $i <= count($data); $i ++) {
+                $zoho_crm->upsertRecord($crm_module, $data[$i]);
+                Log::debug(var_export($data[$i]));
+                sleep(1);
+            } */
+            
+            //die();
 
             if (count($insert_list) > 0) {
                 $data_mapping = [
@@ -179,10 +209,22 @@ class syncStudent extends Command
             $start_offset = 0;
             $total_page = count($update_sync_status_crm['data']) <= $max_record ? 1 : ceil(count($update_sync_status_crm['data'])/$max_record);
             for ($i = 1; $i <= $total_page; $i ++) {
-                $data['data'] = array();
+                $data = ['data' => []];
                 $data['data'] = array_slice($update_sync_status_crm['data'], $start_offset, $max_record, true);
-                $zoho_crm->upsertRecord($crm_module, $data);
+                
+                $this->info('UPDATE CRM: '. count($data['data']));
+                
+                try {
+                    $zoho_crm->upsertRecord($crm_module, $data);
+                }
+                catch (Exception $e) {
+                    Log::error($e->getMessage());
+                    var_dump($data);
+                    break;
+                }
+
                 $start_offset = $start_offset == 0 ? $max_record : $max_record*$i;
+
             }
         }
     }

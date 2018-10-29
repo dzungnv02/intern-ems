@@ -38,54 +38,81 @@ class ZohoCrmConnect
             ],
         ];
 
-        $response = $this->zoho_account_client->request('POST', '/oauth/v2/token', $options);
-        if ($response->getStatusCode() == 200) {
-            $data = json_decode($response->getBody());
-            return $data;
-        } else {
+        try {
+            $response = $this->zoho_account_client->request('POST', '/oauth/v2/token', $options);
+            if ($response->getStatusCode() == 200) {
+                $data = json_decode($response->getBody());
+                return $data;
+            } else {
+                $retry = 4;
+                $retry_count = 0;
+                $access_token = false;
+
+                while (($retry_count < $retry) || !$access_token) {
+                    $retry_count ++;
+                    $access_token = $this->getAccessToken();
+                }
+
+                return $access_token != NULL ? $access_token : false;
+            }
+        }
+        catch (Exception $e) {
+            Log::error($e->getMessage());
             return false;
         }
+        
     }
 
     public function getAllRecords($module)
     {
-        $records = [];
-        if ($module !== '') {
-            $uri = '/crm/v2/' . $module . '?page=%d&per_page=%d';
-            $access_token = $this->getAccessToken();
-
-            $options = [
-                'http_errors' => true,
-                'headers' => [
-                    'Authorization' => 'Zoho-oauthtoken ' . $access_token->access_token,
-                ],
-            ];
-
-            $rec_per_page = 200;
-            $page = 1;
-            $record_count = $rec_per_page;
-
-            while ($record_count <= $rec_per_page && $record_count > 0) {
-                $endpoint = sprintf($uri, $page, $rec_per_page);
-
-                $response = $this->zoho_crm_client->request('GET', $endpoint, $options);
-                $page++;
-
-                if ($response->getStatusCode() == 200) {
-                    $data = json_decode($response->getBody());
-                    $record_count = isset($data->data) ? count($data->data) : 0;
-                    $records = $record_count > 0 ? array_merge($records, $data->data) : $records;
-                } else if ($response->getStatusCode() == 204) {
-                    break;
-                } else {
-                    return false;
+        try {
+            $records = [];
+            if ($module !== '') {
+                $uri = '/crm/v2/' . $module . '?page=%d&per_page=%d';
+                $access_token = $this->getAccessToken();
+                if ($access_token == false) return false;
+                $options = [
+                    'http_errors' => true,
+                    'headers' => [
+                        'Authorization' => 'Zoho-oauthtoken ' . $access_token->access_token,
+                    ],
+                ];
+    
+                $rec_per_page = 200;
+                $page = 1;
+                $record_count = $rec_per_page;
+                //echo '$options: ', json_encode($options), "\n";
+    
+                while ($record_count <= $rec_per_page && $record_count > 0) {
+                    //echo  "\n", 'Reading page: ', $page, "\n";
+                    $endpoint = sprintf($uri, $page, $rec_per_page);
+    
+                    $response = $this->zoho_crm_client->request('GET', $endpoint, $options);
+                    $page++;
+                    //echo 'Response code: ', $response->getStatusCode() , "\n";
+                    if ($response->getStatusCode() == 200) {
+                        $data = json_decode($response->getBody());
+                        $record_count = isset($data->data) ? count($data->data) : 0;
+                        $records = $record_count > 0 ? array_merge($records, $data->data) : $records;
+                        //echo 'Record count: ', $record_count , "\n";
+                        sleep(1);
+                    } else if ($response->getStatusCode() == 204) {
+                        break;
+                    } else {
+                        return false;
+                    }
                 }
+    
+                return $records;
+            } else {
+                return false;
             }
-
-            return $records;
-        } else {
+        }
+        catch (Exception $e) {
+            Log::error($e->getMessage());
             return false;
         }
+        
     }
 
     public function getRecordById($module, $id)
