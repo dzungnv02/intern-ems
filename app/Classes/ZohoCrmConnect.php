@@ -44,7 +44,7 @@ class ZohoCrmConnect
                 $data = json_decode($response->getBody());
                 return $data;
             } else {
-                $retry = 4;
+                $retry = config('zoho.ZOHO_API_GET_ACCESS_TOKEN_RETRY_ATTEMPT');
                 $retry_count = 0;
                 $access_token = false;
 
