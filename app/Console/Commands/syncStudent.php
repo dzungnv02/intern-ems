@@ -205,13 +205,15 @@ class syncStudent extends Command
         }
 
         if (count($update_sync_status_crm['data']) > 0) {
+            $data = ['data' => []];
+
             $max_record = 100;
             $start_offset = 0;
             $total_page = count($update_sync_status_crm['data']) <= $max_record ? 1 : ceil(count($update_sync_status_crm['data'])/$max_record);
             for ($i = 1; $i <= $total_page; $i ++) {
-                $data = ['data' => []];
-                $data['data'] = array_slice($update_sync_status_crm['data'], $start_offset, $max_record, true);
-                
+                $ar = array_slice($update_sync_status_crm['data'], $start_offset, $max_record, true);
+                $data['data'] = $ar;
+
                 $this->info('UPDATE CRM: '. count($data['data']));
                 
                 try {
@@ -219,7 +221,6 @@ class syncStudent extends Command
                 }
                 catch (Exception $e) {
                     Log::error($e->getMessage());
-                    var_dump($data);
                     break;
                 }
 

@@ -200,16 +200,12 @@ class ZohoCrmConnect
                     ],
                 ];
 
-                Log::info(var_export(json_decode(json_encode($data)), true));
                 $method = isset($data['data'][0]['id']) ? 'PUT' : 'POST';
                 $response = $this->zoho_crm_client->request($method, $uri, $options);
-                Log::info('$response->getStatusCode() -> ' . var_export($response->getStatusCode(), true));
-                Log::info('$response->getBody() -> ' . var_export(json_decode($response->getBody()), true));
 
                 if ($response->getStatusCode() == 201) {
                     $data = json_decode($response->getBody());
                     $record = $data->data[0];
-                    Log::info('RESULT - ' . var_export(json_encode($data), true));
                     return $record;
                 } else {
                     return false;
@@ -219,6 +215,7 @@ class ZohoCrmConnect
             }
         } catch (Exception $e) {
             Log::error($e->getMessage());
+            Log::debug('DATA: '. var_export($data, TRUE));
             return false;
         }
     }
