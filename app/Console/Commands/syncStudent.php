@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use \App\Classes\ZohoCrmConnect;
 use \App\Student;
 use \App\Branch;
+use \App\Classes;
 
 class syncStudent extends Command
 {
@@ -15,7 +16,7 @@ class syncStudent extends Command
      *
      * @var string
      */
-    protected $signature = 'zohocrm:student {--getlist} {--syncbranch}';
+    protected $signature = 'zoho:student {--getlist} {--syncbranch} {--syncclass}';
 
     /**
      * The console command description.
@@ -45,6 +46,7 @@ class syncStudent extends Command
         if (date_default_timezone_get() != $defaultTimeZone) {
             date_default_timezone_set($defaultTimeZone);
         }
+        $zoho_crm = new ZohoCrmConnect();
 
         $getlist = $this->option('getlist');
         if ($getlist) {
@@ -52,7 +54,6 @@ class syncStudent extends Command
             $crm_mapping = config('zoho.MAPPING.ZOHO_MODULE_STUDENTS');
             $this->info('Start sync module: ' . $crm_module);
 
-            $zoho_crm = new ZohoCrmConnect();
             $list = $zoho_crm->getAllRecords($crm_module);
             if (!$list) {
                 $this->info('Can not get any record!');
@@ -63,18 +64,6 @@ class syncStudent extends Command
             $insert_list = [];
             $update_ems_by_email = [];
             $update_sync_status_crm = ['data' => []];
-
-            // $data_mapping = [
-            //     'name' => 'H_t_n_con',
-            //     'email' => 'Email',
-            //     'student_code' => 'M_h_c_sinh',
-            //     'birthday' => 'Ng_y_sinh_con',
-            //     'birthyear' => 'N_m_sinh_con',
-            //     'crm_id' => 'id',
-            //     'parent_crm_id' => 'Contact_Name',
-            //     'crm_branch' => 'Owner',
-            //     'created_at' => '',
-            // ];
 
             if (is_array($list) && count($list) > 0) {
                 foreach ($list as $student) {
@@ -126,9 +115,13 @@ class syncStudent extends Command
                     'crm_id' => 'id',
                     'parent_crm_id' => 'Contact_Name',
                     'crm_branch' => 'Owner',
+                    'crm_class' => 'L_p_EMS',
                     'created_at' => '',
                 ];
 
+                
+                Log::info(json_encode($insert_list[0], JSON_UNESCAPED_UNICODE));
+                
                 foreach ($insert_list as $student) {
                     $data = [];
                     $now = date('Y-m-d H:i:s');
@@ -141,9 +134,10 @@ class syncStudent extends Command
                             } else {
                                 $data[$field] = $student->$crm_field;
                             }
-                        } else if ($field == 'crm_branch' || $field == 'parent_crm_id') {
+                        } else if ($field == 'crm_branch' || $field == 'parent_crm_id' || $field == 'crm_class') {
                             $data[$field] = $student->$crm_field != null ? json_encode($student->$crm_field, JSON_UNESCAPED_UNICODE) : $student->$crm_field;
-                        } else {
+                        } 
+                        else {
                             $data[$field] = $student->$crm_field;
                         }
                     }
@@ -185,7 +179,7 @@ class syncStudent extends Command
                             } else {
                                 $data[$field] = $crm_student->$crm_field;
                             }
-                        } else if ($field == 'crm_branch' || $field == 'parent_crm_id') {
+                        } else if ($field == 'crm_branch' || $field == 'parent_crm_id' || $field == 'crm_class') {
                             $data[$field] = json_encode($crm_student->$crm_field, JSON_UNESCAPED_UNICODE);
                         } else {
                             $data[$field] = $crm_student->$crm_field;
@@ -202,6 +196,10 @@ class syncStudent extends Command
                             'id' => $crm_student->id,
                             'EMS_SYNC_TIME' => $now,
                         ]);
+                    }
+                    else {
+                        $data['id'] = $crm_student->EMS_ID;
+                        Student::insert($data);
                     }
                 }
             }
@@ -257,5 +255,9 @@ class syncStudent extends Command
             }
         }
 
+        $syncClass = $this->option('syncclass');
+        if ($syncClass) {
+
+        }
     }
 }

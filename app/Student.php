@@ -62,6 +62,11 @@ class Student extends Model
 		]);
 		return $student;
     }
+
+    public static function getStudentByCrmID ($crm_id) 
+    {
+        return DB::table('students')->select('*')->where('crm_id',$crm_id)->get()->toArray();
+    }
     
         /**
      * Thêm mới một bản ghi.

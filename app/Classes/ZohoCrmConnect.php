@@ -118,8 +118,7 @@ class ZohoCrmConnect
                     ],
                 ];
 
-                //$rec_per_page = config('zoho.ZOHO_API_MAX_RECORDS_PER_PAGE');
-                $rec_per_page = 1;
+                $rec_per_page = config('zoho.ZOHO_API_MAX_RECORDS_PER_PAGE');
                 $page = 1;
                 $record_count = $rec_per_page;
 
@@ -133,12 +132,13 @@ class ZohoCrmConnect
                         $data = json_decode($response->getBody());
                         $record_count = isset($data->data) ? count($data->data) : 0;
                         $records = $record_count > 0 ? array_merge($records, $data->data) : $records;
-                        usleep(250);
+                        usleep(5000);
                     } else if ($response->getStatusCode() == 204) {
                         break;
                     } else {
                         return false;
                     }
+                    //if ($page > 1) break;
                 }
                 return $records;
             } else {
@@ -338,6 +338,37 @@ class ZohoCrmConnect
             }
         } catch (Exception $e) {
             Log::error($e->getMessage());
+            return false;
+        }
+    }
+
+    public function getRelatedList ($module, $id, $related) 
+    {
+        $record = [];
+        if ($module !== '' && $id !== '' && $related != '') {
+            $uri = '/crm/v2/' . $module . '/' . $id . '/'. $related;
+            $access_token = $this->getAccessToken();
+            if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
+                Log::error(var_export($access_token, true));
+                return false;
+            }
+
+            $options = [
+                'http_errors' => true,
+                'headers' => [
+                    'Authorization' => 'Zoho-oauthtoken ' . $access_token->access_token,
+                ],
+            ];
+
+            $response = $this->zoho_crm_client->request('GET', $uri, $options);
+            if ($response->getStatusCode() == 200) {
+                $data = json_decode($response->getBody());
+                $records = $data->data;
+                return $records;
+            } else {
+                return false;
+            }
+        } else {
             return false;
         }
     }
