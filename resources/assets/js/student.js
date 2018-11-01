@@ -297,6 +297,7 @@ $(function () {
 	    return data.number_student + "/" + data.class_size;
 	}
     var tableEnrollClass = $('#table-enroll-class').DataTable({
+		language: datatable_language,
     	"columnDefs": [ {
             "searchable": false,
             "orderable": false,

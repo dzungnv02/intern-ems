@@ -9,6 +9,7 @@ $(function () {
     }
     window.onload = updateStatus;
     var tableClass = $('#list_class').DataTable({
+        language: datatable_language,
         "columnDefs": [ {
             "searchable": false,
             "orderable": false,
@@ -428,6 +429,7 @@ $(function () {
         var class_id = $(this).attr('class_id1');
         $('#get_class_id12').val(class_id);
         var tableStudent = $('#table-student-class').DataTable({
+            language: datatable_language,
             "columnDefs": [ {
                 "searchable": false,
                 "orderable": false,
@@ -496,6 +498,7 @@ $(function () {
         $('#modal-list-student-class').modal('show');
         var class_id = $(this).attr('class_id');
         var tableStudentClass = $('#table-student-of-class1').DataTable({
+            language: datatable_language,
             "columnDefs": [ {
                 "searchable": false,
                 "orderable": false,
