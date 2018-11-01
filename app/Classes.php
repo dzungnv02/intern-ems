@@ -76,6 +76,17 @@ class Classes extends Model
             ]
         );
     }
+
+    public static function insertOne($record)
+    {
+        return DB::table('classes')->insertGetId($record);
+    }
+
+    public static function updateOne($id, $data)
+    {
+        return DB::table('classes')->where('id', $id)->update($data);
+    }
+
     /**
      * Lấy thông tin lớp
      *

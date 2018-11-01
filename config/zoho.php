@@ -7,6 +7,7 @@ return [
     'ZOHO_APP_CLIENT_SECRET' => env('ZOHO_CRM_SECRET', 'e24348d2b3e867e9dfc4b6352cde4caeedbd517a09'),
     'ZOHO_API_GET_ACCESS_TOKEN_RETRY_ATTEMPT' => env('ZOHO_API_GET_ACCESS_TOKEN_RETRY_ATTEMPT', '4'),
     'ZOHO_SESSION_FILE' => storage_path('framework/sessions') . '/zoho_session',
+    'ZOHO_API_MAX_RECORDS_PER_PAGE' => 200,
     'MODULES' => [
             'ZOHO_MODULE_LEADS'=>'Leads',
             'ZOHO_MODULE_PARENTS'=>'Accounts',
@@ -20,6 +21,7 @@ return [
             'ZOHO_MODULE_EMS_TEACHER' => 'EPS_Giao_vien',
             'ZOHO_MODULE_EMS_BRANCH' => 'EPS_Trung_tam',
             'ZOHO_MODULE_EMS_STAFF' => 'EPS_Nhan_vien',
+            'ZOHO_MODULE_USERS' => 'users',
     ],
     'MAPPING' => [
         'ZOHO_MODULE_EMS_TEACHER' => [
@@ -96,6 +98,24 @@ return [
             //'N'=>  null,
             //'Record_Image'=>  null,
         ],
+        'ZOHO_MODULE_PARENTS' => [
+            'Account_Name' => 'fullname',
+            'Email' => 'email',
+            'Phone' => 'phone',
+            'Vai_tr_ph_huynh' => 'parent_role',
+            'Facebook_c_nh_n' => 'facebook',
+            'EMS_ID' => 'id',
+            'EMS_SYNC_TIME' => ''
+        ],
+        'ZOHO_MODULE_EMS_CLASS' => [
+            'Product_Name' => 'name',
+            'Gi_o_vi_n1' => [],
+            'Ch_ng_tr_nh_h_c' => 'course_id',
+            'Product_Active' => 'status',
+            'L_ch_h_c_trong_tu_n' => [],
+            'EMS_ID' => 'id',
+            'EMS_SYNC_TIME' => ''
+        ]
     ]
 ];
 

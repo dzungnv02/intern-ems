@@ -28,6 +28,14 @@ class Branch extends Model
         ->get()->toArray();
     }
 
+    public static function getBranchByEmail($email)
+    {
+        return DB::table('branch')->select('*')
+        ->where('email', $email)
+        ->orWhere('email_2', $email)
+        ->get()->toArray();
+    }
+
     public static function insertBranch($ary_data)
     {
         return DB::table('branch')->insertGetId($ary_data);
