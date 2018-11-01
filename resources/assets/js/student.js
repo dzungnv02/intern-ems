@@ -309,9 +309,8 @@ $(function () {
 	    },
 	    columns: [
             { data: null},
-            { data: 'class_code', name: 'class_code'},
             { data: 'name', name: 'name'},
-            { data: 'course_name', name: 'course_name'},
+            { data: 'crm_course', name: 'crm_course'},
             {data: getClassSize},
             {
                 'data': null,

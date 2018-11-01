@@ -255,9 +255,8 @@ class Classes extends Model
     public static function classByStatus(){
         $class = DB::table('classes')
                     ->leftjoin('student_classes','student_classes.class_id','=','classes.id')
-                    ->join('courses','courses.id','=','classes.course_id')
-                    ->select('classes.*','courses.name as course_name',DB::raw('count(student_classes.student_id) as number_student'))
-                    ->where('classes.status',0)
+                    ->select('classes.*',DB::raw('count(student_classes.student_id) as number_student'))
+                    //->where('classes.status', 0)
                     ->groupBy('classes.id')->get();
         return $class;
     }

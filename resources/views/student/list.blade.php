@@ -145,7 +145,7 @@
 	</div>
 
     <div class="modal fade" id="list-class">
-    	<div class="modal-dialog">
+    	<div class="modal-dialog" style="width:800px">
     		<div class="modal-content">
     			<div class="modal-header">
     				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -153,11 +153,10 @@
     			</div>
     			<div class="modal-body">
     				<input type="hidden" value="" id="get_student_id">
-    				<table class="table table-bordered table-striped" id="table-enroll-class">
+    				<table class="table table-bordered table-striped" id="table-enroll-class" style="width:100%">
 						<thead>
 							<tr>
 								<th>STT</th>
-								<th>Mã lớp</th>
 								<th>Tên lớp</th>
 								<th>Tên khóa học</th>
 								<th>Sĩ số</th>
@@ -167,7 +166,6 @@
 						<tfoot>
 							<tr>
 								<th>STT</th>
-								<th>Mã lớp</th>
 								<th>Tên lớp</th>
 								<th>Tên khóa học</th>
 								<th>Sĩ số</th>

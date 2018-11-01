@@ -10805,7 +10805,7 @@ $(function () {
 			url: 'api/get-list-enroll-class',
 			dataSrc: 'data'
 		},
-		columns: [{ data: null }, { data: 'class_code', name: 'class_code' }, { data: 'name', name: 'name' }, { data: 'course_name', name: 'course_name' }, { data: getClassSize }, {
+		columns: [{ data: null }, { data: 'name', name: 'name' }, { data: 'crm_course', name: 'crm_course' }, { data: getClassSize }, {
 			'data': null,
 			'render': function render(data, type, row) {
 				return '<button classID=\"' + row.id + '\" ' + 'title=\"thêm học sinh vào lớp\"' + 'class=\"btn btn-success addStudentToClass\">Thêm</button>';
