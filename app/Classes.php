@@ -21,9 +21,8 @@ class Classes extends Model
     public static function getListClass($keyword,$record,$page = 1)
     {
         $start = ($page - 1) * $record;
-        $listClass = Classes::join('courses','courses.id','=','classes.course_id')
-                    ->join('teachers','teachers.id','=','classes.teacher_id')
-                    ->select('classes.*','teachers.name as teacher_name','courses.name as course_name')
+        $listClass = Classes::join('teachers','teachers.id','=','classes.teacher_id')
+                    ->select('classes.*','teachers.name as teacher_name')
                     ->where('classes.name','like','%'.$keyword.'%')
                     ->orwhere('classes.status','like','%'.$keyword.'%')
                     ->orwhere('classes.schedule','like','%'.$keyword.'%')
@@ -31,7 +30,6 @@ class Classes extends Model
                     ->orwhere('classes.start_date','like','%'.$keyword.'%')
                     ->orwhere('classes.class_size','like','%'.$keyword.'%')
                     ->orwhere('teachers.name','like','%'.$keyword.'%')
-                    ->orwhere('courses.name','like','%'.$keyword.'%')
                     ->offset($start)->limit($record)
                     ->get();
 		                             
