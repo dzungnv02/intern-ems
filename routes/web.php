@@ -13,14 +13,8 @@
 */
 Auth::routes();
 
-Route::get('/', function () {
-    //return view('welcome');
-    // $zoho_crm = new ZohoCrmConnect();
-    // $records = $zoho_crm->getAllRecords(config('zoho.MODULES.ZOHO_MODULE_LEADS'));
-    // var_dump($records[0]);
-    return view('layouts/dashboard');
-})->middleware('auth');
-// exam
+Route::get('/', 'HomeController@index')->middleware('auth');
+
 Route::get('/exam', function(){
 		return view('examination/list');
 })->middleware('auth');

@@ -4,7 +4,7 @@
 <li class="active">Danh sách lớp</li>
 @endsection
 @section('content')
-  <div class=" content-class row">
+  <div class="content-class row">
       <div class="col-xs-12">
             <div class="box-header">
             <button type="button" id="button-create-class" class="btn btn-success">
@@ -15,19 +15,17 @@
             <div class="box-body">
 
             <div  class="table-responsive " style="margin-top: 10px"> 
-              <table id="list_class" class="table table-bordered table-striped">
+              <table id="list_class" class="table table-bordered table-striped table-hover dataTable">
                 <thead>
                   <tr>
                      <th data-field="id">STT</th>
-                     <th data-field="name">Tên Lớp </th>
-                     <th data-field="class_code">Mã lớp</th>
-                     <th data-field="teacher_name">Tên giảng viên</th>
-                     <th data-field="class_size">Sỉ số</th>
-                     <th data-field="start_date">Ngày bắt đầu</th>
-                     <th data-field="schedule">Lịch học</th>
-                      <th data-field="time_start">Thời gian học</th>
-                      <th data-field="status">Trạng thái</th>
-                      <th data-field="action">Action</th>
+                     <th data-field="name">Tên Lớp</th>
+                     <th data-field="teacher_name">Giáo viên</th>
+                     <th data-field="max_seat">Số học sinh tối đa</th>
+                     <th data-field="start_date">Ngày khai giảng</th>
+                     <th data-field="schedule">Lịch học trong tuần</th>
+                     <th data-field="status">Trạng thái</th>
+                     <th data-field="action"></th>
                   </tr>
                   </thead>
                   <tbody>     
@@ -39,186 +37,219 @@
       </div>
     </div>
 <!--Form them moi lop hoc -->
- <div class="modal fade" id="modal-create-class">
-      <div class="modal-dialog">
+ <div class="modal fade" id="modal-class">
+      <div class="modal-dialog" role="document" style="width:870px">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title">Thêm mới lớp học</h4>
+            <h3 class="modal-title">Thêm mới lớp học</h3>
           </div>  
           <div class="modal-body">
-          <form id="form-create-class">
-              <div class="form-group">
-                <label for="exampleInputText">Mã lớp</label>
-                <input type="text" class="form-control" name="class_code" id="class_code"  placeholder="Nhập mã lớp">
+          <form id="form-class">
+              <input type="hidden" name="id" id="id"> 
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for="name">Tên lớp <span class="text-red">*</span> </label>
+                    <input type="text" class="form-control" name="class_name" id="class_name"  placeholder="Nhập tên lớp">
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for="class_code">Mã lớp</label>
+                    <input type="text" class="form-control" name="class_code" id="class_code" placeholder="Nhập mã lớp">
+                  </div>
+                </div>
               </div>
-              <div class="form-group">
-                <label for="exampleInputText">Tên lớp</label>
-                <input type="text" class="form-control" name="name" id="name"   placeholder="Nhập tên lớp">
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for="teacher_id">Tên giảng viên</label>
+                      <select class="form-control select2 js-states" style="width: 100%;" id="teacher_id" name="teacher_id">
+                      </select> 
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="form-group">
+                    <label for="course_name">Chương trình học</label>
+                      <input type="text"  class="form-control" name="course_name" id="course_name" placeholder="Chương trình">
+                    </div>
+                </div>
               </div>
-              <div class="form-group">
-                <label for="exampleInputText">Tên giảng viên</label>
-                <select class="form-control form-control-sm" id="name_teacher">
-                </select>
+              <div class="row">
+                  <div class="col-sm-6">
+                      <div class="form-group">
+                        <label for="teacher_id">Ngày khai giảng <span class="text-red">*</span> </label>
+                        <input type="date" class="form-control" name="start_date" id="start_date" placeholder="Ngày khai giảng"> 
+                      </div>
+                  </div>
+                  <div class="col-sm-3">
+                      <div class="form-group">
+                        <label for="teacher_id">Số học sinh tối đa <span class="text-red">*</span> </label>
+                        <input type="text"  class="form-control" name="max_seat" id="max_seat" placeholder="Số học sinh tối đa"> 
+                      </div>
+                  </div>
+                  <div class="col-sm-3">
+                      <div class="form-group">
+                        <input type="hidden" name="status" id="status" value="1"> 
+                        <label for="status">Trạng thái</label>
+                        <div class="btn-group" style="display:inline-block;width: 100%">
+                            <button type="button" class="btn btn-warning status_selected">Chưa khai giảng</button>
+                            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                              <span class="caret"></span>
+                              <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu status_select" role="menu">
+                              <li><a class="class_status_1" data-value="1">Chưa khai giảng</a></li>
+                              <li><a class="class_status_2" data-value="2">Đang học</a></li>
+                              <li><a class="class_status_3" data-value="3">Kết thúc</a></li>
+                            </ul>
+                          </div>
+                    </div>
+                  </div>
               </div>
-              <div class="form-group">
-              <label for="exampleInputText">Ngày bắt đầu</label>
-                <input type="text" readonly class="form-control" name="start_date" id="start_date"   placeholder="Nhập ngày bắt đầu">
+              <hr>
+              <div class="row" id="schedule_row">
+                  <div class="col-sm-12">
+                      <label>Lịch học</label>
+                      <table class="table no-border">
+                          <tr>
+                            <td class="text-center">
+                              <input class="form-check-input" type="checkbox" name="schedule_mon" id="schedule_mon" value="mon">&nbsp;
+                              <label class="form-check-label" style="font-weight:normal" for="schedule_mon" id="schedule" >Thứ 2</label>
+                            </td>
+                            <td class="text-center">
+                              <input class="form-check-input" type="checkbox" name="schedule" id="schedule_tue" value="tue">&nbsp;
+                              <label class="form-check-label" style="font-weight:normal" for="schedule_tue" id="schedule" >Thứ 3</label>
+                            </td>
+                            <td class="text-center">
+                              <input class="form-check-input" type="checkbox" name="schedule" id="schedule_wed" value="wed">&nbsp;
+                              <label class="form-check-label" style="font-weight:normal" for="schedule_wed" id="schedule" >Thứ 4</label>
+                            </td>
+                            <td class="text-center">
+                              <input class="form-check-input" type="checkbox" name="schedule" id="schedule_thu" value="thu">&nbsp;
+                              <label class="form-check-label" style="font-weight:normal" for="schedule_thu" id="schedule" >Thứ 5</label>
+                            </td>
+                            <td class="text-center">
+                              <input class="form-check-input" type="checkbox" name="schedule" id="schedule_fri" value="fri">&nbsp;
+                              <label class="form-check-label" style="font-weight:normal" for="schedule_fri" id="schedule" >Thứ 6</label>
+                            </td>
+                            <td class="text-center">
+                              <input class="form-check-input" type="checkbox" name="schedule" id="schedule_sat" value="sat">&nbsp;
+                              <label class="form-check-label" style="font-weight:normal" for="schedule_sat" id="schedule" >Thứ 7</label>
+                            </td>
+                            <td class="text-center text-danger">
+                                <input class="form-check-input" type="checkbox" name="schedule" id="schedule_sun" value="sun">&nbsp;
+                                <label class="form-check-label" style="font-weight:normal" for="schedule_sun" id="schedule" >Chủ nhật</label>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="text-center">
+                              <div class="form-group"><input type="time" id="time_start_mon" name="time_start_mon"></div>
+                              <div class="form-group"><input type="time" id="time_end_mon" name="time_end_mon"></div>
+                            </td>
+                            <td class="text-center">
+                                <div class="form-group"><input type="time" id="time_start_tue" name="time_start_tue"></div>
+                                <div class="form-group"><input type="time" id="time_end_tue" name="time_end_tue"></div>
+                            </td>
+                            <td class="text-center">
+                                <div class="form-group"><input type="time" id="time_start_wed" name="time_start_wed"></div>
+                                <div class="form-group"><input type="time" id="time_end_wed" name="time_end_wed"></div>
+                            </td>
+                            <td class="text-center">
+                                <div class="form-group"><input type="time" id="time_start_thu" name="time_start_thu"></div>
+                                <div class="form-group"><input type="time" id="time_end_thu" name="time_end_thu"></div>
+                            </td>
+                            <td class="text-center">
+                                <div class="form-group"><input type="time" id="time_start_fri" name="time_start_fri"></div>
+                                <div class="form-group"><input type="time" id="time_end_fri" name="time_end_fri"></div>
+                            </td>
+                            <td class="text-center">
+                                <div class="form-group"><input type="time" id="time_start_sat" name="time_start_sat"></div>
+                                <div class="form-group"><input type="time" id="time_end_sat" name="time_end_sat"></div>
+                            </td>
+                            <td class="text-center">
+                                <div class="form-group"><input type="time" id="time_start_sun" name="time_start_sun"></div>
+                                <div class="form-group"><input type="time" id="time_end_sun" name="time_end_sun"></div>
+                            </td>
+                          </tr>
+                      </table>
+                  </div>
               </div>
-                <div class="form-group">
-                <label for="exampleInputText">Lịch học</label>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="checkbox" name="schedule" id="schedule_1" value="1">
-                      <label class="form-check-label" for="schedule_1" id="schedule" >Thứ 2</label>&nbsp;&nbsp;
-                      <input class="form-check-input" value="2" type="checkbox" id="schedule_2" >
-                      <label class="form-check-label" for="schedule_2">Thứ 3</label>&nbsp;&nbsp;
-                      <input class="form-check-input" value="3" type="checkbox" name="schedule" id="schedule_3"  >
-                      <label class="form-check-label" for="schedule_3">Thứ 4</label>&nbsp;&nbsp;
-                      <input class="form-check-input" value="4" type="checkbox" name="schedule" id="schedule_4"  >
-                      <label class="form-check-label" for="schedule_4">Thứ 5</label>&nbsp;&nbsp;
-                      <input class="form-check-input" value="5" type="checkbox" name="schedule" id="schedule_5"  >
-                      <label class="form-check-label" for="schedule_5">Thứ 6</label>&nbsp;&nbsp;
-                      <input class="form-check-input" value="6" type="checkbox" name="schedule" id="schedule_6"  >
-                      <label class="form-check-label" for="schedule_6">Thứ 7</label>&nbsp;&nbsp;
-                      <input class="form-check-input" value="0" type="checkbox" name="schedule" id="schedule_7" >
-                      <label class="form-check-label" for="schedule_7">Chủ nhật</label>
-                    </div> 
+          </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+            <button type="button" class="btn btn-primary" id="create-class" data-loading-text="<i class='fa fa-spinner fa-spin'></i>Đang lưu...">Lưu</button>
+          </div>
+        </div>
+      </div>
+</div>
+<!--Het form them moi lop hoc -->
 
-                </div>
-              <div class="form-group">
-                  <label for="exampleInputText">Thời gian bắt đầu</label>
-                  <input type="time" class="form-control" name="time_start" id="time_start">
-                </div>
-              <div class="form-group">
-                <label for="exampleInputText">Thời lượng</label>
-                <input type="text" class="form-control" name="duration" id="duration" placeholder="Nhập thời lượng">
-              </div>
-              <div class="form-group">
-                <label for="exampleInputText">Sĩ số</label>
-                <input type="text" class="form-control" id="class_size" name="class_size"  placeholder="Nhập sĩ số">
-              </div>
-              <div class="form-group">
-                <label for="exampleInputText">Tên khóa học</label>
-                <select class="form-control form-control-sm" id="name_course">
-                    
-                </select>
-              </div>
-      </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" id="create-class">Save</button>
-          </div>
-        </div>
-      </div>
-  </div>
-<!--Het form them moi khoa hoc -->
-<!--Form Sua lop hoc -->
- <div class="modal fade" id="modal-edit-class">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h4 class="modal-title">Sửa lớp học</h4>
-          </div>  
-          <div class="modal-body">
-          <form id="form-edit-class">
-              <div class="form-group">
-                <label for="exampleInputText">Mã lớp</label>
-                <input type="text" class="form-control" name="class_code_edit" id="class_code_edit"  placeholder="Nhập mã lớp">
-              </div>
-              <div class="form-group">
-                <label for="exampleInputText">Tên lớp</label>
-                <input type="text" class="form-control" name="name_edit" id="name_edit"   placeholder="Nhập tên lớp">
-              </div>
-              <div class="form-group">
-              <label for="exampleInputText">Ngày bắt đầu</label>
-                <input type="date" class="form-control" name="start_date_edit" id="start_date_edit"   placeholder="Nhập ngày bắt đầu" disabled>
-              </div>
-                
-              <div class="form-group">
-                  <label for="exampleInputText">Thời gian bắt đầu</label>
-                  <input type="time" class="form-control" name="time_start_edit" id="time_start_edit" disabled>
-                </div>
-              <div class="form-group">
-                <label for="exampleInputText">Thời lượng</label>
-                <input type="text" class="form-control" name="duration_edit" id="duration_edit" placeholder="Nhập thời lượng" disabled>
-              </div>
-              <div class="form-group">
-                <label for="exampleInputText">Sĩ số</label>
-                <input type="text" class="form-control" id="class_size_edit" name="class_size_edit"  placeholder="Nhập sĩ số">
-              </div>
-      </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="button" data-id="" class="button-edit-class btn btn-primary">Save</button>
-          </div>
-        </div>
-      </div>
-  </div>
-<!--Het form sua lop hoc -->
-<!--Form Them moi hoc sinh vao lop-->
-    <div class="modal fade" id="modal-add-student-class">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class=" close close-modal-add-student-class" data-dismiss="modal" aria-hidden="true">×</button>
-                    <h4 class="modal-title">Danh sách học sinh</h4>
-                </div>
-                <div class="modal-body">
-                   <input type="hidden" name="" value="" id="get_class_id12">
-                    <table class="table table-bordered table-striped" id="table-student-class">
-                        <thead>
-                            <tr>
-                                <th>STT</th>
-                                <th>Tên học sinh</th>
-                                <th>Địa chỉ</th>
-                                <th>Số điện thoại</th>
-                                <th>Ngày sinh</th>
-                                <th>Giới tính</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>     
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="close-modal-add-student-class btn btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-<!--Het Them moi hoc sinh vao lop -->
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="confirm-delete">
+		<div class="modal-dialog modal-sm modal-dialog-centered" style="width:400px">
+			<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h5 class="modal-title" id="myModalLabel">Bạn có muốn xoá lớp %s không?</h5>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" id="modal-btn-yes">Có</button>
+				<button type="button" class="btn btn-primary" id="modal-btn-no">Không</button>
+			</div>
+			</div>
+		</div>
+	</div>
+
 <!--Form Danh sach hoc sinh cua lop-->
     <div class="modal fade" id="modal-list-student-class">
-        <div class="modal-dialog">
+        <div class="modal-dialog"  style="width:700px">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close close-modal-list-student-class" data-dismiss="modal" aria-hidden="true">×</button>
                     <h4 class="modal-title">Danh sách học sinh của lớp</h4>
                 </div>
                 <div class="modal-body">
-                   <input type="hidden" name="" value="" id="get_class_id2">
-                    <table class="table table-bordered table-striped" id="table-student-of-class1">
-                        <thead>
-                            <tr>
-                                <th>STT</th>
-                                <th>Tên học sinh</th>
-                                <th>Địa chỉ</th>
-                                <th>Số điện thoại</th>
-                                <th>Ngày sinh</th>
-                                <th>Giới tính</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>     
-                        </tbody>
-                    </table>
+                    <input type="hidden" id="class_id" name="class_id">
+                    <div class="row">
+                        <form>
+                        <div class="col-sm-9" style="padding-right: 5px;text-align:left">
+                            <select style="width:100%" id="student_not_assigned" name="student_not_assigned" class="js-states form-control" multiple="multiple">
+                            </select>
+                        </div>
+                        <div class="col-sm-3" style="padding-left: 5px;text-align:right">
+                            <button type="button" class="btn btn-block btn-sm btn-success" id="btnAssignClass" style="height:32px">Thêm học sinh vào lớp</button>
+                        </div>
+                        </form>
+                    </div>
+                    <div style="margin:0; padding:0; height:50px;"></div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table table-bordered table-striped" id="table-student-of-class">
+                                <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Tên học sinh</th>
+                                        <th>Ngày sinh</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>   
+                                    <tr><td colspan="4">Không có học sinh trong lớp</td></tr>  
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class=" close-modal-list-student-class btn btn-default" data-dismiss="modal">Close</button>
+                    <div class="col-sm-8" style="text-align:left;padding-left:0">
+                        <button type="button" class="btn btn-info"><i class="fa fa-print">&nbsp;&nbsp;</i>In danh sách lớp</button>
+                        <button type="button" class="btn btn-warning"><i class="fa fa-check-square-o">&nbsp;&nbsp;</i>Điểm danh</button>
+                    </div>
+                    <div class="col-sm-4" style="text-align:right;padding-right:0">
+                        <button type="button" class="close-modal-list-student-class btn btn-default" data-dismiss="modal">Đóng</button>
+                    </div>
                 </div>
             </div>
         </div>

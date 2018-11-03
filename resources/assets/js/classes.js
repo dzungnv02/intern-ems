@@ -1,622 +1,513 @@
-$(function () {
-    function updateStatus(){
-        $.ajax({
-            type : 'get',
-            url : 'api/auto-update-status',
-            success:function(response){
-            }
-        })
+$(document).on({
+    ajaxStart: () => {
+        $('div.modal#modal-class').find('div.modal-footer > button#create-class').button('loading');
+        $('div.modal#modal-class').find('div.modal-footer > button#create-class').prop('disabled', true);
+        $('DIV#modal-class FORM#form-class').closest('.form-group').prop('disabled', true);
+    },
+    ajaxStop: () => {
+        $('div.modal#modal-class').find('div.modal-footer > button#create-class').prop('disabled', false);
+        $('div.modal#modal-class').find('div.modal-footer > button#create-class').button('reset');
+        $('DIV#modal-class FORM#form-class').closest('.form-group').prop('disabled', false);
     }
-    window.onload = updateStatus;
-    var tableClass = $('#list_class').DataTable({
-        language: datatable_language,
-        "columnDefs": [ {
-            "searchable": false,
-            "orderable": false,
-            "targets": 0
-        } ],
-        "order": [[ 1, 'asc' ]],
-        ajax: {
-            url: 'api/get-list-class',
-            dataSrc: 'data',
-        },
-        columns: [
-            {data:null},
-            { data: "name" , name:"name"},
-            { data: "class_code", name:"class_code" },
-            { data: "teacher_name", name:"teacher_name" },
-            { data: "class_size", name:"class_size" },
-            { data:  "start_date", name:"start_date"},
-            { 
-                render:function(data, type, row) 
-                {
-                    var arr_date = (row.schedule).split(",");
-                    var days = "";
-                    for(var i = 0; i<arr_date.length-1;i++){
-                        switch(Number(arr_date[i])){
-                            case 0:
-                                day = "<div>Chủ nhật</div>";
-                                break;
-                            case 1:
-                                day = "<div>Thứ hai</div>";
-                                break;
-                            case 2:
-                                day = "<div>Thứ ba</div>";
-                                break;
-                            case 3:
-                                day = "<div>Thứ tư</div>";
-                                break;
-                            case 4:
-                                day = "<div>Thứ năm</div>";
-                                break;
-                            case 5:
-                                day = "<div>Thứ sáu</div>";
-                               break;
-                            case 6:
-                                day = "<div>Thứ bảy</div>";
-                                break;
-                        }
-                        days+=day;
+});
 
-                    }
-                    return days;
-                    
-                }
+$(function () {
+    if ($('TABLE#list_class').length > 0) {
+        var form = $('DIV#modal-class FORM#form-class');
+
+        var table_act_buttons = '<button type="button" class="list-student-class btn btn-sm btn-info"><i class="fa fa-address-book-o" aria-hidden="true"></i></button>\
+                            <button type="button" class="edit-class btn btn-sm btn-warning"><i title="Sửa thông tin lớp" class="fa fa-pencil-square-o" aria-hidden="true"></i></button>\
+                            <button type="button" class="delete-class btn btn-sm btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+
+        /* 
+        <button type="button" class="show-timetable btn btn-sm btn-success"><i title="Xem Thời Khóa Biểu" class="fa fa-book" aria-hidden="true"></i></button>\
+        <button type="button" title="Xem danh sách kì thi" class="show-list-exams btn btn-sm btn-info"><i class="fa fa-graduation-cap" aria-hidden="true"></i></button>\
+        */
+
+        $('SELECT.select2[id="teacher_id"]').select2({
+            placeholder: "Chọn giáo viên",
+        });
+
+        var create_class_validate_rules = {
+            class_name: {
+                required: true
             },
-            { data: "time_start" , name:"time_start"},
-            {
-                "render":function(data, type, row) 
-                {
-                    switch(row.status){
-                        case 0:   
-
-                            return '<select class="change-s" class_id="'+row.id+'" id="'+row.id+'">\
-                                        <option value="0" selected>Đang tuyển sinh</option>\
-                                        <option value="1">Đang học</option>\
-                                        <option value="2">Đã kết thúc</option>\
-                                        <option value="3">Tạm dừng</option>\
-                                    </select>'+
-                                    '<input name="'+row.id+'" type="hidden" class="statuschange" value="'+row.id+'">';
-                            break;
-                        case 1:
-                            return '<select class="change-s" class_id="'+row.id+'" id="'+row.id+'">\
-                                        <option value="0" >Đang tuyển sinh</option>\
-                                        <option value="1" selected>Đang học</option>\
-                                        <option value="2">Đã kết thúc</option>\
-                                        <option value="3">Tạm dừng</option>\
-                                    </select>'+
-                                    '<input name="'+row.id+'" type="hidden" class="statuschange" value="'+row.id+'">';
-                            break;
-                        case 2:
-                            return '<select class="change-s" class_id="'+row.id+'" id="'+row.id+'">\
-                                        <option value="0" selected>Đang tuyển sinh</option>\
-                                        <option value="1">Đang học</option>\
-                                        <option value="2" selected>Đã kết thúc</option>\
-                                        <option value="3">Tạm dừng</option>\
-                                    </select>'+
-                                    '<input name="'+row.id+'" type="hidden" class="statuschange" value="'+row.id+'">';
-                            break;
-                        case 3:
-                            return '<select class="change-s" class_id="'+row.id+'" id="'+row.id+'">\
-                                        <option value="0" selected>Đang tuyển sinh</option>\
-                                        <option value="1">Đang học</option>\
-                                        <option value="2">Đã kết thúc</option>\
-                                        <option value="3" selected>Tạm dừng</option>\
-                                    </select>'+
-                                    '<input name="'+row.id+'" type="hidden" class="statuschange" value="'+row.id+'">';
-                            break;
-                    }
-                    
-                }
+            max_seat: {
+                required: true,
+                number: true,
+                min: 1
             },
-            {
-              "render":function(data, type, row) 
-                {
-                  
-                    return '<button type="button" class_id1="'+row.id+'" class="add-student-class btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i></button>\
-                    <button type="button" class_id="'+row.id+'" class="list-student-class btn btn-danger"><i class="fa fa-address-book-o" aria-hidden="true"></i></button>\
-                    <button type="button" class_id="'+row.id+'" class="show-timetable btn btn-success"><i title="Xem Thời Khóa Biểu" class="fa fa-book"  aria-hidden="true"></i></button>\
-                    <button type="button" class_id="'+row.id+'" title="Xem danh sách kì thi" class=" show-list-exams btn btn-info"><i class="fa fa-graduation-cap" aria-hidden="true"></i> \
-                    <button class_id="'+row.id+'" type="button" class="edit-class btn btn-warning"><i title="Sửa thông tin lớp" class="fa fa-pencil-square-o" aria-hidden="true"></i></button>\
-                    <button class_id="'+row.id+'" type="button" class=" delete-class1 btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>' 
-                    
-                }
+            start_date: {
+                required: true,
+                date: true
             }
-        ]
-     
-    });
-    tableClass.on( 'order.dt search.dt', function () {
-        tableClass.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-            cell.innerHTML = i+1;
-        } );
-    } ).draw();
+        }
 
-    $('#form-create-class').validate(
-            {
-                rules: {
-                    "name": {
-                        required: true
-                    },
-                    "class_code": {
-                        required: true,
-                    },
-                    "schedule": {
-                        required: true
-                    },
-                    "time_start": {
-                        required: true
-                    },
-                    "duration": {
-                        required: true,
-                        number: true,
-                    },
-                    "class_size": {
-                        required: true,
-                        number: true,
-                    },
-                    "start_date": {
-                        required: true         
-                    }
-
-                },
-                messages: {
-                    "name": {
-                        required: "Tên lớp không được trống!"
-                    },
-                    "class_code": {
-                        required: "Mã lớp học không được trống!",
-                    },
-                    "schedule": {
-                        required: "Bạn chưa chọn các ngày học!"
-                    },
-                    "class_size": {
-                        required: "Sĩ số không được bỏ trống!",
-                        number : "Sĩ số phải là kiểu số",
-                    },
-                    "start_date": {
-                        required: "Ngày  bắt đầu không được trống!",
-                    },
-                    "duration": {
-                        required: "Thời lượng không được trống!",
-                        number : "Thời lượng là kiểu số!",
-                    },
-                    "time_start": {
-                        required: "Thời gian bắt đầu không được trống!",
-                    },
-                    "class_size":{
-                        required: "Sĩ số không được trống!",
-                        number : "Sĩ số là kiểu số!",
-                    }
-
-
-                },
-                 highlight: function(element, errorClass) {
-                $(element).closest(".form-group").addClass("has-error");
-                },
-                unhighlight: function(element, errorClass) {
-                    $(element).closest(".form-group").removeClass("has-error");
-                },
-                errorPlacement: function (error, element) {
-                    error.appendTo(element.parent().next());
-                },
-                errorPlacement: function (error, element) {
-                        if(element.attr("type") == "checkbox") {
-                            element.closest(".form-group").children(0).prepend(error);
-                        }
-                        else
-                            error.insertAfter(element);
-                }
+        var create_class_validate_messages = {
+            class_name: {
+                required: "Tên lớp không được trống!"
+            },
+            max_seat: {
+                required: "Số học sinh tối đa không được trống!",
+                number: "Hãy nhập giá trị là số lớn hơn 0!",
+                min: "Hãy nhập giá trị là số lớn hơn 0!"
+            },
+            start_date: {
+                required: 'Ngày bắt đầu không được trống!',
+                date: 'Hãy nhập giá trị là một ngày!'
             }
-    );
-    $('#form-edit-class').validate(
-            {
-                rules: {
-                    "name_edit": {
-                        required: true
-                    },
-                    "class_code_edit": {
-                        required: true,
-                    },
-                    "class_size_edit": {
-                        required: true,
-                        number: true,
-                    },
-                },
-                messages: {
-                    "name_edit": {
-                        required: "Tên lớp không được trống!"
-                    },
-                    "class_code_edit": {
-                        required: "Mã lớp học không được trống!",
-                    },
-                    "class_size_edit":{
-                        required: "Sĩ số không được trống!",
-                        number : "Sĩ số là kiểu số!",
-                    }
+        }
 
+        $(form).find('INPUT[id^="time_start_"]').each(function () {
+            var name_postfix = this.name.substr(this.name.length - 3, 3);
+            create_class_validate_rules[this.name] = {
+                required: 'input#schedule_' + name_postfix + '[type="checkbox"]:checked',
+            };
+            create_class_validate_messages[this.name] = {
+                required: 'Nhập giờ bắt đầu!'
+            };
+        });
 
-                },
-                 highlight: function(element, errorClass) {
-                $(element).closest(".form-group").addClass("has-error");
-                },
-                unhighlight: function(element, errorClass) {
-                    $(element).closest(".form-group").removeClass("has-error");
-                },
-                errorPlacement: function (error, element) {
-                    error.appendTo(element.parent().next());
-                },
-                errorPlacement: function (error, element) {
-                        if(element.attr("type") == "checkbox") {
-                            element.closest(".form-group").children(0).prepend(error);
-                        }
-                        else
-                            error.insertAfter(element);
-                }
-            }
-    );
-    $("#button-create-class").click(function(){
-        $('#modal-create-class').modal('show');
-        $("#name_teacher").empty();
-         $.ajax({
-            dataType : 'json',
-            type : 'get',
-            url : 'api/get-name-teacher',
-            success:function(response){
-                $.each(response.data, function () {
-                    $("#name_teacher").append("<option id='course_id' value="+this.id+">"+this.name+"</option>")
-                });
+        $(form).find('INPUT[id^="time_end_"]').each(function () {
+            var name_postfix = this.name.substr(this.name.length - 3, 3);
+            create_class_validate_rules[this.name] = {
+                required: 'input#schedule_' + name_postfix + '[type="checkbox"]:checked'
+            };
+            create_class_validate_messages[this.name] = {
+                required: 'Nhập giờ kết thúc!'
+            };
+        });
+
+        $(form).find('INPUT[id^="schedule_"]').on('click', (e) => {
+            var name_postfix = $(e.target).prop('id').substr($(e.target).prop('id').length - 3, 3);
+            if ($(e.target)[0].checked == false) {
+                $(form).find('INPUT[id^="time_start_' + name_postfix + '"]').val('');
+                $(form).find('INPUT[id^="time_end_' + name_postfix + '"]').val('');
             }
         });
-        $("#name_course").empty();
-        $.ajax({
-            dataType : 'json',
-            type : 'get',
-            url : 'api/get-name-course',
-            success:function(response){
-                $.each(response.data, function () {
-                    $("#name_course").append("<option id='teacher_id' value="+this.id+">"+this.name+"</option>")
-                });
+
+        form.validate({
+            debug: true,
+            success: "valid",
+            rules: create_class_validate_rules,
+            messages: create_class_validate_messages,
+            highlight: function (element, errorClass) {
+                $(element).closest(".form-group").addClass("has-error");
+            },
+            unhighlight: function (element, errorClass) {
+                $(element).closest(".form-group").removeClass("has-error");
+            },
+            errorPlacement: function (error, element) {
+                error.appendTo(element.parent().next());
+            },
+            errorPlacement: function (error, element) {
+                if (element.attr("type") == "checkbox") {
+                    element.closest(".form-group").children(0).prepend(error);
+                } else
+                    error.insertAfter(element);
             }
+        });
+
+        var table_classes = $('#list_class').DataTable({
+            language: datatable_language,
+            "order": [
+                [1, 'asc']
+            ],
+            ajax: {
+                url: 'api/get-list-class',
+                dataSrc: 'data',
+            },
+            columns: [{
+                    data: null
+                },
+                {
+                    data: "name",
+                    name: "name"
+                },
+                {
+                    data: "teacher_name",
+                    name: "teacher_name"
+                },
+                {
+                    data: "max_seat",
+                    name: "max_seat"
+                },
+                {
+                    data: "start_date",
+                    name: "start_date"
+                },
+                {
+                    data: "schedule",
+                    name: "schedule",
+                    render: (data, type, row) => {
+                        return show_schedule(data);
+                    }
+                },
+                {
+                    data: "status",
+                    name: "status",
+                    render: (data, type, row) => {
+                        var obj_status = {
+                            1: 'Chưa khai giảng',
+                            2: 'Đang học',
+                            3: 'Kết thúc'
+                        };
+                        return obj_status[data];
+                    }
+                }
+            ],
+            'autoWidth': false,
+            "columnDefs": [{
+                "searchable": false,
+                "orderable": false,
+                "targets": [7],
+                "data": null,
+                "defaultContent": table_act_buttons
+            }],
+
+        });
+
+        table_classes.on('order.dt search.dt', function () {
+            table_classes.column(0, {
+                search: 'applied',
+                order: 'applied'
+            }).nodes().each(function (cell, i) {
+                cell.innerHTML = i + 1;
+            });
+        }).draw();
+
+        table_classes.on('click', 'button.list-student-class', function () {
+            var data = table_classes.row($(this).parents('tr')).data();
+            $('DIV#modal-list-student-class DIV.modal-dialog DIV.modal-content DIV.modal-body INPUT#class_id').val(data.id);
+            $('DIV#modal-list-student-class DIV.modal-dialog .modal-title').html('Danh sách học sinh của lớp <strong>' + data.name + '</strong>');
+            $('DIV#modal-list-student-class').modal('show');
+        });
+
+        // table_classes.on('click', 'button.show-timetable', function () {
+        //     var data = table_classes.row($(this).parents('tr')).data();
+        // });
+
+        // table_classes.on('click', 'button.show-list-exams', function () {
+        //     var data = table_classes.row($(this).parents('tr')).data();
+        // });
+
+        table_classes.on('click', 'button.edit-class', function () {
+            var data = table_classes.row($(this).parents('tr')).data();
+            edit_class(data.id);
+        });
+
+        table_classes.on('click', 'button.delete-class', function () {
+            var data = table_classes.row($(this).parents('tr')).data();
+            modalConfirm((confirm) => {
+                if (confirm) {
+                    delete_class(data.id);
+                }
+            }, 'Bạn có muốn xoá lớp <strong>' + data.name + '</strong> không?')
+        });
+
+        $('DIV#modal-class UL.status_select A').on('click', (e) => {
+            var text = $(e.target).text();
+            var val = $(e.target).data('value');
+            $('DIV#modal-class BUTTON.status_selected').text(text);
+            $('DIV#modal-class INPUT#status[type="hidden"]').val(val);
         })
-    });
 
-    jQuery.datetimepicker.setLocale('vi');
-
-    $('#start_date').datetimepicker({
-        format: 'Y-m-d',
-        timepicker: false,
-        minDate: '-1970-01-1',
-    });
-    $('#start_date').blur(function(){
-        let a = $(this).val();
-        let x = new Date(a)
-        let thu = x.getDay();
-        $(":checkbox[value="+thu+"]").prop("checked","true");
-        $(":checkbox").not(":checkbox[value="+thu+"]").prop('checked', false);
-        $(":checkbox[value="+thu+"]").prop("disabled","true");
-        $(":checkbox").not(":checkbox[value="+thu+"]").prop('disabled', false);
-    });
-
-    $("#create-class").click(function(event){
-        event.preventDefault();
-        var name        = $('#name').val();"<br />"
-        var class_code  = $('#class_code').val();
-        var start_date  = $('#start_date').val();
-        var duration    = $('#duration').val();
-        var time_start  = $('#time_start').val();
-        var teacher_id  = $('#teacher_id').val();
-        var course_id   = $('#course_id').val();
-        var class_size  = $('#class_size').val();
-        var val = [];
-        var schedule = "";
-        $(':checkbox:checked').each(function(i){
-            val[i] = $(this).val();
-            schedule =schedule+val[i]+",";
+        $("DIV.content-class BUTTON#button-create-class").click(function () {
+            reset_class_form('create');
+            $('DIV#modal-class').modal('show');
         });
 
-        if($('#form-create-class').valid()){
-            
+        var show_schedule = (json_schedule) => {
+            var schedule = json_schedule ? JSON.parse(json_schedule) : null;
+            var result = [];
+            var vietnamese_weekday = {
+                'mon': 'T2',
+                'tue': 'T3',
+                'wed': 'T4',
+                'thu': 'T5',
+                'fri': 'T6',
+                'sat': 'T7',
+                'sun': 'CN',
+            };
+            if (schedule != null) {
+                for (var wd in schedule) {
+                    result.push('<div>' + vietnamese_weekday[wd] + ': ' + schedule[wd].start + ' - ' + schedule[wd].finish + '</div>');
+                }
+
+                return result.join('');
+            }
+            return '';
+        }
+
+        var delete_class = (class_id) => {
             $.ajax({
-                url: "api/create-class",
-                method:"POST",
-                data:
-                {
-                    name:name,
-                    class_code:class_code,
-                    time_start:time_start,
-                    teacher_id:teacher_id,
-                    duration :duration,
-                    course_id:course_id,
-                    schedule:schedule,
-                    start_date:start_date,
-                    class_size:class_size
+                url: "api/delete-class",
+                method: "GET",
+                data: {
+                    id: class_id
                 },
-                success:function(response){
-                    if(response.code==0){
+                success: function (response) {
+                    if (response.code == 1) {
+                        table_classes.ajax.reload();
+                        toastr.success(response.message);
+
+                    } else
                         toastr.error(response.message);
-                    }else{
-                        $('#form-create-class')[0].reset();
-                        $("#modal-create-class").modal("hide");
-                        toastr.success('Thêm lớp thành công!');
-                        $('#list_class').DataTable().ajax.reload();
+                }
+            });
+        }
+
+        var reset_class_form = (mode, data) => {
+            var modal_title = '';
+            if (mode == 'create') {
+                modal_title = 'Thêm mới lớp học';
+                $(form).find('INPUT').val('');
+                $($(form).find('SELECT OPTION')[0]).prop('selected', 'selected');
+                $(form).find('INPUT[id^="schedule_"][type="checkbox"]').prop('checked', false);
+                status_on_select(1);
+            } else if (mode == 'edit') {
+                modal_title = 'Sửa thông tin lớp học';
+                $(form).find('INPUT#id').val(data.id);
+                $(form).find('INPUT#class_name').val(data.name);
+                $(form).find('INPUT#class_code').val(data.class_code);
+                $(form).find('SELECT#teacher_id').val(data.teacher_id).change();
+                $(form).find('INPUT#start_date').val(data.start_date);
+                $(form).find('INPUT#max_seat').val(data.max_seat);
+                $(form).find('INPUT#status').val(data.status);
+
+                status_on_select(data.status);
+
+                $(form).find('INPUT[id^="schedule_"][type="checkbox"]').prop('checked', false);
+                $(form).find('INPUT[id^="time_start_"]').val('');
+                $(form).find('INPUT[id^="time_end_"]').val('');
+
+                if (data.schedule != '') {
+                    var class_schedule = JSON.parse(data.schedule);
+                    for (var wd in class_schedule) {
+                        $(form).find('INPUT#schedule_' + wd).prop('checked', true);
+                        $(form).find('INPUT#time_start_' + wd).val(class_schedule[wd].start);
+                        $(form).find('INPUT#time_end_' + wd).val(class_schedule[wd].finish);
+                    }
+
+                }
+            }
+
+            $('div.modal#modal-class DIV.modal-header .modal-title').html(modal_title);
+        }
+
+        var edit_class = (class_id) => {
+            $.ajax({
+                dataType: 'json',
+                type: 'get',
+                url: 'api/edit-class',
+                data: {
+                    id: class_id
+                },
+                success: (response) => {
+                    reset_class_form('edit', response);
+                    $('DIV#modal-class').modal("show");
+                }
+            });
+        }
+
+        var status_on_select = (value) => {
+            var text = $('DIV#modal-class UL.status_select A.class_status_' + value).text();
+            $('DIV#modal-class BUTTON.status_selected').text(text);
+            $('DIV#modal-class INPUT#status[type="hidden"]').val(value);
+        }
+
+        var get_student_of_class = (class_id) => {
+            $.ajax({
+                dataType: 'json',
+                type: 'get',
+                url: 'api/get-list-class-student',
+                data: {
+                    id: class_id
+                },
+                success: (response) => {
+                    var students_list = response.data != undefined ? response.data : [];
+                    render_student_of_class(students_list);
+                }
+            });
+        };
+
+        var get_student_not_assign = (class_id) => {
+            $('SELECT#student_not_assigned').empty();
+            $.ajax({
+                dataType: 'json',
+                type: 'get',
+                url: 'api/get-student-not-in-class',
+                data: {
+                    id: class_id
+                },
+                success: (response) => {
+                    var students_list = response.data != undefined ? response.data : [];
+                    if (students_list.length > 0) {
+                        for(var i = 0; i < students_list.length; i++) {
+                            var display_text = students_list[i].name + ' ('+ (students_list[i].birthday != null ? students_list[i].birthday : students_list[i].birthyear)  +')';
+                            var opt = $('<option></option>', {value:students_list[i].id, text:display_text});
+                            $('SELECT#student_not_assigned').append(opt);
+                        }
                     }
                 }
             });
         }
-    });
-    
-    $(document).on('click','.delete-class1',function(){
-        var id = $(this).attr('class_id');
-        if(id){
-                swal({
-                  title: "Bạn có muốn?",
-                  text: "xóa lớp học này?",
-                  icon: "warning",
-                  buttons: true,
-                  dangerMode: true,
-                })
-                .then((willDelete) => {
-                  if (willDelete) {
-                         $.ajax({
-                            url: "api/delete-class",
-                            method:"GET",
-                            data:{id:id},
-                            success:function(response){
-                                if(response.code==1){
-                                    $('#list_class').DataTable().ajax.reload();
-                                    toastr.success(response.message);
-                                    
-                                }else
-                                    toastr.error(response.message);
-                            }
-                        });
-                  }else {
-                    tableClass.ajax.reload();
-                  }
-                });
-             }else{
-                toastr.warning('Không tìm thấy lớp học cần xóa!');
-             }
-    });
 
-    $(document).on('click','.edit-class',function(){
-        $('#modal-edit-class').modal('show');
-        var class_id = $(this).attr('class_id');
-          $.ajax({
-            dataType : 'json',
-            type:'get',
-            url : 'api/edit-class',
-            data : {id:class_id},
-            success: function(response){
-                    $('#class_code_edit').val(response['class_code']);
-                    $('#name_edit').val(response['name']);
-                    $('#start_date_edit').val(response['start_date']);
-                    $('#time_start_edit').val(response['time_start']);
-                    $('#duration_edit').val(response['duration']);
-                    $('#class_size_edit').val(response['class_size']);
-                    $('.button-edit-class').attr('data-id',response['id']);
+        var render_student_of_class = (students) => {
+            var table = $('DIV.modal#modal-list-student-class TABLE#table-student-of-class');
+            $(table).find('tbody').empty();
+
+            if (students.length == 0) {
+                $(table).find('tbody').append($('<tr><td colspan="4" style="text-align:center">Không có học sinh trong lớp</td></tr>'));
+                return;
             }
-        });
-        
-    });
 
-    $(".button-edit-class").click(function(){
-        var id = $(this).attr('data-id');
-        var class_code   =  $('#class_code_edit').val();
-        var name  =  $('#name_edit').val();
-        var class_size   =   $('#class_size_edit').val();
-        var data = {id:id,class_code:class_code,name:name,class_size:class_size};
-           if($("#form-edit-class").valid()){
+            for (var i=0; i < students.length; i++) {
+                var tr = $('<tr></tr>', {'data-student-id': students[i].id});
+                var td_stt = $('<td></td>', {text: (i+1)});
+                var td_name = $('<td></td>', {text: students[i].name});
+                var td_birthday = $('<td></td>', {text: (students[i].birthday != '' ? students[i].birthday:students[i].birthyear)});
+                var td_act = $('<td></td>', {text: ''});
+                $(tr).append(td_stt,td_name,td_birthday,td_act);
+                $(table).find('tbody').append(tr);
+            }
+        }
+
+        $('DIV#modal-class BUTTON#create-class').on('click', (e) => {
+            var is_valid = form.valid();
+            var id = $(form).find('INPUT#id').val();
+            var data = {};
+            var endpoint = id != '' ? "api/edit-class" : "api/create-class";
+            if (is_valid) {
+                data = {
+                    'name': $(form).find('INPUT#class_name').val(),
+                    'class_code': $(form).find('INPUT#class_code').val(),
+                    'teacher_id': $(form).find('SELECT#teacher_id').val(),
+                    'course_name': $(form).find('INPUT#course_name').val(),
+                    'start_date': $(form).find('INPUT#start_date').val(),
+                    'max_seat': $(form).find('INPUT#max_seat').val(),
+                    'status': $(form).find('INPUT#status').val(),
+                    'schedule': render_schedule()
+                };
+
+                if (id != '') data.id = id;
+
                 $.ajax({
-                    type : 'post',
-                    url : 'api/edit-class',
-                    data : data,
-                    success: function(response){
-                        if(response.code==1){
-                            $("#modal-edit-class").modal("hide");
-                            $('#list_class').DataTable().ajax.reload();
-                            toastr.success(response.message);
-                        }else{
-                            toastr.error(response.message);
-                        }
+                    url: endpoint,
+                    method: "POST",
+                    data: data,
+                    success: (response) => {
+                        table_classes.ajax.reload();
+                        $('DIV#modal-class').modal("hide");
+                        toastr.success(response.message);
                     }
                 });
             }
-     });
-
-    $(document).on('click','.add-student-class',function(){
-        $('#modal-add-student-class').modal('show');
-        var class_id = $(this).attr('class_id1');
-        $('#get_class_id12').val(class_id);
-        var tableStudent = $('#table-student-class').DataTable({
-            language: datatable_language,
-            "columnDefs": [ {
-                "searchable": false,
-                "orderable": false,
-                "targets": 0
-            } ],
-            "order": [[ 1, 'asc' ]],
-            paging: false,
-            "bDestroy": true,
-            ajax: {
-                url: 'api/get-student-not-in-class',
-                data: {class_id:class_id},
-                dataSrc: 'data',
-            },
-            columns :[
-                {data:null},
-                {data:"name",name:'name'},
-                {data:"address",name:'address'},
-                {data:"mobile",name:'mobile'},
-                {data:"birthday",name:'birthday'},
-                {
-                    render:function(data, type, row)
-                    {
-                        if(row.gender==0){
-                            return "Nam";
-                        }else if(row.gender==1)
-                            return "Nữ";
-                        else
-                            return "Khác";
-                    }
-                },
-                {
-                    "data":function(data, type, full)
-                    {
-                        return ' <button type="button" student_id1="'+data.id+'" class="button-add-student btn btn-success">Thêm vào lớp</button>'
-                    }
-                },
-            ]
         });
-        tableStudent.on( 'order.dt search.dt', function () {
-            tableStudent.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-                cell.innerHTML = i+1;
-            });
-        } ).draw();
-    });
 
-    $(document).on('click','.button-add-student',function(){
-        var student_id = $(this).attr('student_id1');
-        var class_id = $('#get_class_id12').val();
-        $.ajax({
-            url : "api/add-student-to-class",
-            type: "post",
-            data : {class_id:class_id,student_id:student_id},
-            success:function(response){
-                if(response.code == 0){
-                    $('#table-student-class').DataTable().ajax.reload();
-                    toastr.error(response.message);
-                }else{
-                    $('#table-student-class').DataTable().ajax.reload();
-                    toastr.success(response.message);
+        $('DIV#modal-list-student-class').on('show.bs.modal', (e) => {
+            var class_id = $('DIV#modal-list-student-class DIV.modal-body INPUT#class_id').val();
+            get_student_not_assign(class_id);
+            get_student_of_class(class_id);
+        });
+
+        $('DIV#modal-list-student-class BUTTON#btnAssignClass').on('click', (e) => {
+            var students = $("SELECT#student_not_assigned").val();
+            var class_id = $('DIV#modal-list-student-class DIV.modal-body INPUT#class_id').val();
+            if (students.length > 0) {
+                assign_to_class(class_id, students);
+            }
+        });
+
+        var render_schedule = () => {
+            var form = $('DIV#modal-class FORM#form-class');
+            var container = $(form).find('DIV.row#schedule_row');
+
+            var weekday_check_prefix = 'schedule_';
+            var weekday_time_start_prefix = 'time_start_';
+            var weekday_time_end_prefix = 'time_end_';
+
+            var schedule = {
+                'mon': {},
+                'tue': {},
+                'wed': {},
+                'thu': {},
+                'fri': {},
+                'sat': {},
+                'sun': {}
+            };
+            for (var wd in schedule) {
+                if ($(container).find('INPUT#' + weekday_check_prefix + wd)[0].checked) {
+                    var start_time = $(container).find('INPUT#' + weekday_time_start_prefix + wd).val();
+                    var end_time = $(container).find('INPUT#' + weekday_time_end_prefix + wd).val();
+                    schedule[wd] = {
+                        'start': start_time,
+                        'finish': end_time
+                    };
+                } else {
+                    schedule[wd] = {};
                 }
             }
-        });
-    });
-   
-    $(document).on('click','.list-student-class',function(){
-        $('#modal-list-student-class').modal('show');
-        var class_id = $(this).attr('class_id');
-        var tableStudentClass = $('#table-student-of-class1').DataTable({
-            language: datatable_language,
-            "columnDefs": [ {
-                "searchable": false,
-                "orderable": false,
-                "targets": 0
-            } ],
-            "order": [[ 1, 'asc' ]],
-            paging: false,
-            "bDestroy": true,
-            ajax: {
-                url: 'api/get-list-class-student',
-                data: {class_id:class_id},
-                DataSrc: 'data',
-            },
-            columns: [
-                {data:null},
-                {data:"name",name:'name'},
-                {data:"address",name:'address'},
-                {data:"mobile",name:'mobile'},
-                {data:"birthday",name:'birthday'},
-                {
-                    render:function(data, type, row)
-                    {
-                            if(row.gender==0){
-                                return "Nam";
-                            }else if(row.gender==1)
-                                return "Nữ";
-                            else
-                                return "Khác";
-                    }
-                },
-                {
-                    render:function(data, type, row)
-                    {
-                        return ' <button type="button" student_id="'+row.id+'" class="button-delete-student btn btn-danger">Xóa khỏi lớp</button>'
-                    }
-                },
-            ]
-        });
-        tableStudentClass.on( 'order.dt search.dt', function () {
-            tableStudentClass.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-                cell.innerHTML = i+1;
-            } );
-        } ).draw();
-    });
 
-    $(document).on('click','.button-delete-student',function(){
-        var student_id = $(this).attr('student_id');
-            swal({
-              title: "Bạn có muốn?",
-              text: "xóa học sinh này?",
-              icon: "warning",
-              buttons: true,
-              dangerMode: true,
-            })
-            .then((willDelete) => {
-              if (willDelete) {
-                     $.ajax({
-                        url: "api/delete-student-class",
-                        method:"GET",
-                        data:{id:student_id},
-                        success:function(response){
-                            if(response.code==1){
-                                $('#table-student-of-class1').DataTable().ajax.reload();
-                                toastr.success(response.message);
-                            }else
-                                 toastr.error(response.message);
-                        }
-                    });
-              }
-            });
-         
-    });
-    $(document).on('click','.show-timetable',function(){
-        var class_id = $(this).attr('class_id');
-        window.location.href= asset+ "timetable?classid="+class_id+""
-    });
-    $(document).on('click','.show-list-exams',function(){
-        var class_id = $(this).attr('class_id');
-        window.location.href= asset+ "exam?classid="+class_id+""
-    });
+            return schedule;
+        };
 
-    // function ChangeStatus(){
-    //     var cars = [];
-    //     $(".statuschange").each(function() {
-    //         cars.push($(this).val());
-
-    //     });
-    //     for(var i = 0; i <= cars.length; i++){
-    //         let car = cars[i];
-    //         $(document).on('change','#status_class'+car+'',function(e){
-    //             e.preventDefault();
-    //             var id = $(this).attr('class_id');
-    //             let status = $('select[id=status_class'+car+']').val()
-    //             $.ajax({
-    //                 type: 'post',
-    //                 url: "api/update-status-class",
-    //                 data: {id:id,status:status},
-    //                 success: function(response){
-    //                     toastr.success('Cập nhật thành công');
-    //                 }
-    //             })
-    //         })
-    //     }
-    // }
-
-    // window.onload = ChangeStatus;
-   
-   $(document).on('change','.change-s',function(e){
-        e.preventDefault();
-        var id = $(this).attr('class_id');
-        let status = $('select[id='+id+']').val()
-        $.ajax({
-            type: 'post',
-            url: "api/update-status-class",
-            data: {id:id,status:status},
-            success: function(response){
-                toastr.success('Cập nhật thành công');
+        var assign_to_class = (class_id, students) => {
+            var data = {
+                class_id: class_id,
+                students: students
             }
-        })
-    })
+            $.ajax({
+                url : "api/add-student-to-class",
+                type: "POST",
+                data : data,
+                success:function(response){
+                    if(response.code == 0){
+                        get_student_not_assign(class_id);
+                        get_student_of_class(class_id);
+                        toastr.error(response.message);
+                    }else{
+                        get_student_not_assign(class_id);
+                        get_student_of_class(class_id);
+                        toastr.success(response.message);
+                    }
+                }
+            });
+        }
+
+        $("SELECT#teacher_id").empty();
+
+        $("SELECT#student_not_assigned").select2({
+            placeholder: "Chọn học sinh",
+            minimumInputLength: 3
+        });
+
+        $.ajax({
+            dataType: 'json',
+            type: 'get',
+            url: 'api/get-name-teacher',
+            success: function (response) {
+                $.each(response.data, function () {
+                    $("DIV#modal-class SELECT#teacher_id").append("<option value=" + this.id + ">" + this.name + "</option>")
+                });
+            }
+        });
+
+        var modalConfirm = (callback, message) => {
+            if (message != undefined) {
+                $("#confirm-delete DIV.modal-header H5.modal-title").html(message);
+            }
+            $("#confirm-delete").modal('show');
+
+            $("#modal-btn-yes").unbind('click').bind("click", function () {
+                callback(true);
+                $("#confirm-delete").modal('hide');
+            });
+
+            $("#modal-btn-no").unbind('click').bind("click", function () {
+                callback(false);
+                $("#confirm-delete").modal('hide');
+            });
+        };
+    }
 });

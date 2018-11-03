@@ -3,11 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Classes;
-use App\Holiday;
-use App\TimeTable;
 use DB;
 use Illuminate\Http\Request;
-use Validator;
 
 class ClassController extends Controller
 {
@@ -44,16 +41,16 @@ class ClassController extends Controller
      */
     public function deleteClass(Request $request)
     {
-        $idClass = $request->input('id');
-        $findIdClass = Classes::getInfoClass($idClass);
-        $checkClass = Classes::checkQtyStudentsOfClass($idClass);
+        $id = $request->input('id');
+        $findIdClass = Classes::getInfoClass($id);
+        $checkClass = Classes::checkQtyStudentsOfClass($id);
 
         if ($findIdClass == "") {
             $message = ["code" => 0, "message" => "Không tìm thấy khóa học cần xóa!"];
             return response()->json($message, 200);
         } else if ($checkClass == 0) {
-            Classes::deleteClass($idClass);
-            Classes::deleteTimeTableOfClass($idClass);
+            Classes::deleteClass($id);
+            Classes::deleteTimeTableOfClass($is);
             return response()->json(['code' => 1, 'message' => 'Xóa lớp thành công!']);
         } else {
             $message = ["code" => 0, "message" => "Lớp này đang hoạt động không thể xóa! "];
@@ -61,7 +58,7 @@ class ClassController extends Controller
         }
 
     }
-    
+
     /**
      * Tạo mới lớp học.
      *
@@ -70,82 +67,26 @@ class ClassController extends Controller
      */
     public function createClass(Request $request)
     {
-        $errors = Validator::make($request->all(),
-            [
-                'class_code' => 'required|unique:classes',
-                'name' => 'required',
-                'teacher_id' => 'required|numeric',
-                'time_start' => 'required',
-                'duration' => 'required|numeric',
-                'class_size' => 'required|numeric',
-                'course_id' => 'required|numeric',
-            ],
-            [
-                'class_code.required' => "Mã lớp học không được trống!",
-                'class_code.unique' => "Mã lớp học đã tồn tại!",
-                'name.required' => "Tên lớp học không được trống! ",
-                'teacher_id.required' => "Bạn chưa chọn giảng viên!",
-                'time_start.required' => "Thời gian bắt đầu không được trống!",
-                'time_start.date' => "Thời gian bắt đầu không đúng định dạng!",
-                'duration.required' => "Thời lượng không được trống!",
-                'duration.numeric' => "Thời lượng phải là kiểu số ",
-                'class_size.required' => "Sĩ số không được trống!",
-                'class_size.numeric' => "Sĩ số phải là kiểu số!",
-                'course_id.required' => "Bạn chưa chọn khóa học!",
-            ]
-        );
-        if ($errors->fails() || $request->start_date < date('Y-m-d H:i:s')) {
-            $arrayErrors = $errors->errors()->all();
-            $message = ["code" => 0, "message" => $arrayErrors];
-            return response()->json($message, 200);
-        } else {
-            Classes::createClass($request);
-            $timestart = $request->start_date;
-            $time_start = $request->start_date;
-            $holiday = [];
-            $items = Holiday::getListHoliday();
-            foreach ($items as $holi) {
-                $holiday[] = $holi->holiday;
-            };
-            $qtyLesson = round((Classes::getDurationOfCourse($request->class_code))
-                / ($request->duration));
-            $schedule = explode(',', $request->schedule);
-            $start = 1;
-            for ($j = 0; $j < count($holiday); $j++) {
-                if ($time_start == $holiday[$j]) {
-                    $timestart = date('Y-m-d', strtotime('+1 day', strtotime($time_start)));
-                    return response()->json(['code' => 0, 'message' => "Ngày bắt đầu trùng ngày lễ"]);
-
-                }
-            };
-            while ($start <= $qtyLesson) {
-                for ($i = 0; $i < count($schedule); $i++) {
-
-                    if (date('w', strtotime($timestart)) == $schedule[$i]) {
-                        $date[$start] = $timestart;
-                        $start++;
-                    }
-                }
-                $nextdate = date('Y-m-d', strtotime('+1 day', strtotime($timestart)));
-                for ($j = 0; $j < count($holiday); $j++) {
-                    if ($nextdate == $holiday[$j]) {
-                        $nextdate = date('Y-m-d', strtotime('+2 day', strtotime($timestart)));
-                    }
-                    $timestart = $nextdate;
+        $inputs = $request->all();
+        //validate
+        $data = [];
+        if (is_array($inputs)) {
+            foreach ($inputs as $field => $value) {
+                if ($field != 'schedule' && $field != 'logged_user') {
+                    $data[$field] = $value;
                 }
             }
-            $dataTimeTable = array();
-            for ($i = 1; $i <= $qtyLesson; $i++) {
-                $dataTimeTable['week_days'] = date('w', strtotime($date[$i]));
-                $dataTimeTable['date'] = $date[$i];
-                $dataTimeTable['time'] = $request->time_start;
-                Classes::createTimeTable($dataTimeTable, $request->class_code);
-                $dataTimeTable = array();
-            }
-            return response()->json(['code' => 1, 'message' => TimeTable::all()]);
 
+            $data['schedule'] = json_encode($inputs['schedule'], JSON_UNESCAPED_UNICODE);
+            $data['branch_id'] = $inputs['logged_user']->branch;
+            $data['created_at'] = date(('Y-m-d H:i:s'));
+
+            $class_id = Classes::insertOne($data);
         }
+
+        return response()->json(['code' => 1, 'data' => $class_id, 'message' => 'Tạo lớp học thành công!']);
     }
+
     /**
      * Chỉnh sửa lớp học.
      *
@@ -154,28 +95,28 @@ class ClassController extends Controller
      */
     public function editClass(Request $request)
     {
-        $idClass = $request->id;
-        $errors = Validator::make($request->all(),
-            [
-                'class_code' => 'required|unique:classes,class_code,' . $idClass,
-                'name' => 'required',
-                'class_size' => 'required|numeric',
-            ],
-            [
-                'class_code.required' => "Mã lớp học không được trống!",
-                'class_code.unique' => "Mã lớp học đã tồn tại!",
-                'name.required' => "Tên lớp học không được trống! ",
-                'class_size.required' => "Sĩ số không được trống!",
-                'class_size.numeric' => "Sĩ số phải là kiểu số!",
-            ]
-        );
-        if ($errors->fails()) {
-            $arrayErrors = $errors->errors()->all();
-            return response()->json(["code" => 0, "message" => $arrayErrors], 200);
-        } else {
-            Classes::editClass($request, $idClass);
-            return response()->json(['code' => 1, 'message' => 'Chỉnh lớp học thành công!']);
+        $inputs = $request->all();
+        $data = [];
+        if (is_array($inputs)) {
+            $id = $inputs['id'];
+            foreach ($inputs as $field => $value) {
+                if ($field != 'schedule' && $field != 'logged_user' && $field != 'id') {
+                    $data[$field] = $value;
+                }
+            }
+
+            $data['schedule'] = json_encode($inputs['schedule'], JSON_UNESCAPED_UNICODE);
+            $data['branch_id'] = $inputs['logged_user']->branch;
+            $data['updated_at'] = date(('Y-m-d H:i:s'));
+
+            $result = Classes::updateOne($id, $data);
+            return response()->json(['code' => 1, 'data' => $result, 'message' => 'Cập nhật lớp học thành công!']);
         }
+        else {
+            return response()->json(['code' => 0, 'message' => 'Error!']);
+        }
+
+        
     }
     /**
      * Lấy thông tin lớp học cần sửa
@@ -198,7 +139,7 @@ class ClassController extends Controller
      */
     public function getListStudentOfClass(Request $request)
     {
-        $class_id = $request->input('class_id');
+        $class_id = $request->input('id');
         $studentsOfClass = Classes::getStudentOfClass($class_id);
 
         if ($studentsOfClass->count() == 0) {
@@ -270,16 +211,18 @@ class ClassController extends Controller
      */
     public function addStudentToClass(Request $request)
     {
-        $student_id = request('student_id');
-        $class_id = request('class_id');
-        $data = array(
-            'student_id' => $student_id,
-            'class_id' => $class_id,
-            'created_at' => date("Y-m-d"),
-            'updated_at' => date("Y-m-d"),
-        );
+        $input = $request->all();
+        $fail = 0;
+        $class_id = $input['class_id'];
+        $students = $input['students'];
+        $data = [];
+        if (is_array($students)) {
+            foreach ($students as $student_id) {
+                $data[] = ['class_id' => $class_id, 'student_id' => $student_id, 'created_at' => date("Y-m-d H:i:s")];
+            }
+        }
 
-        $tkb_student = DB::table('students')->join('student_classes', 'student_classes.student_id', '=', 'students.id')
+        /* $tkb_student = DB::table('students')->join('student_classes', 'student_classes.student_id', '=', 'students.id')
             ->join('classes', 'classes.id', '=', 'student_classes.class_id')
             ->join('timetables', 'timetables.class_id', '=', 'classes.id')
             ->select('classes.start_date', DB::raw('max(timetables.date) as end_date'))
@@ -331,7 +274,7 @@ class ClassController extends Controller
                     }
                 }
             }
-        }
+        } */
 
         if ($fail != 0) {
             return response()->json(['code' => 0, 'message' => 'Lịch học bị trùng hoặc Học viên đã có trong lớp']);
@@ -365,9 +308,14 @@ class ClassController extends Controller
      */
     public function getListStudentNotInClass(Request $request)
     {
-        $class_id = $request->input('class_id');
-        $studentsNotInClass = DB::table('students')->whereNotIn('id', DB::table('student_classes')->select('student_id')->from('student_classes')->where('class_id', $class_id)
-        )->get();
+        $class_id = $request->input('id');
+        $studentsNotInClass = DB::table('students')
+            ->whereNotIn('id', DB::table('student_classes')
+            ->select('student_id')
+            ->from('student_classes')
+            ->where('class_id', $class_id)
+        )->where('students.name', '!=', null)
+        ->get();
         return response()->json(['code' => 1, 'data' => $studentsNotInClass]);
     }
 

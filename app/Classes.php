@@ -26,11 +26,10 @@ class Classes extends Model
                     ->where('classes.name','like','%'.$keyword.'%')
                     ->orwhere('classes.status','like','%'.$keyword.'%')
                     ->orwhere('classes.schedule','like','%'.$keyword.'%')
-                    ->orwhere('classes.time_start','like','%'.$keyword.'%')
                     ->orwhere('classes.start_date','like','%'.$keyword.'%')
-                    ->orwhere('classes.class_size','like','%'.$keyword.'%')
+                    ->orwhere('classes.max_seat','like','%'.$keyword.'%')
                     ->orwhere('teachers.name','like','%'.$keyword.'%')
-                    ->offset($start)->limit($record)
+                    //->offset($start)->limit($record)
                     ->get();
 		                             
 		return $listClass;
@@ -64,7 +63,6 @@ class Classes extends Model
                 'name'          =>  $infoClass['name'],
                 'teacher_id'    =>  $infoClass['teacher_id'],
                 'schedule'      =>  $infoClass['schedule'],
-                'time_start'    =>  $infoClass['time_start'],
                 'start_date'    =>  $infoClass['start_date'],
                 'duration'      =>  $infoClass['duration'],
                 'course_id'     =>  $infoClass['course_id'],
@@ -256,7 +254,7 @@ class Classes extends Model
         $class = DB::table('classes')
                     ->leftjoin('student_classes','student_classes.class_id','=','classes.id')
                     ->select('classes.*',DB::raw('count(student_classes.student_id) as number_student'))
-                    //->where('classes.status', 0)
+                    ->where('classes.status', 0)
                     ->groupBy('classes.id')->get();
         return $class;
     }
@@ -269,14 +267,9 @@ class Classes extends Model
      */
 
     public static function addStudentToClass1($data){
-        $student = DB::table('student_classes')
-        ->insert([
-            ['student_id' => $data['student_id'],
-            'class_id' => $data['class_id'],
-            'created_at' => $data['created_at'],
-            'updated_at' => $data['updated_at'],]
-        ]);
-        return $student;
+        $result = DB::table('student_classes')
+        ->insert($data);
+        return $result;
     }
 
     /**

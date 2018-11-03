@@ -1,5 +1,8 @@
 try {
     window.$ = window.jQuery = require('jquery');
+
+    require('jquery-validation');
+
     var user_info = {
         id: $('meta[name="user-id"]').attr('content'),
         name: $('meta[name="user-name"]').attr('content'),
