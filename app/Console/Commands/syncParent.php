@@ -14,7 +14,7 @@ class syncParent extends Command
      *
      * @var string
      */
-    protected $signature = 'zohocrm:parent {--getlist} {--syncbranch}';
+    protected $signature = 'zoho:parent {--getlist} {--syncbranch}';
 
     /**
      * The console command description.

@@ -3,10 +3,10 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use \App\Classes\ZohoCrmConnect;
-use \App\Teacher;
 use \App\Branch;
 use \App\Classes;
+use \App\Classes\ZohoCrmConnect;
+use \App\Teacher;
 
 class syncClasses extends Command
 {
@@ -15,7 +15,7 @@ class syncClasses extends Command
      *
      * @var string
      */
-    protected $signature = 'zoho:classes {--getlist}';
+    protected $signature = 'zoho:classes {--getlist} {--schedule}';
 
     /**
      * The console command description.
@@ -105,24 +105,20 @@ class syncClasses extends Command
                         foreach ($data_mapping as $field => $crm_field) {
                             if ($field == 'created_at') {
                                 $data[$field] = $now;
-                            }
-                            else if ($field == 'crm_branch' || $field == 'crm_teacher'){
+                            } else if ($field == 'crm_branch' || $field == 'crm_teacher') {
                                 $data[$field] = $crm_class->$crm_field != null ? json_encode($crm_class->$crm_field, JSON_UNESCAPED_UNICODE) : $crm_class->$crm_field;
-                            }
-                            else if ($field == 'branch_id') {
+                            } else if ($field == 'branch_id') {
                                 $owner_id = $crm_class->Owner->id;
-                                foreach($branchs as $branch) {
-                                    if ($branch['crm_owner_id'] == $owner_id)
-                                    {
+                                foreach ($branchs as $branch) {
+                                    if ($branch['crm_owner_id'] == $owner_id) {
                                         $data[$field] = $branch['id'];
                                         break;
                                     }
                                 }
                             } else if ($field == 'teacher_id' && !is_null($crm_class->Gi_o_vi_n1)) {
                                 $crm_teacher_id = $crm_class->Gi_o_vi_n1->id;
-                                foreach($teachers as $teacher) {
-                                    if ($teacher['crm_id'] == $crm_teacher_id)
-                                    {
+                                foreach ($teachers as $teacher) {
+                                    if ($teacher['crm_id'] == $crm_teacher_id) {
                                         $data[$field] = $teacher['id'];
                                         break;
                                     }
@@ -138,12 +134,15 @@ class syncClasses extends Command
                                         unset($schedule['$approved']);
                                         unset($schedule['$editable']);
                                         unset($schedule['id']);
-                                        $data[$field] = json_encode($schedule, JSON_UNESCAPED_UNICODE); 
-                                    }                                
+                                        $data[$field] = json_encode($schedule, JSON_UNESCAPED_UNICODE);
+                                    }
                                 }
 
                             } else {
-                                if ($crm_field == '') continue;
+                                if ($crm_field == '') {
+                                    continue;
+                                }
+
                                 $data[$field] = $crm_class->$crm_field;
                             }
                         }
@@ -155,7 +154,7 @@ class syncClasses extends Command
                             'EMS_ID' => '' . $id,
                             'EMS_SYNC_TIME' => $now,
                         ]);
-                        
+
                         usleep(500);
                     }
                 }
@@ -186,24 +185,20 @@ class syncClasses extends Command
                         foreach ($data_mapping as $field => $crm_field) {
                             if ($field == 'updated_at') {
                                 $data[$field] = $now;
-                            }
-                            else if ($field == 'crm_branch' || $field == 'crm_teacher'){
+                            } else if ($field == 'crm_branch' || $field == 'crm_teacher') {
                                 $data[$field] = $crm_class->$crm_field != null ? json_encode($crm_class->$crm_field, JSON_UNESCAPED_UNICODE) : $crm_class->$crm_field;
-                            }
-                            else if ($field == 'branch_id') {
+                            } else if ($field == 'branch_id') {
                                 $owner_id = $crm_class->Owner->id;
-                                foreach($branchs as $branch) {
-                                    if ($branch['crm_owner_id'] == $owner_id)
-                                    {
+                                foreach ($branchs as $branch) {
+                                    if ($branch['crm_owner_id'] == $owner_id) {
                                         $data[$field] = $branch['id'];
                                         break;
                                     }
                                 }
                             } else if ($field == 'teacher_id' && !is_null($crm_class->Gi_o_vi_n1)) {
                                 $crm_teacher_id = $crm_class->Gi_o_vi_n1->id;
-                                foreach($teachers as $teacher) {
-                                    if ($teacher['crm_id'] == $crm_teacher_id)
-                                    {
+                                foreach ($teachers as $teacher) {
+                                    if ($teacher['crm_id'] == $crm_teacher_id) {
                                         $data[$field] = $teacher['id'];
                                         break;
                                     }
@@ -219,15 +214,17 @@ class syncClasses extends Command
                                         unset($schedule['$approved']);
                                         unset($schedule['$editable']);
                                         unset($schedule['id']);
-                                        $data[$field] = json_encode($schedule, JSON_UNESCAPED_UNICODE); 
-                                    }                                
+                                        $data[$field] = json_encode($schedule, JSON_UNESCAPED_UNICODE);
+                                    }
                                 }
 
                             } else if ($field == 'id') {
                                 $id = $crm_class->$crm_field;
-                            }
-                            else {
-                                if ($crm_field == '') continue;
+                            } else {
+                                if ($crm_field == '') {
+                                    continue;
+                                }
+
                                 $data[$field] = $crm_class->$crm_field;
                             }
                         }
@@ -264,6 +261,55 @@ class syncClasses extends Command
                         }
 
                         $start_offset = $start_offset == 0 ? $max_record : $max_record * $i;
+
+                    }
+                }
+            }
+        }
+
+        $syncSchedule = $this->option('schedule');
+        
+        if ($syncSchedule) {
+            $classes_list = Classes::all()->toArray();
+            if (count($classes_list) > 0) {
+                foreach ($classes_list as $class) {
+                    $crm_schedule = trim($class['crm_schedule']) != '' ? json_decode($class['crm_schedule'], true) : '';
+                    if ($crm_schedule != '') {
+                        $class_schedule = [];
+                        $ar_keys = array_keys($crm_schedule);
+                        $ary_couple = [0 => [$ar_keys[0]]];
+                        $j = 0;
+                        for ($i = 1; $i < count($ar_keys); $i++) {
+                            if (substr($ar_keys[$i], -1) == substr($ar_keys[$i - 1], -1)) {
+                                $ary_couple[$j][] = $ar_keys[$i];
+                            } else {
+                                $j++;
+                                $ary_couple[$j][] = $ar_keys[$i];
+                            }
+                        }
+
+                        foreach ($ary_couple as $keys) {
+                            sort($keys);
+                            $wd = "";
+                            for ($i = 0; $i < count($keys); $i += 2) {
+                                $wd = strtolower($crm_schedule[$keys[$i]]);
+                                $hours = trim($crm_schedule[$keys[$i + 1]]);
+                                $ary_tmp = explode('-', $hours);
+                                array_walk($ary_tmp, function (&$item) {
+                                    $item = trim($item);
+                                });
+
+                                $ary_hours = [
+                                    'start' => isset($ary_tmp[0]) ? (strlen($ary_tmp[0]) < 5 ? '0'.$ary_tmp[0] : $ary_tmp[0]) : '',
+                                    'finish' => isset($ary_tmp[1]) ? (strlen($ary_tmp[1]) < 5 ? '0'.$ary_tmp[1] : $ary_tmp[1]) : '',
+                                ];
+
+                                $class_schedule[$wd] = $ary_hours;
+                                $old_class = Classes::find($class['id']);
+                                $old_class->schedule = json_encode($class_schedule);
+                                $old_class->update();
+                            }
+                        }
 
                     }
                 }

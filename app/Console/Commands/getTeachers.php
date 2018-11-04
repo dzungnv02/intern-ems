@@ -13,7 +13,7 @@ class getTeachers extends Command
      *
      * @var string
      */
-    protected $signature = 'zohocrm:teacher {--getlist}';
+    protected $signature = 'zoho:teacher {--getlist}';
 
     /**
      * The console command description.

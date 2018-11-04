@@ -13,7 +13,7 @@ class syncBranch extends Command
      *
      * @var string
      */
-    protected $signature = 'zohocrm:branch {--pushlist}';
+    protected $signature = 'zoho:branch {--pushlist}';
 
     /**
      * The console command description.

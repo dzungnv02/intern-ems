@@ -14,7 +14,7 @@ class syncStudentClasses extends Command
      *
      * @var string
      */
-    protected $signature = 'zoho:classes {--student}';
+    protected $signature = 'zoho:studentclasses {--student}';
 
     /**
      * The console command description.

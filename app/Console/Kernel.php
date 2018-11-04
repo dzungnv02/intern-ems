@@ -30,7 +30,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('zohocrm:teacher --getlist')->everyMinute();
+        $schedule->command('zoho:teacher --getlist')->everyMinute();
     }
 
     /**

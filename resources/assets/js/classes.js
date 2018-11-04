@@ -86,7 +86,7 @@ $(function () {
             }
         });
 
-        form.validate({
+        var create_class_validator = form.validate({
             debug: true,
             success: "valid",
             rules: create_class_validate_rules,
@@ -231,6 +231,8 @@ $(function () {
             };
             if (schedule != null) {
                 for (var wd in schedule) {
+                    schedule[wd].start = schedule[wd].start.length < 5 ? '0' + schedule[wd].start : schedule[wd].start;
+                    schedule[wd].finish = schedule[wd].finish.length < 5 ? '0' + schedule[wd].finish : schedule[wd].finish;
                     result.push('<div>' + vietnamese_weekday[wd] + ': ' + schedule[wd].start + ' - ' + schedule[wd].finish + '</div>');
                 }
 
@@ -259,6 +261,10 @@ $(function () {
 
         var reset_class_form = (mode, data) => {
             var modal_title = '';
+            $(form)[0].reset();
+            create_class_validator.resetForm();
+            form.find(".error").removeClass("error");
+
             if (mode == 'create') {
                 modal_title = 'Thêm mới lớp học';
                 $(form).find('INPUT').val('');
@@ -284,6 +290,8 @@ $(function () {
                 if (data.schedule != '') {
                     var class_schedule = JSON.parse(data.schedule);
                     for (var wd in class_schedule) {
+                        class_schedule[wd].start = class_schedule[wd].start.length < 5 ? '0' + class_schedule[wd].start :class_schedule[wd].start;
+                        class_schedule[wd].finish = class_schedule[wd].finish.length < 5 ? '0' + class_schedule[wd].finish :class_schedule[wd].finish;
                         $(form).find('INPUT#schedule_' + wd).prop('checked', true);
                         $(form).find('INPUT#time_start_' + wd).val(class_schedule[wd].start);
                         $(form).find('INPUT#time_end_' + wd).val(class_schedule[wd].finish);
@@ -409,6 +417,12 @@ $(function () {
             var class_id = $('DIV#modal-list-student-class DIV.modal-body INPUT#class_id').val();
             get_student_not_assign(class_id);
             get_student_of_class(class_id);
+        });
+
+        $('DIV#modal-class').on('show.bs.modal', (e) => {
+            create_class_validator.resetForm();
+            form.find(".has-error").removeClass("has-error");
+            form.find(".has-error").removeClass("has-error");
         });
 
         $('DIV#modal-list-student-class BUTTON#btnAssignClass').on('click', (e) => {
