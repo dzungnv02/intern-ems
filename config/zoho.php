@@ -110,7 +110,7 @@ return [
         'ZOHO_MODULE_EMS_CLASS' => [
             'Product_Name' => 'name',
             'Gi_o_vi_n1' => [],
-            'Ch_ng_tr_nh_h_c' => 'course_id',
+            'Ch_ng_tr_nh_h_c' => 'course_name',
             'Product_Active' => 'status',
             'L_ch_h_c_trong_tu_n' => [],
             'EMS_ID' => 'id',

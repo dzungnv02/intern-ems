@@ -13099,9 +13099,9 @@ $(function () {
     if ($('TABLE#list_class').length > 0) {
         var form = $('DIV#modal-class FORM#form-class');
 
-        var table_act_buttons = '<button type="button" class="list-student-class btn btn-sm btn-info"><i class="fa fa-address-book-o" aria-hidden="true"></i></button>\
-                            <button type="button" class="edit-class btn btn-sm btn-warning"><i title="Sửa thông tin lớp" class="fa fa-pencil-square-o" aria-hidden="true"></i></button>\
-                            <button type="button" class="delete-class btn btn-sm btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+        var table_act_buttons = '<button type="button" title="Danh sách lớp" class="list-student-class btn btn-sm btn-info"><i class="fa fa-address-book-o" aria-hidden="true"></i></button>\
+                            <button type="button" title="Sửa thông tin lớp" class="edit-class btn btn-sm btn-warning"><i title="Sửa thông tin lớp" class="fa fa-pencil-square-o" aria-hidden="true"></i></button>\
+                            <button type="button" title="Xoá lớp" class="delete-class btn btn-sm btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
 
         /* 
         <button type="button" class="show-timetable btn btn-sm btn-success"><i title="Xem Thời Khóa Biểu" class="fa fa-book" aria-hidden="true"></i></button>\
@@ -13116,11 +13116,11 @@ $(function () {
             class_name: {
                 required: true
             },
-            max_seat: {
+            /* max_seat: {
                 required: true,
                 number: true,
                 min: 1
-            },
+            }, */
             start_date: {
                 required: true,
                 date: true
@@ -13131,11 +13131,11 @@ $(function () {
             class_name: {
                 required: "Tên lớp không được trống!"
             },
-            max_seat: {
+            /* max_seat: {
                 required: "Số học sinh tối đa không được trống!",
                 number: "Hãy nhập giá trị là số lớn hơn 0!",
                 min: "Hãy nhập giá trị là số lớn hơn 0!"
-            },
+            }, */
             start_date: {
                 required: 'Ngày bắt đầu không được trống!',
                 date: 'Hãy nhập giá trị là một ngày!'
@@ -13351,6 +13351,7 @@ $(function () {
                 $(form).find('INPUT#start_date').val(data.start_date);
                 $(form).find('INPUT#max_seat').val(data.max_seat);
                 $(form).find('INPUT#status').val(data.status);
+                $(form).find('INPUT#course_name').val(data.course_name);
 
                 status_on_select(data.status);
 

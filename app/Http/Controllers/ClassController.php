@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes;
+use App\Classes\ZohoCrmConnect;
 use DB;
 use Illuminate\Http\Request;
+use \App\Branch;
+use \App\Classes;
+use \App\Teacher;
+use \Illuminate\Support\Facades\Log;
 
 class ClassController extends Controller
 {
@@ -50,7 +54,7 @@ class ClassController extends Controller
             return response()->json($message, 200);
         } else if ($checkClass == 0) {
             Classes::deleteClass($id);
-            Classes::deleteTimeTableOfClass($is);
+            Classes::deleteTimeTableOfClass($id);
             return response()->json(['code' => 1, 'message' => 'Xóa lớp thành công!']);
         } else {
             $message = ["code" => 0, "message" => "Lớp này đang hoạt động không thể xóa! "];
@@ -67,24 +71,71 @@ class ClassController extends Controller
      */
     public function createClass(Request $request)
     {
-        $inputs = $request->all();
-        //validate
-        $data = [];
-        if (is_array($inputs)) {
-            foreach ($inputs as $field => $value) {
-                if ($field != 'schedule' && $field != 'logged_user') {
-                    $data[$field] = $value;
+        try {
+
+            $inputs = $request->all();
+            //validate
+            $data = [];
+            if (is_array($inputs)) {
+                foreach ($inputs as $field => $value) {
+                    if ($field != 'schedule' && $field != 'logged_user') {
+                        $data[$field] = $value;
+                    }
+                }
+
+                $data['schedule'] = json_encode($inputs['schedule'], JSON_UNESCAPED_UNICODE);
+                $data['branch_id'] = $inputs['logged_user']->branch;
+                $data['created_at'] = date(('Y-m-d H:i:s'));
+
+                $class_id = Classes::insertOne($data);
+
+                if ($class_id) {
+                    $crm_module = config('zoho.MODULES.ZOHO_MODULE_EMS_CLASS');
+                    $crm_mapping = config('zoho.MAPPING.ZOHO_MODULE_EMS_CLASS');
+                    $zoho_crm = new ZohoCrmConnect();
+                    //$crm_class = $zoho_crm->search($crm_module, 'Product_Name', $data['name']);
+                    $crm_class = false;
+
+                    $teacher = Teacher::find($data['teacher_id']);
+                    $branch = Branch::find($data['branch_id']);
+
+                    $crm_data = ['data' => []];
+                    $crm_data['data'][0]['EMS_ID'] = trim($class_id);
+                    $crm_data['data'][0]['EMS_SYNC_TIME'] = date('Y-m-d H:i:s');
+                    $crm_data['data'][0]['Gi_o_vi_n1'] = ['id' => $teacher->crm_id, 'name' => $teacher->name];
+                    $crm_data['data'][0]['Product_Name'] = $data['name'];
+                    $crm_data['data'][0]['Ch_ng_tr_nh_h_c'] = $data['course_name'];
+                    $crm_data['data'][0]['Product_Active'] = $data['status'] == 2 ? true : false;
+                    $crm_data['data'][0]['Owner'] = ['id' => $branch->crm_owner_id, 'name' => $branch->crm_owner_name];
+
+                    if (is_array($inputs['schedule'])) {
+                        $ary_wd = array_keys($inputs['schedule']);
+                        $ary_hours = array_values($inputs['schedule']);
+                        $crm_data['data'][0]['L_ch_h_c_trong_tu_n'] = [0 => [
+                            'Bu_i_1' => ucfirst($ary_wd[0]),
+                            'Gi_bu_i_1' => implode(' - ', $ary_hours[0]),
+                            'Bu_i_2' => ucfirst($ary_wd[1]),
+                            'Gi_bu_i_2' => implode(' - ', $ary_hours[1]),
+                        ],
+                        ];
+                    }
+
+                    if ($crm_class == false) {
+                        $result = $zoho_crm->upsertRecord($crm_module, $crm_data);
+                        if ($result != false) {
+                            $crm_id = $result->details->id;
+                            $class = Classes::find($class_id);
+                            $class->crm_id = $crm_id;
+                            $class->update();
+                        }
+                    }
                 }
             }
 
-            $data['schedule'] = json_encode($inputs['schedule'], JSON_UNESCAPED_UNICODE);
-            $data['branch_id'] = $inputs['logged_user']->branch;
-            $data['created_at'] = date(('Y-m-d H:i:s'));
-
-            $class_id = Classes::insertOne($data);
+            return response()->json(['code' => 1, 'data' => $class_id, 'message' => 'Tạo lớp học thành công!']);
+        } catch (Exception $e) {
+            return response()->json(['code' => 0, 'message' => $e->getMessage()], 200);
         }
-
-        return response()->json(['code' => 1, 'data' => $class_id, 'message' => 'Tạo lớp học thành công!']);
     }
 
     /**
@@ -95,28 +146,77 @@ class ClassController extends Controller
      */
     public function editClass(Request $request)
     {
-        $inputs = $request->all();
-        $data = [];
-        if (is_array($inputs)) {
-            $id = $inputs['id'];
-            foreach ($inputs as $field => $value) {
-                if ($field != 'schedule' && $field != 'logged_user' && $field != 'id') {
-                    $data[$field] = $value;
+        try {
+
+            $inputs = $request->all();
+            $data = [];
+            if (is_array($inputs)) {
+                $id = $inputs['id'];
+                foreach ($inputs as $field => $value) {
+                    if ($field != 'schedule' && $field != 'logged_user' && $field != 'id') {
+                        $data[$field] = $value;
+                    }
                 }
+
+                $data['schedule'] = json_encode($inputs['schedule'], JSON_UNESCAPED_UNICODE);
+                $data['branch_id'] = $inputs['logged_user']->branch;
+                $data['updated_at'] = date(('Y-m-d H:i:s'));
+
+                $result = Classes::updateOne($id, $data);
+                $class = Classes::find($id);
+
+                if ($result) {
+                    $crm_module = config('zoho.MODULES.ZOHO_MODULE_EMS_CLASS');
+                    $crm_mapping = config('zoho.MAPPING.ZOHO_MODULE_EMS_CLASS');
+                    $zoho_crm = new ZohoCrmConnect();
+                    $crm_class = $zoho_crm->getRecordById($crm_module, $class->crm_id);
+
+                    $teacher = Teacher::find($data['teacher_id']);
+                    $branch = Branch::find($data['branch_id']);
+                    $crm_schedule_id = null;
+
+                    $crm_data = ['data' => []];
+                    $crm_data['data'][0]['id'] = $class->crm_id;
+                    $crm_data['data'][0]['EMS_ID'] = trim($id);
+                    $crm_data['data'][0]['EMS_SYNC_TIME'] = date('Y-m-d H:i:s');
+                    $crm_data['data'][0]['Gi_o_vi_n1'] = ['id' => $teacher->crm_id, 'name' => $teacher->name];
+                    $crm_data['data'][0]['Product_Name'] = $data['name'];
+                    $crm_data['data'][0]['Ch_ng_tr_nh_h_c'] = $data['course_name'];
+                    $crm_data['data'][0]['Product_Active'] = $data['status'] == 2 ? true : false;
+                    $crm_data['data'][0]['Owner'] = ['id' => $branch->crm_owner_id, 'name' => $branch->crm_owner_name];
+                    
+
+                    if ($crm_class != false)
+                        $crm_schedule_id = isset($crm_class->L_ch_h_c_trong_tu_n) ? $crm_class->L_ch_h_c_trong_tu_n[0]->id : null;
+                        
+
+                    if (is_array($inputs['schedule'])) {
+                        $ary_wd = array_keys($inputs['schedule']);
+                        $ary_hours = array_values($inputs['schedule']);
+                        $crm_data['data'][0]['L_ch_h_c_trong_tu_n'] = [0 => [
+                            'Bu_i_1' => ucfirst($ary_wd[0]),
+                            'Gi_bu_i_1' => implode(' - ', $ary_hours[0]),
+                            'Bu_i_2' => ucfirst($ary_wd[1]),
+                            'Gi_bu_i_2' => implode(' - ', $ary_hours[1]),
+                        ],
+                        ];
+
+                        if ($crm_schedule_id != null) {
+                            $crm_data['data'][0]['L_ch_h_c_trong_tu_n'][0]['id'] = $crm_schedule_id;
+                        }
+                    }
+
+                    Log::info(json_encode($crm_data));
+                    $result = $zoho_crm->upsertRecord($crm_module, $crm_data);
+                }
+
+                return response()->json(['code' => 1, 'data' => $result, 'message' => 'Cập nhật lớp học thành công!']);
+            } else {
+                return response()->json(['code' => 0, 'message' => 'Error!']);
             }
-
-            $data['schedule'] = json_encode($inputs['schedule'], JSON_UNESCAPED_UNICODE);
-            $data['branch_id'] = $inputs['logged_user']->branch;
-            $data['updated_at'] = date(('Y-m-d H:i:s'));
-
-            $result = Classes::updateOne($id, $data);
-            return response()->json(['code' => 1, 'data' => $result, 'message' => 'Cập nhật lớp học thành công!']);
+        } catch (Exception $e) {
+            return response()->json(['code' => 0, 'message' => $e->getMessage()], 200);
         }
-        else {
-            return response()->json(['code' => 0, 'message' => 'Error!']);
-        }
-
-        
     }
     /**
      * Lấy thông tin lớp học cần sửa
@@ -223,57 +323,57 @@ class ClassController extends Controller
         }
 
         /* $tkb_student = DB::table('students')->join('student_classes', 'student_classes.student_id', '=', 'students.id')
-            ->join('classes', 'classes.id', '=', 'student_classes.class_id')
-            ->join('timetables', 'timetables.class_id', '=', 'classes.id')
-            ->select('classes.start_date', DB::raw('max(timetables.date) as end_date'))
-            ->where('students.id', $student_id)
-            ->groupBy('classes.start_date')->get();
+        ->join('classes', 'classes.id', '=', 'student_classes.class_id')
+        ->join('timetables', 'timetables.class_id', '=', 'classes.id')
+        ->select('classes.start_date', DB::raw('max(timetables.date) as end_date'))
+        ->where('students.id', $student_id)
+        ->groupBy('classes.start_date')->get();
 
         $end_date = json_decode(json_encode($tkb_student), true);
 
         $lop_moi = DB::table('timetables')->join('classes', 'classes.id', '=', 'timetables.class_id')
-            ->select('classes.start_date', DB::raw('max(timetables.date) as end_date'))
-            ->where('classes.id', $class_id)->groupBy('classes.start_date')->get();
+        ->select('classes.start_date', DB::raw('max(timetables.date) as end_date'))
+        ->where('classes.id', $class_id)->groupBy('classes.start_date')->get();
 
         $end_date_lop_moi = json_decode(json_encode($lop_moi), true);
 
         $get = DB::table('students')
-            ->join("student_classes", 'students.id', '=', 'student_classes.student_id')
-            ->join('classes', 'classes.id', '=', 'student_classes.class_id')
-            ->join('timetables', 'timetables.class_id', '=', 'classes.id')
-            ->where('students.id', $student_id)
-            ->select('timetables.time', 'timetables.week_days', 'classes.duration')
-            ->distinct('timetables.time', 'timetables.week_days', 'classes.duration')
-            ->get();
+        ->join("student_classes", 'students.id', '=', 'student_classes.student_id')
+        ->join('classes', 'classes.id', '=', 'student_classes.class_id')
+        ->join('timetables', 'timetables.class_id', '=', 'classes.id')
+        ->where('students.id', $student_id)
+        ->select('timetables.time', 'timetables.week_days', 'classes.duration')
+        ->distinct('timetables.time', 'timetables.week_days', 'classes.duration')
+        ->get();
 
         $gio_hoc = json_decode(json_encode($get), true);
 
         $themvao = DB::table('timetables')->join('classes', 'classes.id', '=', 'timetables.class_id')
-            ->select('timetables.time', 'timetables.week_days', 'classes.duration')
-            ->where('class_id', $class_id)
-            ->distinct('timetables.time', 'timetables.week_days', 'classes.duration')
-            ->get();
+        ->select('timetables.time', 'timetables.week_days', 'classes.duration')
+        ->where('class_id', $class_id)
+        ->distinct('timetables.time', 'timetables.week_days', 'classes.duration')
+        ->get();
         $time_lop_moi = json_decode(json_encode($themvao), true);
 
         $fail = 0;
         for ($i = 0; $i < count($end_date); $i++) {
-            if ($end_date_lop_moi[0]['start_date'] > $end_date[$i]['end_date'] || $end_date[$i]['start_date'] > $end_date_lop_moi[0]['end_date']) {
-            } else {
-                for ($i = 0; $i < count($gio_hoc); $i++) {
-                    for ($j = 0; $j < count($time_lop_moi); $j++) {
-                        if ($gio_hoc[$i]['week_days'] == $time_lop_moi[$j]['week_days']) {
-                            $time_end1 = date(' H:i:s', strtotime('+' . $gio_hoc[$i]['duration'] . 'hour', strtotime($gio_hoc[$i]['time'])));
-                            $time_end2 = date(' H:i:s', strtotime('+' . $time_lop_moi[$j]['duration'] . 'hour', strtotime($time_lop_moi[$j]['time'])));
-                            $time_start1 = $gio_hoc[$i]['time'];
-                            $time_start2 = $time_lop_moi[$j]['time'];
-                            if (strtotime($time_end2) < strtotime($time_start1) || strtotime($time_start2) > strtotime($time_end1)) {
-                            } else {
-                                $fail++;
-                            }
-                        }
-                    }
-                }
-            }
+        if ($end_date_lop_moi[0]['start_date'] > $end_date[$i]['end_date'] || $end_date[$i]['start_date'] > $end_date_lop_moi[0]['end_date']) {
+        } else {
+        for ($i = 0; $i < count($gio_hoc); $i++) {
+        for ($j = 0; $j < count($time_lop_moi); $j++) {
+        if ($gio_hoc[$i]['week_days'] == $time_lop_moi[$j]['week_days']) {
+        $time_end1 = date(' H:i:s', strtotime('+' . $gio_hoc[$i]['duration'] . 'hour', strtotime($gio_hoc[$i]['time'])));
+        $time_end2 = date(' H:i:s', strtotime('+' . $time_lop_moi[$j]['duration'] . 'hour', strtotime($time_lop_moi[$j]['time'])));
+        $time_start1 = $gio_hoc[$i]['time'];
+        $time_start2 = $time_lop_moi[$j]['time'];
+        if (strtotime($time_end2) < strtotime($time_start1) || strtotime($time_start2) > strtotime($time_end1)) {
+        } else {
+        $fail++;
+        }
+        }
+        }
+        }
+        }
         } */
 
         if ($fail != 0) {
@@ -311,11 +411,11 @@ class ClassController extends Controller
         $class_id = $request->input('id');
         $studentsNotInClass = DB::table('students')
             ->whereNotIn('id', DB::table('student_classes')
-            ->select('student_id')
-            ->from('student_classes')
-            ->where('class_id', $class_id)
-        )->where('students.name', '!=', null)
-        ->get();
+                    ->select('student_id')
+                    ->from('student_classes')
+                    ->where('class_id', $class_id)
+            )->where('students.name', '!=', null)
+            ->get();
         return response()->json(['code' => 1, 'data' => $studentsNotInClass]);
     }
 

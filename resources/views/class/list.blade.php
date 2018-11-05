@@ -85,7 +85,7 @@
                   </div>
                   <div class="col-sm-3">
                       <div class="form-group">
-                        <label for="teacher_id">Số học sinh tối đa <span class="text-red">*</span> </label>
+                        <label for="teacher_id">Số học sinh tối đa </label>
                         <input type="text"  class="form-control" name="max_seat" id="max_seat" placeholder="Số học sinh tối đa"> 
                       </div>
                   </div>
