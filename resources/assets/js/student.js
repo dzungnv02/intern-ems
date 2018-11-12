@@ -189,9 +189,9 @@ $(function () {
 
 		var validate = (data) => 
 		{
-			var result = 
+			var result = false;
 			if (data.student.name == '') {
-				
+
 			}
 		}
 
