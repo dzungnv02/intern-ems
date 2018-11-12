@@ -97,7 +97,7 @@ class ZohoCrmConnect
 
     }
 
-    public function getAllRecords($module, $fields = '')
+    public function getAllRecords($module, $fields = '', $page_limit = 0)
     {
         try {
             $records = [];
@@ -123,10 +123,9 @@ class ZohoCrmConnect
                 $record_count = $rec_per_page;
 
                 while ($record_count <= $rec_per_page && $record_count > 0) {
+                    
                     $endpoint = sprintf($uri, $page, $rec_per_page);
-
                     $response = $this->zoho_crm_client->request('GET', $endpoint, $options);
-                    $page++;
 
                     if ($response->getStatusCode() == 200) {
                         $data = json_decode($response->getBody());
@@ -138,7 +137,11 @@ class ZohoCrmConnect
                     } else {
                         return false;
                     }
-                    //if ($page > 1) break;
+
+                    $page++;
+                    if ($page_limit > 0 && $page >= $page_limit )  {
+                        break;
+                    }
                 }
                 return $records;
             } else {
@@ -148,7 +151,6 @@ class ZohoCrmConnect
             Log::error($e->getMessage());
             return false;
         }
-
     }
 
     public function getRecordById($module, $id)
@@ -229,7 +231,7 @@ class ZohoCrmConnect
     {
         try {
             if ($module !== '' && $data !== null) {
-                $uri = '/crm/v2/' . $module;
+                $uri = '/crm/v2/' . $module. '/upsert';
                 $access_token = $this->getAccessToken();
 
                 if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
@@ -251,7 +253,7 @@ class ZohoCrmConnect
                     ],
                 ];
 
-                $method = isset($data['data'][0]['id']) ? 'PUT' : 'POST';
+                $method = 'POST';
                 $response = $this->zoho_crm_client->request($method, $uri, $options);
 
                 if ($response->getStatusCode() == 201) {

@@ -48,6 +48,41 @@ class syncStudent extends Command
         }
         $zoho_crm = new ZohoCrmConnect();
 
+        $this->get_list($zoho_crm);
+
+        //php artisan zoho:student --syncbranch
+        $syncBranch = $this->option('syncbranch');
+        if ($syncBranch) {
+            $branchs = Branch::all(['id', 'crm_id', 'crm_owner_id'])->toArray();
+            $students = Student::all()->toArray();
+
+            foreach($students as $student) {
+                $crm_branch = $student['crm_branch'] ? json_decode($student['crm_branch'])->id : null;
+                
+                if ($crm_branch != null ) {
+                    foreach ($branchs as $branch) {
+                        if ($crm_branch == $branch['crm_owner_id']) {
+                            $student['branch_id'] = $branch['id'];
+                            break;
+                        }
+                    }
+                    if ($student['branch_id']) {
+                        $objStudent = Student::find($student['id']);
+                        $objStudent->branch_id = $student['branch_id'];
+                        $objStudent->update();
+                    }
+                }
+            }
+        }
+
+        $syncClass = $this->option('syncclass');
+        if ($syncClass) {
+
+        }
+    }
+
+    protected function get_list($zoho_crm) 
+    {
         $getlist = $this->option('getlist');
         if ($getlist) {
             $crm_module = config('zoho.MODULES.ZOHO_MODULE_STUDENTS');
@@ -55,6 +90,7 @@ class syncStudent extends Command
             $this->info('Start sync module: ' . $crm_module);
 
             $list = $zoho_crm->getAllRecords($crm_module);
+            
             if (!$list) {
                 $this->info('Can not get any record!');
                 exit();
@@ -78,36 +114,9 @@ class syncStudent extends Command
             $this->info('INSERT LIST: ' . count($insert_list));
             $this->info('UPDATE LIST: ' . count($update_list));
 
-            /* $max_record = 100;
-            $page = 1;
-            $data = [$page => ['data'=>[]]];
-            foreach ($update_list as $crm_student) {
-            if (count($data[$page]['data']) >= $max_record) {
-            $page++;
-            $data[$page]['data'] = [];
-            }
-
-            array_push($data[$page]['data'], [
-            'id' => $crm_student->id,
-            'EMS_ID' => NULL,
-            'EMS_SYNC_TIME' => NULL
-            ]);
-            }
-
-            for ($i = 1; $i <= count($data); $i ++) {
-            $this->info('FROM: '.$data[$i]['data'][0]['id']);
-            $this->info('TO: '.$data[$i]['data'][count($data[$i]['data']) - 1]['id']);
-
-            $zoho_crm->upsertRecord($crm_module, $data[$i]);
-            Log::debug(var_export($data[$i], true));
-            usleep(500);
-            }
-
-            die(); */
-
             if (count($insert_list) > 0) {
                 $data_mapping = [
-                    'name' => 'H_t_n_con',
+                    'name' => 'Deal_Name',
                     'email' => 'Email',
                     'student_code' => 'M_h_c_sinh',
                     'birthday' => 'Ng_y_sinh_con',
@@ -116,33 +125,33 @@ class syncStudent extends Command
                     'parent_crm_id' => 'Contact_Name',
                     'crm_branch' => 'Owner',
                     'crm_class' => 'L_p_EMS',
+                    'student_code' => 'M_h_c_sinh',
                     'created_at' => '',
                 ];
 
                 
                 Log::info(json_encode($insert_list[0], JSON_UNESCAPED_UNICODE));
                 
-                foreach ($insert_list as $student) {
+                foreach ($insert_list as $crm_student) {
                     $data = [];
                     $now = date('Y-m-d H:i:s');
                     foreach ($data_mapping as $field => $crm_field) {
                         if ($field == 'created_at') {
                             $data[$field] = $now;
                         } else if ($field == 'birthyear') {
-                            if ($student->$crm_field != null && !is_numeric($student->$crm_field)) {
-                                $data[$field] = date('Y', strtotime($student->$crm_field));
+                            if ($crm_student->Ng_y_sinh_con != null) {
+                                $data[$field] = date('Y', strtotime($crm_student->Ng_y_sinh_con));
                             } else {
-                                $data[$field] = $student->$crm_field;
+                                $data[$field] = is_numeric($crm_student->$crm_field) ? $crm_student->$crm_field : null;
                             }
                         } else if ($field == 'crm_branch' || $field == 'parent_crm_id' || $field == 'crm_class') {
-                            $data[$field] = $student->$crm_field != null ? json_encode($student->$crm_field, JSON_UNESCAPED_UNICODE) : $student->$crm_field;
-                        } 
-                        else {
-                            $data[$field] = $student->$crm_field;
+                            $data[$field] = $crm_student->$crm_field != null ? json_encode($crm_student->$crm_field, JSON_UNESCAPED_UNICODE) : $crm_student->$crm_field;
+                        } else {
+                            $data[$field] = $crm_student->$crm_field;
                         }
                     }
 
-                    $data['name'] = is_null($data['name']) ? $student->Deal_Name : $data['name'];
+                    $data['name'] = is_null($data['name']) ? $crm_student->Deal_Name : $data['name'];
 
                     $id = Student::insert($data);
 
@@ -156,7 +165,7 @@ class syncStudent extends Command
 
             if (count($update_list) > 0) {
                 $data_mapping = [
-                    'name' => 'H_t_n_con',
+                    'name' => 'Deal_Name',
                     'email' => 'Email',
                     'student_code' => 'M_h_c_sinh',
                     'birthday' => 'Ng_y_sinh_con',
@@ -164,6 +173,7 @@ class syncStudent extends Command
                     'crm_id' => 'id',
                     'parent_crm_id' => 'Contact_Name',
                     'crm_branch' => 'Owner',
+                    'student_code' => 'M_h_c_sinh',
                     'updated_at' => '',
                 ];
 
@@ -174,19 +184,20 @@ class syncStudent extends Command
                         if ($field == 'updated_at') {
                             $data[$field] = $now;
                         } else if ($field == 'birthyear') {
-                            if ($student->$crm_field != null && !is_numeric($crm_student->$crm_field)) {
-                                $data[$field] = date('Y', strtotime($crm_student->$crm_field));
+                            if ($crm_student->Ng_y_sinh_con != null) {
+                                $data[$field] = date('Y', strtotime($crm_student->Ng_y_sinh_con));
                             } else {
-                                $data[$field] = $crm_student->$crm_field;
+                                $data[$field] = is_numeric($crm_student->$crm_field) ? $crm_student->$crm_field : null;
                             }
                         } else if ($field == 'crm_branch' || $field == 'parent_crm_id' || $field == 'crm_class') {
                             $data[$field] = json_encode($crm_student->$crm_field, JSON_UNESCAPED_UNICODE);
-                        } else {
+                        }  else {
                             $data[$field] = $crm_student->$crm_field;
                         }
                     }
 
                     $old_student = Student::find($crm_student->EMS_ID);
+                    
                     if (is_object($old_student)) {
                         foreach ($data as $field => $value) {
                             $old_student->$field = $value;
@@ -228,36 +239,6 @@ class syncStudent extends Command
 
                 }
             }
-        }
-
-        //php artisan zoho:student --syncbranch
-        $syncBranch = $this->option('syncbranch');
-        if ($syncBranch) {
-            $branchs = Branch::all(['id', 'crm_id', 'crm_owner_id'])->toArray();
-            $students = Student::all()->toArray();
-
-            foreach($students as $student) {
-                $crm_branch = $student['crm_branch'] ? json_decode($student['crm_branch'])->id : null;
-                
-                if ($crm_branch != null ) {
-                    foreach ($branchs as $branch) {
-                        if ($crm_branch == $branch['crm_owner_id']) {
-                            $student['branch_id'] = $branch['id'];
-                            break;
-                        }
-                    }
-                    if ($student['branch_id']) {
-                        $objStudent = Student::find($student['id']);
-                        $objStudent->branch_id = $student['branch_id'];
-                        $objStudent->update();
-                    }
-                }
-            }
-        }
-
-        $syncClass = $this->option('syncclass');
-        if ($syncClass) {
-
         }
     }
 }

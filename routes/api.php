@@ -26,10 +26,11 @@ Route::group(['middleware' => 'api.headers'], function () {
 
     // Student
     Route::get('/get-list-student', 'StudentController@index');
-    Route::get('/edit-student', 'StudentController@editStudent');
+    Route::get('/get-student', 'StudentController@getStudent');
     Route::post('/delete-student', 'StudentController@deleteStudent');
     Route::post('/update-student', 'StudentController@updateStudent');
     Route::post('/add-student', 'StudentController@addStudent');
+    Route::post('/save-student', 'StudentController@saveStudent');
 
     // Course
     Route::get('/get-list-course', 'CourseController@getListCourse');
@@ -62,6 +63,9 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::get('/edit-teacher', 'TeacherController@edit');
 
     // Time table
+    Route::get('/calc_time_table', 'TimeTableController@calculate_time_table');
+    Route::post('/save-time-table', 'TimeTableController@save_time_table');
+
     Route::get('/get-list-timetable', 'TimeTableController@index');
     Route::get('/edit-timetable', 'TimeTableController@edit');
     Route::post('/update-timetable', 'TimeTableController@update2');

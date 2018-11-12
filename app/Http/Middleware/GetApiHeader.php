@@ -15,7 +15,7 @@ class GetApiHeader
      */
     public function handle($request, Closure $next)
     {
-        $user_info = json_decode($request->header('AUTH-USER'));
+        $user_info = $request->header('AUTH-USER') ? json_decode($request->header('AUTH-USER')) : [];
         $request->request->add(['logged_user' => $user_info]);
         return $next($request);
     }

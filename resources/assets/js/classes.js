@@ -16,13 +16,79 @@ $(function () {
         var form = $('DIV#modal-class FORM#form-class');
 
         var table_act_buttons = '<button type="button" title="Danh sách lớp" class="list-student-class btn btn-sm btn-info"><i class="fa fa-address-book-o" aria-hidden="true"></i></button>\
+                            <button type="button"  title="Thời Khóa Biểu" class="show-timetable btn btn-sm bg-purple"><i class="fa fa-calendar-times-o" aria-hidden="true"></i></button>\
                             <button type="button" title="Sửa thông tin lớp" class="edit-class btn btn-sm btn-warning"><i title="Sửa thông tin lớp" class="fa fa-pencil-square-o" aria-hidden="true"></i></button>\
                             <button type="button" title="Xoá lớp" class="delete-class btn btn-sm btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
 
-        /* 
-        <button type="button" class="show-timetable btn btn-sm btn-success"><i title="Xem Thời Khóa Biểu" class="fa fa-book" aria-hidden="true"></i></button>\
-        <button type="button" title="Xem danh sách kì thi" class="show-list-exams btn btn-sm btn-info"><i class="fa fa-graduation-cap" aria-hidden="true"></i></button>\
-        */
+        var vietnamese_weekday = {
+            'mon': 'T2',
+            'tue': 'T3',
+            'wed': 'T4',
+            'thu': 'T5',
+            'fri': 'T6',
+            'sat': 'T7',
+            'sun': 'CN',
+        };
+
+        var vietnamese_weekday_full = {
+            'mon': 'Thứ 2',
+            'tue': 'Thứ 3',
+            'wed': 'Thứ 4',
+            'thu': 'Thứ 5',
+            'fri': 'Thứ 6',
+            'sat': 'Thứ 7',
+            'sun': 'Chủ nhật',
+        };
+
+        var date_range_time_table = $('DIV#modal-time-table DIV.modal-body INPUT#reservation').daterangepicker({
+            "locale": {
+                "format": "YYYY-MM-DD",
+                "separator": " - ",
+                "applyLabel": "Chọn",
+                "cancelLabel": "Đóng",
+                "fromLabel": "From",
+                "toLabel": "To",
+                "customRangeLabel": "Custom",
+                "daysOfWeek": [
+                    "CN",
+                    "Th2",
+                    "Th3",
+                    "Th4",
+                    "Th5",
+                    "Th6",
+                    "Th7"
+                ],
+                "monthNames": [
+                    "Tháng 1",
+                    "Tháng 2",
+                    "Tháng 3",
+                    "Tháng 4",
+                    "Tháng 5",
+                    "Tháng 6",
+                    "Tháng 7",
+                    "Tháng 8",
+                    "Tháng 9",
+                    "Tháng 10",
+                    "Tháng 11",
+                    "Tháng 12"
+                ],
+                "firstDay": 1
+            },
+            autoUpdateInput: false
+        });
+
+        date_range_time_table.on('apply.daterangepicker', function (e, picker) {
+            $(e.target).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+            $('DIV#modal-time-table DIV.modal-body INPUT#start_date').val(picker.startDate.format('YYYY-MM-DD'));
+            $('DIV#modal-time-table DIV.modal-body INPUT#end_date').val(picker.endDate.format('YYYY-MM-DD'));
+            $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').prop('disabled', false);
+        });
+
+        $('DIV#modal-time-table DIV.modal-body INPUT#reservation').on('change', (e) => {
+            if ($(e.target).val() == '') {
+                $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').prop('disabled', true);
+            }
+        })
 
         $('SELECT.select2[id="teacher_id"]').select2({
             placeholder: "Chọn giáo viên",
@@ -178,14 +244,16 @@ $(function () {
 
         table_classes.on('click', 'button.list-student-class', function () {
             var data = table_classes.row($(this).parents('tr')).data();
-            $('DIV#modal-list-student-class DIV.modal-dialog DIV.modal-content DIV.modal-body INPUT#class_id').val(data.id);
+            $('DIV#modal-list-student-class DIV.modal-body INPUT#class_id').val(data.id);
             $('DIV#modal-list-student-class DIV.modal-dialog .modal-title').html('Danh sách học sinh của lớp <strong>' + data.name + '</strong>');
             $('DIV#modal-list-student-class').modal('show');
         });
 
-        // table_classes.on('click', 'button.show-timetable', function () {
-        //     var data = table_classes.row($(this).parents('tr')).data();
-        // });
+        table_classes.on('click', 'button.show-timetable', function () {
+            var data = table_classes.row($(this).parents('tr')).data();
+            $('DIV#modal-time-table DIV.modal-body INPUT#class_id').val(data.id);
+            $('DIV#modal-time-table').modal('show');
+        });
 
         // table_classes.on('click', 'button.show-list-exams', function () {
         //     var data = table_classes.row($(this).parents('tr')).data();
@@ -220,15 +288,7 @@ $(function () {
         var show_schedule = (json_schedule) => {
             var schedule = json_schedule ? JSON.parse(json_schedule) : null;
             var result = [];
-            var vietnamese_weekday = {
-                'mon': 'T2',
-                'tue': 'T3',
-                'wed': 'T4',
-                'thu': 'T5',
-                'fri': 'T6',
-                'sat': 'T7',
-                'sun': 'CN',
-            };
+
             if (schedule != null) {
                 for (var wd in schedule) {
                     schedule[wd].start = schedule[wd].start.length < 5 ? '0' + schedule[wd].start : schedule[wd].start;
@@ -291,8 +351,8 @@ $(function () {
                 if (data.schedule != '') {
                     var class_schedule = JSON.parse(data.schedule);
                     for (var wd in class_schedule) {
-                        class_schedule[wd].start = class_schedule[wd].start.length < 5 ? '0' + class_schedule[wd].start :class_schedule[wd].start;
-                        class_schedule[wd].finish = class_schedule[wd].finish.length < 5 ? '0' + class_schedule[wd].finish :class_schedule[wd].finish;
+                        class_schedule[wd].start = class_schedule[wd].start.length < 5 ? '0' + class_schedule[wd].start : class_schedule[wd].start;
+                        class_schedule[wd].finish = class_schedule[wd].finish.length < 5 ? '0' + class_schedule[wd].finish : class_schedule[wd].finish;
                         $(form).find('INPUT#schedule_' + wd).prop('checked', true);
                         $(form).find('INPUT#time_start_' + wd).val(class_schedule[wd].start);
                         $(form).find('INPUT#time_end_' + wd).val(class_schedule[wd].finish);
@@ -335,7 +395,7 @@ $(function () {
                 },
                 success: (response) => {
                     var students_list = response.data != undefined ? response.data : [];
-                    render_student_of_class(students_list);
+                    render_student_of_class(students_list, class_id);
                 }
             });
         };
@@ -352,9 +412,12 @@ $(function () {
                 success: (response) => {
                     var students_list = response.data != undefined ? response.data : [];
                     if (students_list.length > 0) {
-                        for(var i = 0; i < students_list.length; i++) {
-                            var display_text = students_list[i].name + ' ('+ (students_list[i].birthday != null ? students_list[i].birthday : students_list[i].birthyear)  +')';
-                            var opt = $('<option></option>', {value:students_list[i].id, text:display_text});
+                        for (var i = 0; i < students_list.length; i++) {
+                            var display_text = students_list[i].name + ' (' + (students_list[i].birthday != null ? students_list[i].birthday : students_list[i].birthyear) + ')';
+                            var opt = $('<option></option>', {
+                                value: students_list[i].id,
+                                text: display_text
+                            });
                             $('SELECT#student_not_assigned').append(opt);
                         }
                     }
@@ -362,7 +425,7 @@ $(function () {
             });
         }
 
-        var render_student_of_class = (students) => {
+        var render_student_of_class = (students, class_id) => {
             var table = $('DIV.modal#modal-list-student-class TABLE#table-student-of-class');
             $(table).find('tbody').empty();
 
@@ -371,14 +434,179 @@ $(function () {
                 return;
             }
 
-            for (var i=0; i < students.length; i++) {
-                var tr = $('<tr></tr>', {'data-student-id': students[i].id});
-                var td_stt = $('<td></td>', {text: (i+1)});
-                var td_name = $('<td></td>', {text: students[i].name});
-                var td_birthday = $('<td></td>', {text: (students[i].birthday != '' ? students[i].birthday:students[i].birthyear)});
-                var td_act = $('<td></td>', {text: ''});
-                $(tr).append(td_stt,td_name,td_birthday,td_act);
+            for (var i = 0; i < students.length; i++) {
+                var tr = $('<tr></tr>', {
+                    'data-student-id': students[i].id
+                });
+                var td_stt = $('<td></td>', {
+                    text: (i + 1)
+                });
+                var td_name = $('<td></td>', {
+                    text: students[i].name
+                });
+                var td_birthday = $('<td></td>', {
+                    text: (students[i].birthday != '' ? students[i].birthday : students[i].birthyear)
+                });
+
+                var button = $('<button></button>', {
+                    type: 'button',
+                    title: 'Xoá khỏi danh sách lớp',
+                    class: 'btn btn-sm btn-danger',
+                    'data-student': students[i].id,
+                    'data-class': class_id
+                }).append($('<i class="fa fa-trash-o" aria-hidden="true"></i>'));
+                var td_act = $('<td></td>', {
+                    text: ''
+                }).append(button);
+
+                $(button).bind('click', (e) => {
+                    console.log(e.currentTarget);
+                    var student_id = $(e.currentTarget).data('student');
+                    var class_id = $(e.currentTarget).data('class');
+                    remove_student_class(class_id, student_id);
+                });
+
+                $(tr).append(td_stt, td_name, td_birthday, td_act);
                 $(table).find('tbody').append(tr);
+            }
+        }
+
+        var remove_student_class = (class_id, student_id) => {
+            $.ajax({
+                dataType: 'json',
+                type: 'get',
+                url: 'api/delete-student-class',
+                data: {
+                    class_id: class_id,
+                    student_id: student_id
+                },
+                success: (response) => {
+                    var table = $('DIV.modal#modal-list-student-class TABLE#table-student-of-class');
+                    var tr = $(table).find('tbody tr td button[data-student="' + student_id + '"]').parent().parent().remove();
+
+                    if ($(table).find('tbody tr').length == 0) {
+                        $(table).find('tbody').append($('<tr><td colspan="4" style="text-align:center">Không có học sinh trong lớp</td></tr>'));
+                    }
+                }
+            });
+        }
+
+        var calc_time_table = (class_id, start_date, end_date, callback) => {
+            data = {
+                'class_id': class_id,
+                'start_date': start_date,
+                'end_date': end_date
+            };
+
+            $.ajax({
+                url: 'api/calc_time_table',
+                dataType: 'json',
+                data: data,
+                type: 'GET',
+                success: function (response) {
+                    time_table_init(response.data);
+                }
+            }).done(function () {
+                callback();
+            });
+        }
+
+        var modalConfirm = (callback, message) => {
+            if (message != undefined) {
+                $("#confirm-delete DIV.modal-header H5.modal-title").html(message);
+            }
+            $("#confirm-delete").modal('show');
+
+            $("#modal-btn-yes").unbind('click').bind("click", function () {
+                callback(true);
+                $("#confirm-delete").modal('hide');
+            });
+
+            $("#modal-btn-no").unbind('click').bind("click", function () {
+                callback(false);
+                $("#confirm-delete").modal('hide');
+            });
+        };
+
+        var time_table_init = (list) => {
+            var my_lang = datatable_language;
+            my_lang.emptyTable = 'Chưa có thời khoá biểu';
+            var buttons = '<button type="button" title="Điểm danh" class="btn btn-warning rollcall"><i class="fa fa-check-square-o"></i></button>\
+            <button type="button" title="Nhật ký" class="btn btn-info teaching-diary"><i class="fa fa-sticky-note"></i></button>\
+            <button type="button" title="Chỉnh sửa" class="btn bg-olive edit"><i class="fa fa-pencil-square-o"></i></button>';
+
+            var table_timetable = null;
+            if ($.fn.dataTable.isDataTable('DIV#modal-time-table TABLE#table-timetable')) {
+                table_timetable = $('DIV#modal-time-table TABLE#table-timetable').DataTable();
+                table_timetable.clear();
+                table_timetable.rows.add(list);
+                table_timetable.draw();
+            } else {
+                var table_timetable = $('DIV#modal-time-table TABLE#table-timetable').DataTable({
+                    data: list,
+                    language: my_lang,
+                    'autoWidth': false,
+                    "ordering": false,
+                    "searching": false,
+                    "bPaginate": true,
+                    "columnDefs": [{
+                            "searchable": false,
+                            "orderable": false
+                        },
+                        {
+                            targets: [4],
+                            "data": null,
+                            "visible": false,
+                            "defaultContent": buttons
+                        }
+                    ],
+                    columns: [{
+                            data: null
+                        },
+                        {
+                            data: "date",
+                            name: "date",
+                            render: (data, type, row) => {
+                                var wd = '<span> (' + vietnamese_weekday_full[row.week_day] + ')</span>';
+                                if (row.week_day == 'sun') wd = '<span style="color:red"> (' + vietnamese_weekday_full[row.week_day] + ')</span>'
+                                return data + wd;
+                            }
+                        },
+                        {
+                            render: (data, type, row) => {
+                                return row.start + ' - ' + row.finish;
+                            }
+                        },
+                        {
+                            data: "teacher_name",
+                            name: "teacher_name"
+                        },
+                        {
+                            data: null
+                        },
+                    ]
+                });
+
+                table_timetable.on('draw.dt order.dt search.dt', function () {
+                    table_timetable.column(0, {}).nodes().each(function (cell, i) {
+                        cell.innerHTML = i + 1;
+                    });
+                }).draw();
+
+                table_timetable.on('click', 'button.rollcall', function () {
+                    var data = table_timetable.row($(this).parents('tr')).data();
+                    console.log('rollcall', data);
+                });
+
+                table_timetable.on('click', 'button.teaching-diary', function () {
+                    var data = table_timetable.row($(this).parents('tr')).data();
+                    console.log('teaching-diary', data);
+                });
+
+                table_timetable.on('click', 'button.edit', function () {
+                    var data = table_timetable.row($(this).parents('tr')).data();
+                    console.log('edit', data);
+                });
             }
         }
 
@@ -414,10 +642,61 @@ $(function () {
             }
         });
 
+        $('DIV#modal-time-table DIV.modal-footer BUTTON#btnSave').on('click', (e) => {
+            if ($.fn.dataTable.isDataTable('DIV#modal-time-table TABLE#table-timetable')) {
+                var table_timetable = $('DIV#modal-time-table TABLE#table-timetable').DataTable();
+                var data = {
+                    'class_id': $('DIV#modal-time-table DIV.modal-body INPUT#class_id').val(),
+                    'start_date': $('DIV#modal-time-table DIV.modal-body INPUT#start_date').val(),
+                    'end_date': $('DIV#modal-time-table DIV.modal-body INPUT#end_date').val(),
+                    'time_table': []
+                };
+                var time_table = [];
+                table_timetable.data().each(function (d) {
+                    time_table.push(d);
+                });
+
+                data.time_table = time_table;
+
+                var url = 'api/save-time-table';
+                $.ajax({
+                    url: url,
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    method: 'POST',
+                    success: (response) => {
+                        console.log(response);
+                    }
+                });
+
+            }
+        });
+
+        $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').on('click', (e) => {
+            var class_id = $('DIV#modal-time-table DIV.modal-body INPUT#class_id').val();
+            var start_date = $('DIV#modal-time-table DIV.modal-body INPUT#start_date').val();
+            var end_date = $('DIV#modal-time-table DIV.modal-body INPUT#end_date').val();
+
+            $(e.target).button('loading');
+            $(e.target).prop('disabled', true);
+
+            calc_time_table(class_id, start_date, end_date, () => {
+                $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').prop('disabled', false);
+                $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').button('reset');
+            });
+        });
+
         $('DIV#modal-list-student-class').on('show.bs.modal', (e) => {
             var class_id = $('DIV#modal-list-student-class DIV.modal-body INPUT#class_id').val();
             get_student_not_assign(class_id);
             get_student_of_class(class_id);
+        });
+
+        $('DIV#modal-list-student-class').on('hide.bs.modal', (e) => {
+            var table = $('DIV.modal#modal-list-student-class TABLE#table-student-of-class');
+            $(table).find('tbody').empty();
+            $(table).find('tbody').append($('<tr><td colspan="4" style="text-align:center">Không có học sinh trong lớp</td></tr>'));
         });
 
         $('DIV#modal-class').on('show.bs.modal', (e) => {
@@ -425,6 +704,38 @@ $(function () {
             form.find(".has-error").removeClass("has-error");
             form.find(".has-error").removeClass("has-error");
         });
+
+        $('DIV#modal-time-table').on('hide.bs.modal', (e) => {
+            if ($.fn.dataTable.isDataTable('DIV#modal-time-table TABLE#table-timetable')) {
+                var table_timetable = $('DIV#modal-time-table TABLE#table-timetable').DataTable();
+                table_timetable.clear();
+                table_timetable.rows.add([]);
+                table_timetable.draw();
+            }
+        });
+
+        $('DIV#modal-time-table').on('show.bs.modal', (e) => {
+            var start_date = $('DIV#modal-time-table DIV.modal-body INPUT#start_date').val();
+            var end_date = $('DIV#modal-time-table DIV.modal-body INPUT#end_date').val();
+            var class_id = $('DIV#modal-time-table DIV.modal-body INPUT#class_id').val();
+
+            if ($('DIV#modal-time-table DIV.modal-body INPUT#start_date').val() != '')
+                $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').prop('disabled', false);
+            else
+                $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').prop('disabled', true);
+
+            $.ajax({
+                url: 'api/get-list-timetable',
+                method: 'GET',
+                data: {
+                    'class_id': class_id
+                },
+                success: (response) => {
+                    time_table_init(response.data);
+                }
+            });
+        });
+
 
         $('DIV#modal-list-student-class BUTTON#btnAssignClass').on('click', (e) => {
             var students = $("SELECT#student_not_assigned").val();
@@ -473,15 +784,15 @@ $(function () {
                 students: students
             }
             $.ajax({
-                url : "api/add-student-to-class",
+                url: "api/add-student-to-class",
                 type: "POST",
-                data : data,
-                success:function(response){
-                    if(response.code == 0){
+                data: data,
+                success: function (response) {
+                    if (response.code == 0) {
                         get_student_not_assign(class_id);
                         get_student_of_class(class_id);
                         toastr.error(response.message);
-                    }else{
+                    } else {
                         get_student_not_assign(class_id);
                         get_student_of_class(class_id);
                         toastr.success(response.message);
@@ -508,21 +819,6 @@ $(function () {
             }
         });
 
-        var modalConfirm = (callback, message) => {
-            if (message != undefined) {
-                $("#confirm-delete DIV.modal-header H5.modal-title").html(message);
-            }
-            $("#confirm-delete").modal('show');
 
-            $("#modal-btn-yes").unbind('click').bind("click", function () {
-                callback(true);
-                $("#confirm-delete").modal('hide');
-            });
-
-            $("#modal-btn-no").unbind('click').bind("click", function () {
-                callback(false);
-                $("#confirm-delete").modal('hide');
-            });
-        };
     }
 });

@@ -8,7 +8,7 @@ use DB;
 class Student extends Model
 {
 	protected $table = 'students';
-    protected $fillable = ['name','email','address','mobile','birthday','gender','created_at','updated_at'];
+    protected $fillable = ['name','email','address','mobile','birthday','birthyear','parent_id','gender','created_at','updated_at'];
     
     /**
      * Hiển thị danh sách các bản ghi.
@@ -25,8 +25,6 @@ class Student extends Model
 	                            ->orwhere('student_code','like','%'.$keyword.'%')
 	                            ->orwhere('address','like','%'.$keyword.'%')
 	                            ->orwhere('mobile','like','%'.$keyword.'%')
-                                // ->offset($start)
-                                // ->limit($record)
                                 ->get();
 		return $search;
 	}

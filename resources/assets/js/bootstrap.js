@@ -2,6 +2,7 @@ try {
     window.$ = window.jQuery = require('jquery');
 
     require('jquery-validation');
+    require('daterangepicker');
 
     var user_info = {
         id: $('meta[name="user-id"]').attr('content'),

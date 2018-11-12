@@ -180,84 +180,158 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
-            <button type="button" class="btn btn-primary" id="create-class" data-loading-text="<i class='fa fa-spinner fa-spin'></i>Đang lưu...">Lưu</button>
+            <button type="button" class="btn btn-primary" id="create-class" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Đang lưu...">Lưu</button>
           </div>
         </div>
       </div>
 </div>
 <!--Het form them moi lop hoc -->
-
-<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="confirm-delete">
-		<div class="modal-dialog modal-sm modal-dialog-centered" style="width:400px">
-			<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h5 class="modal-title" id="myModalLabel">Bạn có muốn xoá lớp %s không?</h5>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" id="modal-btn-yes">Có</button>
-				<button type="button" class="btn btn-primary" id="modal-btn-no">Không</button>
-			</div>
-			</div>
-		</div>
-	</div>
-
 <!--Form Danh sach hoc sinh cua lop-->
-    <div class="modal fade" id="modal-list-student-class">
-        <div class="modal-dialog"  style="width:700px">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close close-modal-list-student-class" data-dismiss="modal" aria-hidden="true">×</button>
-                    <h4 class="modal-title">Danh sách học sinh của lớp</h4>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="class_id" name="class_id">
-                    <div class="row">
-                        <form>
-                        <div class="col-sm-9" style="padding-right: 5px;text-align:left">
-                            <select style="width:100%" id="student_not_assigned" name="student_not_assigned" class="js-states form-control" multiple="multiple">
-                            </select>
-                        </div>
-                        <div class="col-sm-3" style="padding-left: 5px;text-align:right">
-                            <button type="button" class="btn btn-block btn-sm btn-success" id="btnAssignClass" style="height:32px">Thêm học sinh vào lớp</button>
-                        </div>
-                        </form>
+<div class="modal fade" id="modal-list-student-class">
+    <div class="modal-dialog" style="width:800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close close-modal-list-student-class" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">Danh sách học sinh của lớp</h4>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="class_id" name="class_id">
+                <div class="row">
+                    <form>
+                    <div class="col-sm-9" style="padding-right: 5px;text-align:left">
+                        <select style="width:100%" id="student_not_assigned" name="student_not_assigned" class="js-states form-control" multiple="multiple">
+                        </select>
                     </div>
-                    <div style="margin:0; padding:0; height:50px;"></div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <table class="table table-bordered table-striped" id="table-student-of-class">
-                                <thead>
-                                    <tr>
-                                        <th>STT</th>
-                                        <th>Tên học sinh</th>
-                                        <th>Ngày sinh</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>   
-                                    <tr><td colspan="4">Không có học sinh trong lớp</td></tr>  
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="col-sm-3" style="padding-left: 5px;text-align:right">
+                        <button type="button" class="btn btn-block btn-sm btn-success" id="btnAssignClass" style="height:32px">Thêm học sinh vào lớp</button>
+                    </div>
+                    </form>
+                </div>
+                <div class="row" style="height:30px"></div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-bordered table-striped" id="table-student-of-class">
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Tên học sinh</th>
+                                    <th>Ngày sinh</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>   
+                                <tr><td style="text-align:center" colspan="4">Không có học sinh trong lớp</td></tr>  
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <div class="col-sm-8" style="text-align:left;padding-left:0">
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-8" style="text-align:left;padding-right:0">
                         <button type="button" class="btn btn-info"><i class="fa fa-print">&nbsp;&nbsp;</i>In danh sách lớp</button>
-                        <button type="button" class="btn btn-warning"><i class="fa fa-check-square-o">&nbsp;&nbsp;</i>Điểm danh</button>
+                        {{--  <button type="button" class="btn btn-warning"><i class="fa fa-check-square-o">&nbsp;&nbsp;</i>Điểm danh</button>  --}}
                     </div>
-                    <div class="col-sm-4" style="text-align:right;padding-right:0">
+                    <div class="col-sm-4" style="text-align:right;padding-left:0">
                         <button type="button" class="close-modal-list-student-class btn btn-default" data-dismiss="modal">Đóng</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 <!--Het Form Danh sach hoc sinh cua lop -->
+
+{{--  Time table --}}
+<div class="modal fade" id="modal-time-table">
+    <div class="modal-dialog" style="width:800px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close close-modal-time-table" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">Thời khoá biểu của lớp</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                        <input type="hidden" id="class_id" name="class_id">
+                        <input type="hidden" id="start_date" name="start_date">
+                        <input type="hidden" id="end_date" name="end_date">
+                        <div class="col-sm-10">
+                                <div class="row">
+                                    <div class="col-sm-12"><label>Khoảng thời gian tính thời khoá biểu</label></div>
+                                </div>
+                                <div class="input-group">
+                                    <div class="input-group-addon"><i class="fa fa-calendar"></i></div>
+                                    <input type="text" class="form-control pull-right" id="reservation" style="height:32px;width:100%">
+                                </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="row">
+                                <div class="col-sm-12"><label>&nbsp;</label></div>
+                            </div>
+                            <div class="input-group">
+                                <button type="button" class="btn btn-sm btn-info" id="btnCalc" style="height:32px;width:103px" data-loading-text="<i class='fa fa-spinner fa-spin'></i>Đang tính..." ><i class="fa fa-calculator">&nbsp;&nbsp;</i>Tính</button>
+                            </div>
+                        </div>
+                </div>
+                <div class="row" style="height:30px"></div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table class="table table-bordered table-striped" id="table-timetable">
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Ngày</th>
+                                    <th>Giờ</th>
+                                    <th>Giáo viên</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>   
+                                <tr><td style="text-align:center" colspan="5">Chưa có thời khoá biểu</td></tr>  
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-6" style="text-align:left;padding-right:0">
+                        <button type="button" class="btn btn-info"><i class="fa fa-print">&nbsp;&nbsp;</i>In thời khoá biểu</button>
+                    </div>
+                    <div class="col-sm-6" style="text-align:right;padding-left:0">
+                            <button type="button" class="btn btn-success" id="btnSave"><i class="fa fa-save">&nbsp;&nbsp;</i>Lưu</button>
+                            <button type="button" class="close-modal-time_table btn btn-default" data-dismiss="modal">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{--  END -Time table --}}
+
+{{--  Confirm dialog  --}}
+<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="confirm-delete">
+    <div class="modal-dialog modal-sm modal-dialog-centered" style="width:400px">
+        <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h5 class="modal-title" id="myModalLabel">Bạn có muốn xoá lớp %s không?</h5>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" id="modal-btn-yes">Có</button>
+            <button type="button" class="btn btn-primary" id="modal-btn-no">Không</button>
+        </div>
+        </div>
+    </div>
+</div>
+{{--  END - Confirm dialog  --}}
+
 @endsection
 @section('footer')
 <script type="text/javascript">
-  var asset = "{{ asset('') }}"
+  var asset = "{{ asset('') }}";
 </script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 @endsection

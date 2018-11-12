@@ -150,9 +150,9 @@ class Classes extends Model
      * @return void
      */
 
-    public static function deleteStudentOfClass($idStudent)
+    public static function deleteStudentOfClass($class_id, $student_id)
     {
-         StudentClass::where('student_id',$idStudent)->delete();
+         StudentClass::where('student_id',$student_id)->where('class_id',$class_id)->delete();
     }
 
     /**
@@ -162,10 +162,10 @@ class Classes extends Model
      * @return $idStudentOfClass->count()
      */
 
-    public static function findStudentOfClass($idStudent)
+    public static function findStudentOfClass($class_id, $student_id)
     {
-        $idStudentOfClass =  StudentClass::where('student_id',$idStudent)->get();
-        return $idStudentOfClass->count();
+        $result =  StudentClass::where('student_id',$student_id)->where('class_id',$class_id)->get();
+        return $result->count();
     }
     /**
      * Tạo thời khóa biểu
@@ -267,8 +267,7 @@ class Classes extends Model
      */
 
     public static function addStudentToClass1($data){
-        $result = DB::table('student_classes')
-        ->insert($data);
+        $result = DB::table('student_classes')->insert($data);
         return $result;
     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Student;
 use App\StudentClass;
+use App\Parents;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
@@ -89,15 +90,19 @@ class StudentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function editStudent(Request $request)
+    public function getStudent(Request $request)
     {
         $id = $request->id;
         if ($id) {
-            if (Student::find($id) == null) {
+            $student = Student::find($id)->toArray();
+            $parent = Parents::find($student['parent_id']);
+            if ($parent != null) $parent->toArray();
+
+            if (count($student) == 0) {
                 return response()->json(['code' => 0, 'message' => 'khong ton tai hoc sinh nay'], 200);
-            } else {
-                $student = Student::edit($id);
-                return response()->json(['code' => 1, 'data' => $student], 200);
+            }
+            else {
+                return response()->json(['code' => 1, 'data' => ['student' => $student, 'parent' => $parent]], 200);
             }
         }
     }
@@ -134,6 +139,27 @@ class StudentController extends Controller
 
         $dataStudent = Student::update1($data, $id);
         return response()->json(['code' => 1, 'message' => 'Cap nhat thanh cong'], 200);
+    }
+
+    public function saveStudent(Request $request) 
+    {
+        $inputs = $request->all();
+        $student_data = $inputs['student'];
+        $parent_data =  $inputs['parent'];
+        
+        if ($student_data['id']) {
+            $student = Student::find($student_data['id']);
+            foreach($student_data as $field => $value) {
+                $student->$field = $value;
+            }
+            $student->update();
+        }
+        else {
+            unset($student_data['id']);
+            $student_data['id'] = Student::insert($student_data);
+        }
+
+        return response()->json(['code' => 1, 'data' => $student_data, 'message' => 'Cap nhat thanh cong'], 200);
     }
 
 }

@@ -20,7 +20,9 @@
         "vue": "^2.5.7"
     },
     "dependencies": {
+        "bootstrap-daterangepicker": "^3.0.3",
         "datatables.net": "^1.10.19",
+        "daterangepicker": "^3.0.3",
         "jquery-validation": "^1.18.0"
     }
 }
