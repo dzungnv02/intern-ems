@@ -644,6 +644,9 @@ $(function () {
 
         $('DIV#modal-time-table DIV.modal-footer BUTTON#btnSave').on('click', (e) => {
             if ($.fn.dataTable.isDataTable('DIV#modal-time-table TABLE#table-timetable')) {
+                $(e.target).prop('disabled', true);
+                $(e.target).button('loading');
+
                 var table_timetable = $('DIV#modal-time-table TABLE#table-timetable').DataTable();
                 var data = {
                     'class_id': $('DIV#modal-time-table DIV.modal-body INPUT#class_id').val(),
@@ -666,7 +669,9 @@ $(function () {
                     dataType: 'json',
                     method: 'POST',
                     success: (response) => {
-                        console.log(response);
+                        $(e.target).prop('disabled', false);
+                        $(e.target).button('reset');
+                        $('DIV#modal-time-table').modal('hide');
                     }
                 });
 

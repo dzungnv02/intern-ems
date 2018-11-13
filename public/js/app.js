@@ -31818,6 +31818,9 @@ $(function () {
 
         $('DIV#modal-time-table DIV.modal-footer BUTTON#btnSave').on('click', function (e) {
             if ($.fn.dataTable.isDataTable('DIV#modal-time-table TABLE#table-timetable')) {
+                $(e.target).prop('disabled', true);
+                $(e.target).button('loading');
+
                 var table_timetable = $('DIV#modal-time-table TABLE#table-timetable').DataTable();
                 var data = {
                     'class_id': $('DIV#modal-time-table DIV.modal-body INPUT#class_id').val(),
@@ -31840,7 +31843,9 @@ $(function () {
                     dataType: 'json',
                     method: 'POST',
                     success: function success(response) {
-                        console.log(response);
+                        $(e.target).prop('disabled', false);
+                        $(e.target).button('reset');
+                        $('DIV#modal-time-table').modal('hide');
                     }
                 });
             }
@@ -32758,6 +32763,9 @@ $(function () {
     var table_teachers = $('TABLE#teacher-list');
     var table = null;
 
+    var table_act_buttons = '<button type="button" title="Sửa thông tin giáo viên" class="edit btn btn-sm btn-warning"><i title="Sửa thông tin giáo viên" class="fa fa-pencil-square-o" aria-hidden="true"></i></button>\
+    <button type="button" title="Xoá giáo viên" class="delete btn btn-sm btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+
     var getTeacherList = function getTeacherList(mode) {
         var url = '/api/list-teachers';
         $.ajax(url, {
@@ -32803,7 +32811,7 @@ $(function () {
             "columnDefs": [{
                 "targets": -1,
                 "data": null,
-                "defaultContent": '<a class="edit">Sửa</a>&nbsp;&nbsp;<a class="delete">Xoá</a>'
+                "defaultContent": table_act_buttons
             }]
         });
 
@@ -32816,7 +32824,7 @@ $(function () {
             });
         }).draw();
 
-        table.on('click', 'a.delete', function () {
+        table.on('click', 'button.delete', function () {
             var data = table.row($(this).parents('tr')).data();
             modalConfirm(function (confirm) {
                 if (confirm) {
@@ -32825,7 +32833,7 @@ $(function () {
             }, 'Bạn có muốn xoá giáo viên <strong>' + data.name + '</strong> không?');
         });
 
-        table.on('click', 'a.edit', function () {
+        table.on('click', 'button.edit', function () {
             var data = table.row($(this).parents('tr')).data();
             $('FORM#frmTeacher INPUT#id').val(data.id);
             showTeacherModal('edit');

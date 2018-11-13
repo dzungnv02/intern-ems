@@ -299,7 +299,7 @@
                         <button type="button" class="btn btn-info"><i class="fa fa-print">&nbsp;&nbsp;</i>In thời khoá biểu</button>
                     </div>
                     <div class="col-sm-6" style="text-align:right;padding-left:0">
-                            <button type="button" class="btn btn-success" id="btnSave"><i class="fa fa-save">&nbsp;&nbsp;</i>Lưu</button>
+                            <button type="button" class="btn btn-success" id="btnSave" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Đang lưu..."><i class="fa fa-save">&nbsp;&nbsp;</i>Lưu</button>
                             <button type="button" class="close-modal-time_table btn btn-default" data-dismiss="modal">Đóng</button>
                     </div>
                 </div>

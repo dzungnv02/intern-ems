@@ -8,6 +8,7 @@ use App\TimeTable;
 use App\Classes;
 use App\Teacher;
 use App\Classes\ClassesTimeTable;
+use App\TeacherSchedules;
 
 class TimeTableController extends Controller
 {
@@ -34,6 +35,8 @@ class TimeTableController extends Controller
         $update_schedules = [];
 
         $old_timetables = TimeTable::get_time_table_by_class($class_id);
+
+        TeacherSchedules::insert($raw_schedule);
 
         foreach($raw_schedule as $schedule) {
             $schedule['class_id'] = $class_id;

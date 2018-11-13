@@ -3,6 +3,10 @@ $(function () {
     var table_teachers = $('TABLE#teacher-list');
     var table = null;
 
+    var table_act_buttons = '<button type="button" title="Sửa thông tin giáo viên" class="edit btn btn-sm btn-warning"><i title="Sửa thông tin giáo viên" class="fa fa-pencil-square-o" aria-hidden="true"></i></button>\
+    <button type="button" title="Xoá giáo viên" class="delete btn btn-sm btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+
+
     var getTeacherList = (mode) => {
         var url = '/api/list-teachers';
         $.ajax(url, {
@@ -55,7 +59,7 @@ $(function () {
             "columnDefs": [{
                 "targets": -1,
                 "data": null,
-                "defaultContent": '<a class="edit">Sửa</a>&nbsp;&nbsp;<a class="delete">Xoá</a>'
+                "defaultContent": table_act_buttons
             }]
         });
 
@@ -68,7 +72,7 @@ $(function () {
             });
         }).draw();
 
-        table.on('click', 'a.delete', function () {
+        table.on('click', 'button.delete', function () {
             var data = table.row($(this).parents('tr')).data();
             modalConfirm((confirm) => {
                 if (confirm) {
@@ -77,7 +81,7 @@ $(function () {
             }, 'Bạn có muốn xoá giáo viên <strong>'+ data.name +'</strong> không?')
         });
 
-        table.on('click', 'a.edit', function () {
+        table.on('click', 'button.edit', function () {
             var data = table.row($(this).parents('tr')).data();
             $('FORM#frmTeacher INPUT#id').val(data.id);
             showTeacherModal('edit');
