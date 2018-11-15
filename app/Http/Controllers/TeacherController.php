@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Classes\ZohoCrmConnect;
 use App\Teacher;
+use App\TeacherSchedules;
 use Illuminate\Http\Request;
 
 class TeacherController extends Controller
@@ -223,5 +224,12 @@ class TeacherController extends Controller
             return response()->json(['code' => 0, 'message' => $e->getMessage()], 200);
         }
 
+    }
+
+    public static function getTeacherSchedule(Request $request)
+    {
+        $teacher_id = $request->id;
+        $schedules = TeacherSchedules::getByTeacher($teacher_id);
+        return response()->json(['code' => 1, 'data' => $schedules], 200);
     }
 }

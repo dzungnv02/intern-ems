@@ -61,6 +61,7 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::post('/delete-teacher', 'TeacherController@destroy');
     Route::post('/update-teacher', 'TeacherController@update');
     Route::get('/edit-teacher', 'TeacherController@edit');
+    Route::get('/get-teacher-schedule', 'TeacherController@getTeacherSchedule');
 
     // Time table
     Route::get('/calc_time_table', 'TimeTableController@calculate_time_table');

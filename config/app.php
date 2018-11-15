@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'I Can Read - EMS'),
 
     /*
     |--------------------------------------------------------------------------
@@ -212,5 +212,14 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Countries' => Webpatser\Countries\CountriesFacade::class,
     ],
+
+    'teacher_schedule_type' => [
+        1 => 'Dạy trên lớp',
+        2 => 'Kiểm tra đầu vào',
+        3 => 'Chấm thi',
+        4 => 'Hoạt động ngoại khoá',
+        5 => 'Việc riêng',
+        6 => 'Khác'
+    ]
 
 ];

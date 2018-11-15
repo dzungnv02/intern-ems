@@ -159,11 +159,104 @@
 			</div>
 			</div>
 		</div>
+	</div>
+
+	<div class="modal fade" id="modal-teacher-schedule" role="dialog" aria-hidden="true">
+		<div class="modal-dialog" role="document" style="width:800px">
+			<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h2 class="modal-title" id="modal-teacher-schedule-title">Modal title</h2>
+			</div>
+			<div class="modal-body">
+				<form id="frmTeacher">
+					<input type="text" class="form-control hidden" id="id">
+					<input type="text" class="form-control hidden" id="crm_id">
+					<div class="box-body">
+						<div class="row">
+							<table class="table table-bordered table-striped" id="table-schedule">
+								<thead>
+									<tr>
+										<th>STT</th>
+										<th>Thời gian</th>
+										<th>Công việc</th>
+										<th>Mô tả</th>
+										<th></th>
+									</tr>
+								</thead>
+								<tbody>   
+									<tr><td style="text-align:center" colspan="5">Chưa có thời khoá biểu</td></tr>  
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<div class="row">
+					<div class="col-sm-6" style="text-align:left;padding-right:0">
+						{{--  <button type="button" class="btn btn-info" id="btnAddSchedule"><i class="fa fa-plus">&nbsp;&nbsp;</i>Thêm lịch</button>  --}}
+					</div>
+					<div class="col-sm-6" style="text-align:right;padding-left:0">
+						{{--  <button type="button" class="btn btn-success" id="btnSave" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Đang lưu..."><i class="fa fa-save">&nbsp;&nbsp;</i>Lưu</button>  --}}
+						<button type="button" class="close-modal-time_table btn btn-default" data-dismiss="modal">Đóng</button>
+					</div>
+				</div>
+			</div>
+			</div>
 		</div>
+	</div>
 	
+	<div class="modal fade" id="modal-teacher-schedule-add" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-sm"  style="width:800px">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h2 class="modal-title" id="myModalLabel">Thêm lịch cho giáo viên</h2>
+				</div>
+				<div class="modal-body">
+					<form id="frmTeacherSchedule">
+						<div class="box-body">
+							<div class="row">
+								<div class="form-group col-sm-6">
+									<label for="name" class="col-form-label">Công việc<i style="color:red">*</i></label>
+									<input type="text" class="form-control" id="name" placeholder="Họ tên giáo viên">
+								</div>
+								<div class="form-group col-sm-6">
+									<label for="nationality" class="col-form-label">Mô tả:<i style="color:red">*</i></label>
+									<select class="form-control select2" name="nationality" id="nationality" style="width: 100%;"></select>
+								</div>
+							</div>
+							<hr>
+							<div class="row">
+									<div class="form-group col-sm-12">
+										<label for="name" class="col-form-label">Thời gian<i style="color:red">*</i></label>
+										<input type="text" class="form-control" id="name" placeholder="Họ tên giáo viên">
+									</div>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<div class="row">
+						<div class="col-sm-12" style="text-align:right;padding-left:0">
+							<button type="button" class="btn btn-success" id="btnSave" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Đang lưu..."><i class="fa fa-save">&nbsp;&nbsp;</i>Lưu</button>
+							<button type="button" class="close-modal-time_table btn btn-default" data-dismiss="modal">Đóng</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 	
 	<script>
 		var base_url = "{{ url('/') }}/";
 		$('SELECT.select2[id="nationality"]').select2();
+		var schedule_type = {};
+		@foreach ($schedule_types as $index => $type) 
+		schedule_type[{{$index}}] = '{{$type}}';
+		@endforeach
 	</script>
 	@endsection

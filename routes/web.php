@@ -52,7 +52,8 @@ Route::get('holiday', function(){
 })->middleware('auth');
 
 Route::get('teacher-list', function(){
-    return view('teacher/list');
+    $schedule_types = config('app.teacher_schedule_type');
+    return view('teacher/list', ['schedule_types' => $schedule_types]);
 })->middleware('auth');
 
 Route::get('teacher-add', function(){

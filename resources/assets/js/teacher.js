@@ -2,9 +2,13 @@ $(function () {
 
     var table_teachers = $('TABLE#teacher-list');
     var table = null;
+    var modal_teacher_schedule = $('DIV#modal-teacher-schedule');
+    var modal_add_schedule = $('DIV#modal-teacher-schedule-add');
+    var table_schedule = null;
 
     var table_act_buttons = '<button type="button" title="Sửa thông tin giáo viên" class="edit btn btn-sm btn-warning"><i title="Sửa thông tin giáo viên" class="fa fa-pencil-square-o" aria-hidden="true"></i></button>\
-    <button type="button" title="Xoá giáo viên" class="delete btn btn-sm btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+    <button type="button" title="Xoá giáo viên" class="delete btn btn-sm btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>\
+    <button type="button" title="Lịch" class="schedule btn btn-sm btn-info"><i class="fa fa-calendar-times-o" aria-hidden="true"></i></button>';
 
 
     var getTeacherList = (mode) => {
@@ -30,31 +34,18 @@ $(function () {
         table = $('TABLE#teacher-list').DataTable({
             data: list,
             language: datatable_language,
-            columns: [{
-                    data: null
-                },
-                {
-                    data: 'name'
-                },
+            columns: [{data: null},
+                {data: 'name'},
                 {
                     data: 'email',
                     render: (data, type, row) => {
-                        console.log(data);
-                        return data != null ? '<a href="mailto:'+data+'">'+data+'</a>' : '';
+                        return data != null ? '<a href="mailto:' + data + '">' + data + '</a>' : '';
                     }
                 },
-                {
-                    data: 'mobile'
-                },
-                {
-                    data: 'address'
-                },
-                {
-                    data: 'nationality'
-                },
-                {
-                    data: null
-                }
+                {data: 'mobile'},
+                {data: 'address'},
+                {data: 'nationality'},
+                {data: null}
             ],
             "columnDefs": [{
                 "targets": -1,
@@ -78,13 +69,19 @@ $(function () {
                 if (confirm) {
                     del(data.id);
                 }
-            }, 'Bạn có muốn xoá giáo viên <strong>'+ data.name +'</strong> không?')
+            }, 'Bạn có muốn xoá giáo viên <strong>' + data.name + '</strong> không?')
         });
 
         table.on('click', 'button.edit', function () {
             var data = table.row($(this).parents('tr')).data();
             $('FORM#frmTeacher INPUT#id').val(data.id);
             showTeacherModal('edit');
+        });
+
+        table.on('click', 'button.schedule', function () {
+            var data = table.row($(this).parents('tr')).data();
+            $(modal_teacher_schedule).find('.modal-title').html('Lịch của giáo viên <strong>'+data.name+'</strong>');
+            get_teacher_schedule(data.id);
         });
     };
 
@@ -122,7 +119,6 @@ $(function () {
             success: function (response) {
                 if (response.code == 1) {
                     var teacher = response.data[0];
-                    console.log(teacher);
                     $('DIV#modal-teacher-form FORM INPUT#crm_id').val(teacher.crm_id);
                     $('DIV#modal-teacher-form FORM INPUT#name').val(teacher.name);
                     $('DIV#modal-teacher-form FORM SELECT#nationality').val(teacher.nationality).change();
@@ -167,7 +163,6 @@ $(function () {
                     $('DIV#modal-teacher-form').modal('hide');
                     getTeacherList('reload');
                 }
-
             }
         });
 
@@ -178,15 +173,16 @@ $(function () {
         $.ajax(url, {
             method: 'POST',
             dataType: 'json',
-            data: {"id": id},
+            data: {
+                "id": id
+            },
             success: function (response) {
                 getTeacherList('reload');
             },
-        });      
+        });
     };
 
     var showTeacherModal = (mode) => {
-
         if (mode == 'new') {
             $('DIV#modal-teacher-form DIV.modal-header H2.modal-title').text('Thêm giáo viên');
             $('DIV#modal-teacher-form FORM')[0].reset();
@@ -199,30 +195,105 @@ $(function () {
         }
     };
 
+    var get_teacher_schedule = (teacher_id) => {
+        var data = {
+            id: teacher_id
+        };
+        $.ajax({
+            url: 'api/get-teacher-schedule',
+            method: 'GET',
+            data: data,
+            success: (response) => {
+                render_teacher_schedule(response.data, () => {
+                    $('DIV#modal-teacher-schedule').modal('show');
+                });
+            }
+        });
+    };
+
+    var render_teacher_schedule = (data, calllback) => {
+        if ($.fn.dataTable.isDataTable('DIV#modal-teacher-schedule TABLE#table-schedule')) {
+            table_schedule = $('DIV#modal-teacher-schedule TABLE#table-schedule').DataTable();
+            table_schedule.clear();
+            table_schedule.rows.add(data);
+            table_schedule.draw();
+        } else {
+            table_schedule = $('DIV#modal-teacher-schedule TABLE#table-schedule').DataTable({
+                data: data,
+                language: datatable_language,
+                'autoWidth': false,
+                "ordering": false,
+                "searching": false,
+                "bPaginate": true,
+                "columnDefs": [{
+                    "searchable": false,
+                    "orderable": false
+                }],
+                columns: [
+                    {data: null},
+                    {
+                        data: null,
+                        render: (data, type, row) => {
+                            return 'Từ: ' + row.start_time + '<br />' + 'Đến: '+ row.end_time;
+                        }
+                    },
+                    {
+                        data: 'appoinment_type',
+                        render: (data, type, row) => {
+                            return schedule_type[data];
+                        }
+                    },
+                    {
+                        data: 'desc'
+                    }
+                ]
+            });
+            table_schedule.on('draw.dt order.dt search.dt', function () {
+                table_schedule.column(0, {}).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+        }
+        if (calllback != undefined) calllback();
+    }
+
+    var show_add_schedule_modal = () => {
+        if ($(modal_teacher_schedule).is(':visible')) {
+            $(modal_teacher_schedule).removeClass("fade").modal("hide");
+            $(modal_add_schedule).modal("show").addClass("fade");
+        }
+
+        // var modal_teacher_schedule = $('DIV#modal-teacher-schedule');
+        // var modal_add_schedule = $('DIV#modal-teacher-schedule-add');
+    }
+
+    $(modal_teacher_schedule).find('BUTTON#btnAddSchedule').on('click', (e) =>{
+        show_add_schedule_modal();
+    });
+
     if (table_teachers.length > 0) {
         getTeacherList('load');
-
         $('#btnOpenModalTeacher').on('click', (e) => {
             showTeacherModal('new');
             e.preventDefault();
         });
 
-        var modalConfirm = function(callback, message){
+        var modalConfirm = function (callback, message) {
             if (message != undefined) {
                 $("#confirm-delete DIV.modal-header H5.modal-title").html(message);
             }
             $("#confirm-delete").modal('show');
-            
-            $("#modal-btn-yes").unbind('click').bind("click", function(){
-              callback(true);
-              $("#confirm-delete").modal('hide');
+
+            $("#modal-btn-yes").unbind('click').bind("click", function () {
+                callback(true);
+                $("#confirm-delete").modal('hide');
             });
-            
-            $("#modal-btn-no").unbind('click').bind("click", function(){
-              callback(false);
-              $("#confirm-delete").modal('hide');
+
+            $("#modal-btn-no").unbind('click').bind("click", function () {
+                callback(false);
+                $("#confirm-delete").modal('hide');
             });
-         };
+        };
     }
 
     if ($('FORM#frmTeacher').length > 0) {

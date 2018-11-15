@@ -35,13 +35,52 @@ class TimeTableController extends Controller
         $update_schedules = [];
 
         $old_timetables = TimeTable::get_time_table_by_class($class_id);
+        /* $start_date = $raw_schedule[0]['date'];
+        $end_date = $raw_schedule[count($raw_schedule) - 1]['date'];
 
-        TeacherSchedules::insert($raw_schedule);
+        foreach($raw_schedule as $schedule) {
+            if ($schedule['date'] < $start_date) {
+                $start_date = $schedule['date'];
+            }
+
+            if ($schedule['date'] > $end_date) {
+                $end_date = $schedule['date'];
+            }
+        } */
+        
+        //$date_range = ['start' => $start_date, 'end' => $end_date];
+
+        $teacher_schedule_insert = [];
+        $teacher_schedule_update = [];
+
+        $class = Classes::find($class_id);
 
         foreach($raw_schedule as $schedule) {
             $schedule['class_id'] = $class_id;
             $schedule['created_at'] = $now;
+
             unset ($schedule['teacher_name']);
+
+            $old_teacher_schedule = TeacherSchedules::getByTeacher($schedule['teacher_id'], $class_id);
+
+            if (count($old_teacher_schedule)) 
+            {
+                foreach($old_teacher_schedule as $teacher_schedule)  {
+                    $tsch = TeacherSchedules::find($teacher_schedule->id);
+                    $tsch->delete();
+                }
+            }
+            
+            array_push($teacher_schedule_insert, [
+                'teacher_id' => $schedule['teacher_id'],
+                'class_id' => $schedule['class_id'],
+                'start_time' => $schedule['date'] . ' ' . $schedule['start'],
+                'end_time' => $schedule['date'] . ' ' . $schedule['finish'],
+                'desc' => 'Lớp ' . $class->name,
+                'appoinment_type' => 1,
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+
             if (count($old_timetables)) {
                 foreach ($old_timetables  as $old) {
                     if (strtotime($old->date) == strtotime($schedule['date']) && !in_array($schedule, $update_schedules)) {
@@ -70,7 +109,9 @@ class TimeTableController extends Controller
             }
         }
 
-        return response()->json(['code' => 1, 'update' => $update_schedules, 'insert' => $new_schedules, 'old' => $old_timetables], 200);
+        if (count($teacher_schedule_insert)) TeacherSchedules::insert($teacher_schedule_insert);
+
+        return response()->json(['code' => 1, 'update' => $update_schedules, 'old' => $old_timetables], 200);
     }
 
     public function calculate_time_table (Request $request)
