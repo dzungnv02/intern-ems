@@ -62,6 +62,8 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::post('/update-teacher', 'TeacherController@update');
     Route::get('/edit-teacher', 'TeacherController@edit');
     Route::get('/get-teacher-schedule', 'TeacherController@getTeacherSchedule');
+    Route::post('/add_teacher_schedule', 'TeacherController@addTeacherSchedule');
+
 
     // Time table
     Route::get('/calc_time_table', 'TimeTableController@calculate_time_table');

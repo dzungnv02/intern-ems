@@ -172,8 +172,8 @@
 			</div>
 			<div class="modal-body">
 				<form id="frmTeacher">
-					<input type="text" class="form-control hidden" id="id">
-					<input type="text" class="form-control hidden" id="crm_id">
+					<input type="hidden" id="teacher_id">
+					<input type="hidden" id="crm_id">
 					<div class="box-body">
 						<div class="row">
 							<table class="table table-bordered table-striped" id="table-schedule">
@@ -197,7 +197,7 @@
 			<div class="modal-footer">
 				<div class="row">
 					<div class="col-sm-6" style="text-align:left;padding-right:0">
-						{{--  <button type="button" class="btn btn-info" id="btnAddSchedule"><i class="fa fa-plus">&nbsp;&nbsp;</i>Thêm lịch</button>  --}}
+						<button type="button" class="btn btn-info" id="btnAddSchedule"><i class="fa fa-plus">&nbsp;&nbsp;</i>Thêm lịch</button>
 					</div>
 					<div class="col-sm-6" style="text-align:right;padding-left:0">
 						{{--  <button type="button" class="btn btn-success" id="btnSave" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Đang lưu..."><i class="fa fa-save">&nbsp;&nbsp;</i>Lưu</button>  --}}
@@ -210,7 +210,7 @@
 	</div>
 	
 	<div class="modal fade" id="modal-teacher-schedule-add" role="dialog" aria-hidden="true">
-		<div class="modal-dialog modal-sm"  style="width:800px">
+		<div class="modal-dialog modal-sm"  style="width:500px">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -218,23 +218,37 @@
 				</div>
 				<div class="modal-body">
 					<form id="frmTeacherSchedule">
+						<input type="text" class="form-control hidden" id="teacher_id">
 						<div class="box-body">
 							<div class="row">
 								<div class="form-group col-sm-6">
 									<label for="name" class="col-form-label">Công việc<i style="color:red">*</i></label>
-									<input type="text" class="form-control" id="name" placeholder="Họ tên giáo viên">
+									<select class="form-control select2" id="appoinment_type" name="appoinment_type">
+									</select>
 								</div>
 								<div class="form-group col-sm-6">
-									<label for="nationality" class="col-form-label">Mô tả:<i style="color:red">*</i></label>
-									<select class="form-control select2" name="nationality" id="nationality" style="width: 100%;"></select>
+									<label for="desc" class="col-form-label">Lớp liên quan:</label>
+									<select style="width:100%" class="form-control select2" id="class_id" name="class_id">
+									</select>
 								</div>
 							</div>
 							<hr>
 							<div class="row">
-									<div class="form-group col-sm-12">
-										<label for="name" class="col-form-label">Thời gian<i style="color:red">*</i></label>
-										<input type="text" class="form-control" id="name" placeholder="Họ tên giáo viên">
-									</div>
+								<div class="form-group col-sm-6">
+									<label for="start_time" class="col-form-label">Từ<i style="color:red">*</i></label>
+									<input type="datetime-local" class="form-control" id="start_time" name="start_time" placeholder="Bắt đầu">
+								</div>
+								<div class="form-group col-sm-6">
+									<label for="end_time" class="col-form-label">Đến<i style="color:red">*</i></label>
+									<input type="datetime-local" class="form-control" id="end_time" name="end_time" placeholder="Kết thúc">
+								</div>
+							</div>
+							<hr>
+							<div class="row">
+								<div class="form-group col-sm-12">
+									<label for="desc" class="col-form-label">Mô tả:<i style="color:red">*</i></label>
+									<textarea class="form-control" id="desc" name="desc" rows="3"></textarea>
+								</div>
 							</div>
 						</div>
 					</form>
@@ -254,6 +268,7 @@
 	<script>
 		var base_url = "{{ url('/') }}/";
 		$('SELECT.select2[id="nationality"]').select2();
+		$('SELECT.select2[id="class_id"]').select2();
 		var schedule_type = {};
 		@foreach ($schedule_types as $index => $type) 
 		schedule_type[{{$index}}] = '{{$type}}';

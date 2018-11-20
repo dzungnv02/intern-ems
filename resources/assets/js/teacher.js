@@ -81,7 +81,11 @@ $(function () {
         table.on('click', 'button.schedule', function () {
             var data = table.row($(this).parents('tr')).data();
             $(modal_teacher_schedule).find('.modal-title').html('Lịch của giáo viên <strong>'+data.name+'</strong>');
-            get_teacher_schedule(data.id);
+
+            get_teacher_schedule(data.id, () => {
+                $(modal_teacher_schedule).find('FORM#frmTeacher INPUT#teacher_id').val(data.id);
+                $(modal_teacher_schedule).modal('show');
+            });
         });
     };
 
@@ -195,7 +199,7 @@ $(function () {
         }
     };
 
-    var get_teacher_schedule = (teacher_id) => {
+    var get_teacher_schedule = (teacher_id, callback) => {
         var data = {
             id: teacher_id
         };
@@ -204,9 +208,7 @@ $(function () {
             method: 'GET',
             data: data,
             success: (response) => {
-                render_teacher_schedule(response.data, () => {
-                    $('DIV#modal-teacher-schedule').modal('show');
-                });
+                render_teacher_schedule(response.data, callback);
             }
         });
     };
@@ -259,17 +261,89 @@ $(function () {
 
     var show_add_schedule_modal = () => {
         if ($(modal_teacher_schedule).is(':visible')) {
+            var teacher_id = $(modal_teacher_schedule).find('FORM#frmTeacher INPUT#teacher_id').val();
+
+            console.log('teacher_id', teacher_id);
+
             $(modal_teacher_schedule).removeClass("fade").modal("hide");
+            $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val(teacher_id);
             $(modal_add_schedule).modal("show").addClass("fade");
         }
-
-        // var modal_teacher_schedule = $('DIV#modal-teacher-schedule');
-        // var modal_add_schedule = $('DIV#modal-teacher-schedule-add');
     }
 
     $(modal_teacher_schedule).find('BUTTON#btnAddSchedule').on('click', (e) =>{
         show_add_schedule_modal();
     });
+
+    var schedule_type_select = (selected) => {
+       var appoinment_type = $(modal_add_schedule).find('SELECT#appoinment_type');
+       $(appoinment_type).empty();
+       for (var i in schedule_type) {
+           if (i == 1) continue;
+            var opt = $('<option></option>', {
+                value: i,
+                text: schedule_type[i]
+            });
+            if (selected == i) opt.prop('selected', 'selected');
+            appoinment_type.append(opt);
+       }
+       if (selected == undefined)
+            $($(appoinment_type).find('OPTION')[0]).attr('selected', 'selected');
+    }
+
+    var get_class_list = (selected) => {
+        var class_id = $('SELECT.select2[id="class_id"]');
+        $(class_id).empty();
+        $(class_id).append($('<option></option>', {value: '0', text: '[Chọn lớp]'}));
+        $.ajax('api/get-list-class', {
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (response) {
+                if (response.code == 1) {
+                    if (response.data.length > 0) {
+                        for (var i = 0; i < response.data.length; i++) {
+                            var cls = response.data[i];
+                            var opt = $('<option></option>', {value: cls.id, text: cls.name});
+                            if (selected == cls.id) opt.prop('selected', 'selected');
+                            $(class_id).append(opt);
+                        }
+                        if (selected == undefined)
+                            $($(class_id).find('OPTION')[0]).attr('selected', 'selected');
+                    }
+                }
+                
+            }
+        });
+    }
+
+    var add_teacher_schedule = (callback) => {
+        var data = {};
+        var form = $(modal_add_schedule).find('FORM#frmTeacherSchedule');
+        var inputs = $(form).find('input,select,textarea');
+        $(inputs).each((index, el) => {
+            console.log('el',el);
+            data[el.id] = $(el).val();
+        });
+
+        $.ajax({
+            url: 'api/add_teacher_schedule',
+            method: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            success: (response) => {
+                console.log(response);
+                var teacher_id = $(form).find('INPUT#teacher_id').val();
+                
+                get_teacher_schedule(teacher_id, () => {
+                    if ($(modal_add_schedule).is(':visible')) {
+                        $(modal_add_schedule).removeClass("fade").modal("hide");
+                        $(modal_teacher_schedule).modal("show").addClass("fade");
+                    }
+                });
+            }
+        });
+    };
+
 
     if (table_teachers.length > 0) {
         getTeacherList('load');
@@ -307,6 +381,17 @@ $(function () {
             var mode = $('FORM#frmTeacher INPUT#id').val().trim() !== '' ? 'edit' : 'new';
             save(mode);
         });
+
+        $(modal_add_schedule).on('show.bs.modal', (e) => {
+            schedule_type_select();
+            get_class_list();
+        })
+    }
+
+    if ($(modal_add_schedule).find('FORM#frmTeacherSchedule').length > 0) {
+        $(modal_add_schedule).find('DIV.modal-footer BUTTON#btnSave').on('click', (e) => {
+            add_teacher_schedule();
+        }) 
     }
 
 });

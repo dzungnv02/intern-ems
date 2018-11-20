@@ -232,4 +232,19 @@ class TeacherController extends Controller
         $schedules = TeacherSchedules::getByTeacher($teacher_id);
         return response()->json(['code' => 1, 'data' => $schedules], 200);
     }
+
+    public function addTeacherSchedule (Request $request) 
+    {
+        $inputs = $request->all();
+        $teacher_schedule = new TeacherSchedules;
+        $teacher_schedule->teacher_id = $inputs['teacher_id'];
+        $teacher_schedule->class_id = $inputs['class_id'];
+        $teacher_schedule->start_time = $inputs['start_time'];
+        $teacher_schedule->end_time = $inputs['end_time'];
+        $teacher_schedule->desc = $inputs['desc'];
+        $teacher_schedule->appoinment_type = $inputs['appoinment_type'];
+        $teacher_schedule->created_at = date('Y-m-d H:i:s');
+        $teacher_schedule->save();
+        return response()->json(['code' => 1, 'data' => $inputs], 200);
+    }
 }
