@@ -12,6 +12,8 @@ $(function () {
         var start = '2018-11-01';
         var end = '2018-11-30';
         var bootpag = null;
+        var appointment_durations = [];
+        var minute_inteval = 30;
 
         var init = () => {
             get_teacher_list((data) => {
@@ -51,20 +53,44 @@ $(function () {
                 for (var wd in schedule_obj) {
                     for (var tid in schedule_obj[wd]) {
                         var content = '';
+                        var class_schedule = null;
                         var style = '';
+                        finish_hour = '';
+                        start_hour = '';
+                        last_time = '';
+                        finish_hour = '';
+
                         if (schedule_obj[wd][tid] != '') {
                             for (var c in classes) {
                                 if (classes[c].id == schedule_obj[wd][tid]) {
                                     content = classes[c].name;
-                                    console.log(classes[c]);
+                                    class_schedule = JSON.parse(classes[c].schedule);
+                                    var diff = diff_minutes(class_schedule[wd.toLowerCase()].start, class_schedule[wd.toLowerCase()].finish);
+                                    var finish_hour = add_minutes(class_schedule[wd.toLowerCase()].start, diff - 30);
+                                    last_time = (finish_hour.getHours() + '').length == 1 ? '0' + finish_hour.getHours() + '_' + finish_hour.getMinutes() : finish_hour.getHours() + '_' + finish_hour.getMinutes();
                                     style = 'background-color:yellow;text-align:center';
                                     break;
                                 }
                             }
                         }
-                        //var cell_id = 
+
+                        var cell_id = wd + '_' + hour.replace(':', '_') + '_' + tid;
+                        var last_cell_id = wd + '_' + last_time + '_' + tid;
+                        if (last_time != '') {
+                            appointment_durations.push({
+                                'wd': wd,
+                                'tid': tid,
+                                'start': cell_id,
+                                'start_time': hour,
+                                'end': last_cell_id,
+                                'end_time': finish_hour.getHours() + ':' + finish_hour.getMinutes()
+                            });
+                            console.log(appointment_durations);
+                        }
+
+
                         var td = $('<td></td>', {
-                            id: '',
+                            id: cell_id,
                             class: 'schedule_content',
                             text: content,
                             'style': style
@@ -78,11 +104,30 @@ $(function () {
 
 
             $(table_schedule).find('thead').append(teachers_row);
+
+            var style = 'background-color:yellow;text-align:center';
+
+            for (var cell = 0; cell < appointment_durations.length; cell++) {
+                var diff_time = diff_minutes(appointment_durations[cell].start_time, appointment_durations[cell].end_time);
+                if (diff_time > minute_inteval) {
+                    var next_hour = new Date(start + ' ' + appointment_durations[cell].start_time);
+                    for (var i = 1; i <= (diff_time / minute_inteval); i++) {
+                        next_hour = add_minutes(next_hour.getHours() + ':' + next_hour.getMinutes(), minute_inteval);
+                        var h = (next_hour.getHours() + '').length == 1 ? '0' + next_hour.getHours() : next_hour.getHours();
+                        var m = (next_hour.getMinutes() + '').length == 1 ? '0' + next_hour.getMinutes() : next_hour.getMinutes();
+                        tmp_time = h + '_' + m;
+                        var next_cell = appointment_durations[cell].wd + '_' + tmp_time + '_' + appointment_durations[cell].tid;
+                        $(table_schedule).find('tbody td#' + next_cell).prop('style', style);
+                        next_hour = new Date(start + ' ' + tmp_time.replace('_', ':'));
+                    }
+                }
+                $(table_schedule).find('tbody td#' + appointment_durations[cell].end).prop('style', style);
+            }
         }
 
         var get_schedule_list = (ids, callback) => {
             var params = ids.join('&teachers[]=');
-            var end_point = 'api/teacher_weekly_time_table?start='+start+'&end='+end+'&teachers[]=' + params;
+            var end_point = 'api/teacher_weekly_time_table?start=' + start + '&end=' + end + '&teachers[]=' + params;
 
             $.ajax({
                 url: end_point,
@@ -153,6 +198,20 @@ $(function () {
                 bootpag.unbind('page');
                 init();
             }
+        }
+
+        var add_minutes = (start_time, minutes) => {
+            var date = new Date(start + ' ' + start_time)
+            return new Date(date.getTime() + minutes * 60000);
+        }
+
+        var diff_minutes = (start_time, end_time) => {
+            var date_start = new Date(start + ' ' + start_time);
+            var date_end = new Date(start + ' ' + end_time);
+
+            var diff = (date_end.getTime() - date_start.getTime()) / 1000;
+            diff /= 60;
+            return Math.abs(Math.round(diff));
         }
 
         $(form).find('BUTTON#btnRefresh').on('click', (e) => {
