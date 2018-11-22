@@ -7,18 +7,29 @@ use Illuminate\Support\Facades\DB;
 
 class TeacherSchedules extends Model
 {
-    public static function getByTeacher($teacher_id, $class_id = null, $date_range = null)
+    public static function getByTeacher($teacher_id, $class_id = null, $date_range = null, $schedule_type = null)
     {
         $query = DB::table('teacher_schedules')->select('teacher_schedules.*', 'teachers.name')
-        ->join('teachers', 'teachers.id', 'teacher_schedules.teacher_id')
-        ->where('teacher_id', $teacher_id);
-        if ($class_id) {
+        ->join('teachers', 'teachers.id', 'teacher_schedules.teacher_id');
+        
+        if (!is_array($teacher_id)) {
+            $query->where('teacher_id', $teacher_id);
+        }
+        else {
+            $query->whereIn('teacher_id', $teacher_id);
+        }
+
+        if ($class_id != null){
             $query->where('class_id', $class_id);
         }
 
         if ($date_range) {
             $query->where('start_time', '>=', $date_range['start'])
                 ->where('end_time', '<=', $date_range['end']);
+        }
+
+        if ($schedule_type) {
+            $query->where('appoinment_type',  $schedule_type);
         }
 
         return $query->get()->toArray();

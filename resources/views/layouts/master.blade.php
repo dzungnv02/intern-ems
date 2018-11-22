@@ -148,7 +148,7 @@
           </a>
           <ul class="treeview-menu">
             <li><a href="{{asset('teacher-list')}}"><i class="fa fa-circle-o"></i> Danh sách giáo viên</a></li>
-            {{--  <li><a href="{{asset('teacher-add')}}"><i class="fa fa-circle-o"></i> Thêm giáo viên</a></li>  --}}
+            <li><a href="{{asset('teacher-weekly-schedule')}}"><i class="fa fa-circle-o"></i> Lịch hàng tuần</a></li>
           </ul>
         </li>
         <li class="treeview">
@@ -233,6 +233,7 @@
 <script src="{{ asset('admin/datetimepicker/build/jquery.datetimepicker.full.min.js') }}"></script>
 <script src="{{ asset('admin/js/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('admin/js/dataTables.bootstrap.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('admin/js/jquery.bootpag.min.js') }}"></script>
 <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js" type="text/javascript"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>

@@ -56,12 +56,8 @@ Route::get('teacher-list', function(){
     return view('teacher/list', ['schedule_types' => $schedule_types]);
 })->middleware('auth');
 
-Route::get('teacher-add', function(){
-    return view('teacher/add');
-})->middleware('auth');
-
-Route::get('teacher-edit', function(){
-    return view('teacher/edit');
+Route::get('teacher-weekly-schedule', function(){
+    return view('teacher/weekly-schedule');
 })->middleware('auth');
 
 Route::get('staff-list', function(){

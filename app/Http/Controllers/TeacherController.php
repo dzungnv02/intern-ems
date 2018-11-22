@@ -5,6 +5,8 @@ use App\Classes\ZohoCrmConnect;
 use App\Teacher;
 use App\TeacherSchedules;
 use Illuminate\Http\Request;
+use App\Classes\TeacherTimeTable;
+use App\Classes;
 
 class TeacherController extends Controller
 {
@@ -246,5 +248,30 @@ class TeacherController extends Controller
         $teacher_schedule->created_at = date('Y-m-d H:i:s');
         $teacher_schedule->save();
         return response()->json(['code' => 1, 'data' => $inputs], 200);
+    }
+
+    public function weeklyTimeTable(Request $request)
+    {
+        $inputs = $request->all();
+        $teachers = $inputs['teachers'];
+
+        $start = $inputs['start'];
+        $end = $inputs['end'];
+        $date_range = ['start' => $start, 'end' => $end];
+        $schedules = [];
+        if (count($teachers) ) {
+            $schedules = json_decode(json_encode( TeacherSchedules::getByTeacher($teachers, null,$date_range, 1)), TRUE);
+            $classes = Classes::getListClass(null);
+            $obj_time_table = new TeacherTimeTable;
+            $obj_time_table->set_start_of_day(config('constant.START_TIME_OF_DAY'));
+            $obj_time_table->set_end_of_day(config('constant.END_TIME_OF_DAY'));
+            $obj_time_table->set_teacher_list($teachers);
+            $obj_time_table->set_schedule_list($schedules);
+            $time_table = $obj_time_table->render_weekly_time_table();
+            return response()->json(['code' => 1, 'data' => $time_table, 'classes' => $classes], 200);
+        }
+        else {
+            return response()->json(['code' => 0, 'message' => 'No teachers'], 200);
+        }
     }
 }

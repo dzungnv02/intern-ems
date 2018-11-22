@@ -36,6 +36,7 @@ try {
     require('./teacher.js');
     require('./invoice.js');
     require('./branch.js');
+    require('./weeklyschedule.js');
     require('bootstrap');
 } catch (e) {
     console.log(e);

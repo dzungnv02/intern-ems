@@ -63,6 +63,7 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::get('/edit-teacher', 'TeacherController@edit');
     Route::get('/get-teacher-schedule', 'TeacherController@getTeacherSchedule');
     Route::post('/add_teacher_schedule', 'TeacherController@addTeacherSchedule');
+    Route::get('/teacher_weekly_time_table', 'TeacherController@weeklyTimeTable');
 
 
     // Time table
