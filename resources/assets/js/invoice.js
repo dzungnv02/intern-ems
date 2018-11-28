@@ -1,4 +1,5 @@
 $(function () {
+    if ($('FORM#frm_invoice').length == 0) return false;
     var form = $('FORM#frm_invoice');
     var invoice_type = $(form).find('input#invoice_type_tuition[type="radio"]:checked').length > 0 ? 'TUITION_FEE' : 'OTHER_FEE';
     

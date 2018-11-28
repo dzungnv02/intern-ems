@@ -1,4 +1,5 @@
 $(function () { 
+	if ($('#list-exam').length == 0) return false;
 	var url_string = window.location.href;
 	var url = new URL(url_string);
 	var classid = url.searchParams.get("classid");

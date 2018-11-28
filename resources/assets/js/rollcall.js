@@ -1,4 +1,6 @@
 $(function(){
+    if ($('#table-rollcall').length == 0 ) return false;
+    
     var timetable_id = localStorage.getItem("idOfTimetable");
 	var tableRollCall = $('#table-rollcall').DataTable({
     	"columnDefs": [ {

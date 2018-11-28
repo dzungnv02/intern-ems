@@ -1,4 +1,5 @@
 $(function () {
+    if ($('#branch-list').length == 0) return false;
     var tableBranch = $('#branch-list').DataTable({
         language: datatable_language,
         ajax: {

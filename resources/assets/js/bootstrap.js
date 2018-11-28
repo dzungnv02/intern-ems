@@ -26,10 +26,11 @@ try {
     });
     
     require('./student.js');
+    require('./student_detail.js');
     require('./timetable.js');
     require('./rollcall.js');
     require('./holiday.js');
-    require('./course.js');
+    // require('./course.js');
     require('./classes.js');
     require('./examination.js');
     require('./staff.js');

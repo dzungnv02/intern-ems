@@ -1,4 +1,5 @@
 $(function () {
+    if ($('#list-course').length == 0) return false;
     var tableCourse = $('#list-course').DataTable({
         "columnDefs": [ {
             "searchable": false,

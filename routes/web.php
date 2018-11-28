@@ -35,8 +35,12 @@ Route::get('/dashboard', function () {
     return view('layouts/dashboard');
 });
 
-Route::get('student', function(){
+Route::get('/student', function(){
 	return view('student/list');
+})->middleware('auth');
+
+Route::get('/student/detail', function(){
+	return view('student/form');
 })->middleware('auth');
 
 Route::get('timetable', function(){

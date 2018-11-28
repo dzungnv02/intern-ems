@@ -108,12 +108,12 @@
         </li>
        
         
-        <li class="">
+        {{--  <li class="">
           <a href="{{ asset('course') }}">
             <i class="fa fa-book" aria-hidden="true"></i>
             <span>Quản lý khóa học</span>
           </a>
-        </li>
+        </li>  --}}
         <li class="">
           <a href="{{ asset('class') }}">
             <i class="fa fa-university" aria-hidden="true"></i>

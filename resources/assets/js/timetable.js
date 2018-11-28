@@ -1,4 +1,7 @@
 $(function(){
+
+    if ($('#timeTableClass').length == 0) return false;
+
     var url_string = window.location.href;
     var url = new URL(url_string);
     var id = url.searchParams.get("classid");
