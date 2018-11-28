@@ -1,12 +1,13 @@
 @extends('layouts.master')
 @section('title')
-	Thêm học sinh
+	Thông tin chi tiết học sinh
 @endsection
 @section('breadcrumb')
 	<li class="active">Danh sách học sinh</li>
 @endsection
 @section('content')
-    <div class="group-tabs">
+<div class="row">
+    <div class="group-tabs col-sm-11" style="padding-right:0">
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" id="student_detail">
             <li class="active"><a data-tab="profile">Học sinh</a></li>
@@ -16,21 +17,28 @@
             <li><a data-tab="payment_histories">Lịch sử học phí</a></li>
         </ul>
     </div>
-    <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="profile">
-            @include('student.detail.profile')
-        </div>
-        <div role="tabpanel" class="tab-pane" id="parents">
-             @include('student.detail.parent')
-        </div>
-        <div role="tabpanel" class="tab-pane" id="exam_results">
-            @include('student.detail.exam')
-        </div>
-        <div role="tabpanel" class="tab-pane" id="teacher_reports">
-            @include('student.detail.report')
-        </div>
-        <div role="tabpanel" class="tab-pane" id="payment_histories">
-            @include('student.detail.payment')
+    <div class="col-sm-1" style="height:40px;text-align:right;padding-left:0"><button style="height:42px" class="btn btn-lg btn-success">Lưu</button></div>
+</div>
+
+<div class="row">
+    <div class=" col-sm-12">
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="profile">
+                @include('student.detail.profile')
+            </div>
+            <div role="tabpanel" class="tab-pane" id="parents">
+                @include('student.detail.parent')
+            </div>
+            <div role="tabpanel" class="tab-pane" id="exam_results">
+                @include('student.detail.exam')
+            </div>
+            <div role="tabpanel" class="tab-pane" id="teacher_reports">
+                @include('student.detail.report')
+            </div>
+            <div role="tabpanel" class="tab-pane" id="payment_histories">
+                @include('student.detail.payment')
+            </div>
         </div>
     </div>
+</div>
 @endsection

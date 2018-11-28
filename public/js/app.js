@@ -26862,14 +26862,15 @@ try {
     __webpack_require__(134);
     __webpack_require__(135);
     __webpack_require__(136);
+    // require('./course.js');
     __webpack_require__(137);
     __webpack_require__(138);
     __webpack_require__(139);
     __webpack_require__(140);
     __webpack_require__(141);
     __webpack_require__(142);
-    __webpack_require__(146);
     __webpack_require__(143);
+    __webpack_require__(144);
 } catch (e) {
     console.log(e);
 }
@@ -30633,6 +30634,35 @@ $(function () {
 /***/ (function(module, exports) {
 
 $(function () {
+    var tab_headers = $('UL.nav#student_detail');
+    var tab_contents = $('DIV.tab-content');
+
+    if (tab_headers.length == 0) return false;
+
+    var tab_col = $(tab_headers).find('LI');
+
+    var tab_activate = function tab_activate(target) {
+        $(tab_col).removeClass('active');
+        $(target).parent().addClass('active');
+        $(tab_contents).find("DIV[role='tabpanel']").removeClass('active');
+        $(tab_contents).find("DIV[role='tabpanel']#" + $(target).data('tab')).addClass('active');
+    };
+
+    $(tab_headers).find('A').bind('click', function (e) {
+        tab_activate(e.target);
+        e.preventDefault();
+        e.stopPropagation();
+    });
+});
+
+/***/ }),
+/* 134 */
+/***/ (function(module, exports) {
+
+$(function () {
+
+    if ($('#timeTableClass').length == 0) return false;
+
     var url_string = window.location.href;
     var url = new URL(url_string);
     var id = url.searchParams.get("classid");
@@ -30754,10 +30784,12 @@ $(function () {
 });
 
 /***/ }),
-/* 134 */
+/* 135 */
 /***/ (function(module, exports) {
 
 $(function () {
+    if ($('#table-rollcall').length == 0) return false;
+
     var timetable_id = localStorage.getItem("idOfTimetable");
     var tableRollCall = $('#table-rollcall').DataTable({
         "columnDefs": [{
@@ -30845,12 +30877,13 @@ $(function () {
 });
 
 /***/ }),
-/* 135 */
+/* 136 */
 /***/ (function(module, exports) {
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 $(function () {
+	if ($('#list-holiday').length == 0) return false;
 	var tableHoliday = $('#list-holiday').DataTable({
 		"columnDefs": [{
 			"searchable": false,
@@ -30903,7 +30936,7 @@ $(function () {
 		errorPlacement: function errorPlacement(error, element) {
 			error.appendTo(element.parent().next());
 		}
-	}, "errorPlacement", function errorPlacement(error, element) {
+	}, 'errorPlacement', function errorPlacement(error, element) {
 		if (element.attr("type") == "checkbox") {
 			element.closest(".form-group").children(0).prepend(error);
 		} else error.insertAfter(element);
@@ -30958,255 +30991,6 @@ $(function () {
 		timepicker: false,
 		minDate: '-1970-01-1'
 	});
-});
-
-/***/ }),
-/* 136 */
-/***/ (function(module, exports) {
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-$(function () {
-    var tableCourse = $('#list-course').DataTable({
-        "columnDefs": [{
-            "searchable": false,
-            "orderable": false,
-            "targets": 0
-        }],
-        "order": [[1, 'asc']],
-        "ajax": "api/get-list-course",
-
-        "columns": [{ "data": "id" }, { "data": "code" }, { "data": "name" }, {
-            "data": function data(_data, type, full) {
-                if (_data.level == 0) {
-                    return "Cơ bản";
-                } else return "Nâng cao";
-            }
-        }, { "data": "curriculum" }, { "data": "duration" }, { "data": "fee" }, {
-            "data": function data(_data2, type, full) {
-                return '<button type="button" class="edit-course btn btn-warning" course_id="' + _data2.id + '"><i class="fa fa-pencil-square" aria-hidden="true"></i></button> \
-                <button course_id="' + _data2.id + '" type="button"   class="delete-course btn btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
-            }
-        }]
-    });
-    tableCourse.on('order.dt search.dt', function () {
-        tableCourse.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
-            cell.innerHTML = i + 1;
-        });
-    }).draw();
-
-    $('#form-edit-course').validate(_defineProperty({
-        rules: {
-            "name": {
-                required: true
-            },
-            "code": {
-                required: true
-            },
-            "curriculum": {
-                required: true
-            },
-            "duration": {
-                required: true
-            },
-            "fee": {
-                required: true,
-                number: true
-            }
-        },
-        messages: {
-            "name": {
-                required: "Bắt buộc nhập tên khóa học"
-            },
-            "code": {
-                required: "Bắt buộc nhập mã khóa học"
-            },
-            "curriculum": {
-                required: "Bắt buộc nhập giáo trình"
-            },
-            "duration": {
-                required: "Bắt buộc nhập thời gian"
-            },
-            "fee": {
-                required: "Bắt buộc nhập học phí",
-                number: "Bắt buộc nhập số"
-            }
-        },
-        highlight: function highlight(element, errorClass) {
-            $(element).closest(".form-group").addClass("has-error");
-        },
-        unhighlight: function unhighlight(element, errorClass) {
-            $(element).closest(".form-group").removeClass("has-error");
-        },
-        errorPlacement: function errorPlacement(error, element) {
-            error.appendTo(element.parent().next());
-        }
-    }, "errorPlacement", function errorPlacement(error, element) {
-        if (element.attr("type") == "checkbox") {
-            element.closest(".form-group").children(0).prepend(error);
-        } else error.insertAfter(element);
-    }));
-    $('#form-create-course').validate(_defineProperty({
-        rules: {
-            "name": {
-                required: true
-            },
-            "code": {
-                required: true
-            },
-            "curriculum": {
-                required: true
-            },
-            "duration": {
-                required: true,
-                number: true
-            },
-            "fee": {
-                required: true,
-                number: true
-            }
-        },
-        messages: {
-            "name": {
-                required: "Bắt buộc nhập tên khóa học"
-            },
-            "code": {
-                required: "Bắt buộc nhập mã khóa học"
-            },
-            "curriculum": {
-                required: "Bắt buộc nhập giáo trình"
-            },
-            "duration": {
-                required: "Bắt buộc nhập thời gian",
-                number: "Bắt buộc nhập số"
-            },
-            "fee": {
-                required: "Bắt buộc nhập học phí",
-                number: "Bắt buộc nhập số"
-            }
-        },
-        highlight: function highlight(element, errorClass) {
-            $(element).closest(".form-group").addClass("has-error");
-        },
-        unhighlight: function unhighlight(element, errorClass) {
-            $(element).closest(".form-group").removeClass("has-error");
-        },
-        errorPlacement: function errorPlacement(error, element) {
-            error.appendTo(element.parent().next());
-        }
-    }, "errorPlacement", function errorPlacement(error, element) {
-        if (element.attr("type") == "checkbox") {
-            element.closest(".form-group").children(0).prepend(error);
-        } else error.insertAfter(element);
-    }));
-    $('#button-create-course').click(function () {
-        $('#modal-create-course').modal('show');
-    });
-    $("#create-course").click(function (event) {
-        event.preventDefault();
-        var name = $('#name').val();
-        var code = $('#code').val();
-        var duration = $('#duration').val();
-        var fee = $('#fee').val();
-        var curriculum = $('#curriculum').val();
-        var level = $('#level').val();
-        var data = { name: name, code: code, duration: duration, fee: fee, curriculum: curriculum, level: level };
-        if ($('#form-create-course').valid()) {
-            $.ajax({
-                url: "api/create-course",
-                method: "POST",
-                data: data,
-                success: function success(response) {
-                    if (response.code == 1) {
-                        tableCourse.ajax.reload();
-                        toastr.success(response.message);
-                        $('#form-create-course')[0].reset();
-                        $('#modal-create-course').modal('hide');
-                    } else toastr.error(response.message);
-                }
-            });
-        }
-    });
-    //Form Edit
-    $(document).on('click', '.edit-course', function () {
-        $('#modal-edit-course').modal('show');
-        var course_id = $(this).attr('course_id');
-        $('#get_course_id1').val(course_id);
-        $.ajax({
-            dataType: 'json',
-            type: 'get',
-            url: 'api/edit-course',
-            data: { course_id: course_id },
-            success: function success(response) {
-                $('#code_edit').val(response['code']);
-                $('#name_edit').val(response['name']);
-                $('#curriculum_edit').val(response['curriculum']);
-                $('#level_edit').val(response['level']);
-                $('#duration_edit').val(response['duration']);
-                $('#fee_edit').val(response['fee']);
-            }
-        });
-    });
-
-    $('.button-edit-course').click(function () {
-        var course_id = $('#get_course_id1').val();
-        var name = $('#name_edit').val();
-        var code = $('#code_edit').val();
-        var duration = $('#duration_edit').val();
-        var fee = $('#fee_edit').val();
-        var curriculum = $('#curriculum_edit').val();
-        var level = $('#level_edit').val();
-        var data = {
-            course_id: course_id,
-            name: name, code: code,
-            duration: duration,
-            fee: fee,
-            curriculum: curriculum,
-            level: level
-        };
-        if ($('#form-edit-course').valid()) {
-            $.ajax({
-                dataType: 'json',
-                type: 'post',
-                url: 'api/edit-course',
-                data: data,
-                success: function success(response) {
-                    if (response.code == 1) {
-                        $("#modal-edit-course").modal("hide");
-                        tableCourse.ajax.reload();
-                        toastr.success(response.message);
-                    } else {
-                        toastr.error(response.message);
-                    }
-                }
-            });
-        }
-    });
-
-    $(document).on('click', '.delete-course', function () {
-        var course_id = $(this).attr('course_id');
-        swal({
-            title: "Bạn có muốn?",
-            text: "xóa khóa học này?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true
-        }).then(function (willDelete) {
-            if (willDelete) {
-                $.ajax({
-                    url: "api/delete-course",
-                    method: "GET",
-                    data: { id: course_id },
-                    success: function success(response) {
-                        if (response.code == 1) {
-                            toastr.success(response.message);
-                            tableCourse.ajax.reload();
-                        } else toastr.error(response.message);
-                    }
-                });
-            } else {}
-        });
-    });
 });
 
 /***/ }),
@@ -32003,6 +31787,7 @@ $(function () {
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 $(function () {
+	if ($('#list-exam').length == 0) return false;
 	var url_string = window.location.href;
 	var url = new URL(url_string);
 	var classid = url.searchParams.get("classid");
@@ -32109,7 +31894,7 @@ $(document).on('click', '.button-add', function (e) {
 		errorPlacement: function errorPlacement(error, element) {
 			error.appendTo(element.parent().next());
 		}
-	}, "errorPlacement", function errorPlacement(error, element) {
+	}, 'errorPlacement', function errorPlacement(error, element) {
 		if (element.attr("type") == "checkbox") {
 			element.closest(".form-group").children(0).prepend(error);
 		} else error.insertAfter(element);
@@ -32268,7 +32053,7 @@ $(document).on('click', '.button-edit-exam', function (e) {
 		errorPlacement: function errorPlacement(error, element) {
 			error.appendTo(element.parent().next());
 		}
-	}, "errorPlacement", function errorPlacement(error, element) {
+	}, 'errorPlacement', function errorPlacement(error, element) {
 		if (element.attr("type") == "checkbox") {
 			element.closest(".form-group").children(0).prepend(error);
 		} else error.insertAfter(element);
@@ -32426,7 +32211,7 @@ $(document).on('click', '.button-update-point', function () {
 		errorPlacement: function errorPlacement(error, element) {
 			error.appendTo(element.parent().next());
 		}
-	}, "errorPlacement", function errorPlacement(error, element) {
+	}, 'errorPlacement', function errorPlacement(error, element) {
 		if (element.attr("type") == "checkbox") {
 			element.closest(".form-group").children(0).prepend(error);
 		} else error.insertAfter(element);
@@ -32455,7 +32240,6 @@ $(document).on('click', '.button-update-point', function () {
 /***/ (function(module, exports) {
 
 $(document).ready(function () {
-	console.log(img);
 	$(document).ready(function () {
 		function uploadImg(selectorClick, selectorShow) {
 			$(document).on('change', '#' + selectorClick, function () {
@@ -32580,6 +32364,8 @@ $(document).ready(function () {
 			});
 		}
 	});
+
+	if ($('TABLE#staff_list').length == 0) return false;
 	/*
  * ajax get list staff
  */
@@ -33142,6 +32928,7 @@ $(function () {
 /***/ (function(module, exports) {
 
 $(function () {
+    if ($('FORM#frm_invoice').length == 0) return false;
     var form = $('FORM#frm_invoice');
     var invoice_type = $(form).find('input#invoice_type_tuition[type="radio"]:checked').length > 0 ? 'TUITION_FEE' : 'OTHER_FEE';
 
@@ -33292,6 +33079,7 @@ $(function () {
 /***/ (function(module, exports) {
 
 $(function () {
+    if ($('#branch-list').length == 0) return false;
     var tableBranch = $('#branch-list').DataTable({
         language: datatable_language,
         ajax: {
@@ -33333,6 +33121,231 @@ $(function () {
 
 /***/ }),
 /* 143 */
+/***/ (function(module, exports) {
+
+$(function () {
+    var table_schedule = $('TABLE#teacher-weekly-schedule');
+    if (table_schedule.length > 0) {
+        var form = $('FORM#frmReport');
+        var teacher_list = null;
+        var curr_page = 1;
+        var total_page = 1;
+        var teacher_per_page = 2;
+        var offset = 0;
+        var curr_teachers = [];
+        var classes = [];
+        var start = '2018-11-01';
+        var end = '2018-11-30';
+        var bootpag = null;
+        var appointment_durations = [];
+        var minute_inteval = 30;
+
+        var init = function init() {
+            get_teacher_list(function (data) {
+                paginate(data);
+            });
+        };
+
+        var render_table = function render_table(list) {
+            $(table_schedule).find('thead tr#weekdays th:not(:first-child)').prop('colspan', curr_teachers.length);
+            $(table_schedule).find('thead tr#teacher_header').remove();
+            $(table_schedule).find('tbody').empty();
+
+            var teachers_row = $('<tr></tr>', {
+                id: 'teacher_header'
+            }).append($('<td></td>'));
+
+            for (var wd = 1; wd <= 7; wd++) {
+                for (var t = 0; t < curr_teachers.length; t++) {
+                    var td = $('<td></td>', {
+                        text: curr_teachers[t].name,
+                        'style': 'text-align:center'
+                    });
+                    $(teachers_row).append(td);
+                }
+            }
+
+            for (var hour in list) {
+                var tr = $('<tr></tr>');
+                var hour_cell = $('<th></th>', {
+                    class: 'schedule_hour',
+                    'style': 'text-align:center',
+                    text: hour
+                });
+
+                $(tr).append(hour_cell);
+                var schedule_obj = list[hour];
+                for (var wd in schedule_obj) {
+                    for (var tid in schedule_obj[wd]) {
+                        var content = '';
+                        var class_schedule = null;
+                        var style = '';
+                        finish_hour = '';
+                        start_hour = '';
+                        last_time = '';
+                        finish_hour = '';
+
+                        if (schedule_obj[wd][tid] != '') {
+                            for (var c in classes) {
+                                if (classes[c].id == schedule_obj[wd][tid]) {
+                                    content = classes[c].name;
+                                    class_schedule = JSON.parse(classes[c].schedule);
+                                    var diff = diff_minutes(class_schedule[wd.toLowerCase()].start, class_schedule[wd.toLowerCase()].finish);
+                                    var finish_hour = add_minutes(class_schedule[wd.toLowerCase()].start, diff - 30);
+                                    last_time = (finish_hour.getHours() + '').length == 1 ? '0' + finish_hour.getHours() + '_' + finish_hour.getMinutes() : finish_hour.getHours() + '_' + finish_hour.getMinutes();
+                                    style = 'background-color:yellow;text-align:center';
+                                    break;
+                                }
+                            }
+                        }
+
+                        var cell_id = wd + '_' + hour.replace(':', '_') + '_' + tid;
+                        var last_cell_id = wd + '_' + last_time + '_' + tid;
+                        if (last_time != '') {
+                            appointment_durations.push({
+                                'wd': wd,
+                                'tid': tid,
+                                'start': cell_id,
+                                'start_time': hour,
+                                'end': last_cell_id,
+                                'end_time': finish_hour.getHours() + ':' + finish_hour.getMinutes()
+                            });
+                            console.log(appointment_durations);
+                        }
+
+                        var td = $('<td></td>', {
+                            id: cell_id,
+                            class: 'schedule_content',
+                            text: content,
+                            'style': style
+                        });
+
+                        $(tr).append(td);
+                    }
+                }
+                $(table_schedule).find('tbody').append(tr);
+            }
+
+            $(table_schedule).find('thead').append(teachers_row);
+
+            var style = 'background-color:yellow;text-align:center';
+
+            for (var cell = 0; cell < appointment_durations.length; cell++) {
+                var diff_time = diff_minutes(appointment_durations[cell].start_time, appointment_durations[cell].end_time);
+                if (diff_time > minute_inteval) {
+                    var next_hour = new Date(start + ' ' + appointment_durations[cell].start_time);
+                    for (var i = 1; i <= diff_time / minute_inteval; i++) {
+                        next_hour = add_minutes(next_hour.getHours() + ':' + next_hour.getMinutes(), minute_inteval);
+                        var h = (next_hour.getHours() + '').length == 1 ? '0' + next_hour.getHours() : next_hour.getHours();
+                        var m = (next_hour.getMinutes() + '').length == 1 ? '0' + next_hour.getMinutes() : next_hour.getMinutes();
+                        tmp_time = h + '_' + m;
+                        var next_cell = appointment_durations[cell].wd + '_' + tmp_time + '_' + appointment_durations[cell].tid;
+                        $(table_schedule).find('tbody td#' + next_cell).prop('style', style);
+                        next_hour = new Date(start + ' ' + tmp_time.replace('_', ':'));
+                    }
+                }
+                $(table_schedule).find('tbody td#' + appointment_durations[cell].end).prop('style', style);
+            }
+        };
+
+        var get_schedule_list = function get_schedule_list(ids, callback) {
+            var params = ids.join('&teachers[]=');
+            var end_point = 'api/teacher_weekly_time_table?start=' + start + '&end=' + end + '&teachers[]=' + params;
+
+            $.ajax({
+                url: end_point,
+                method: 'GET',
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function success(response) {
+                    if (response.code == 1) {
+                        classes = response.classes;
+                        callback(response.data);
+                    }
+                }
+            });
+        };
+
+        var get_teacher_list = function get_teacher_list(callback) {
+            $.ajax({
+                url: '/api/list-teachers',
+                method: 'GET',
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function success(response) {
+                    if (response.code == 1) {
+                        teacher_list = response.data;
+                        if (callback != undefined) callback(teacher_list);
+                    }
+                }
+            });
+        };
+
+        var paginate = function paginate(teacher_list) {
+            if (teacher_list == null) return '';
+            total_page = Math.ceil(teacher_list.length / teacher_per_page);
+
+            if (curr_page == 1) {
+                offset = 0;
+            }
+
+            bootpag = $('.paginate').bootpag({
+                total: total_page,
+                next: 'Sau',
+                prev: 'Trước'
+            }).on("page", function (event, num) {
+                curr_page = num;
+                if (num == 1) {
+                    offset = 0;
+                } else {
+                    offset = teacher_per_page * (num - 1);
+                }
+
+                curr_teachers = teacher_list.slice(offset, offset + teacher_per_page);
+                var ids = [];
+
+                for (var i = 0; i < curr_teachers.length; i++) {
+                    ids[i] = curr_teachers[i].id;
+                }
+                get_schedule_list(ids, render_table);
+            });
+
+            bootpag.trigger('page', curr_page);
+        };
+
+        var refresh_schedule = function refresh_schedule() {
+            start = $(form).find('INPUT#start').val();
+            end = $(form).find('INPUT#end').val();
+            if (start != '' && end != '') {
+                bootpag.unbind('page');
+                init();
+            }
+        };
+
+        var add_minutes = function add_minutes(start_time, minutes) {
+            var date = new Date(start + ' ' + start_time);
+            return new Date(date.getTime() + minutes * 60000);
+        };
+
+        var diff_minutes = function diff_minutes(start_time, end_time) {
+            var date_start = new Date(start + ' ' + start_time);
+            var date_end = new Date(start + ' ' + end_time);
+
+            var diff = (date_end.getTime() - date_start.getTime()) / 1000;
+            diff /= 60;
+            return Math.abs(Math.round(diff));
+        };
+
+        $(form).find('BUTTON#btnRefresh').on('click', function (e) {
+            refresh_schedule();
+        });
+
+        init();
+    }
+});
+
+/***/ }),
+/* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -33341,7 +33354,7 @@ $(function () {
   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
   */
 (function (global, factory) {
-   true ? factory(exports, __webpack_require__(1), __webpack_require__(144)) :
+   true ? factory(exports, __webpack_require__(1), __webpack_require__(145)) :
   typeof define === 'function' && define.amd ? define(['exports', 'jquery', 'popper.js'], factory) :
   (factory((global.bootstrap = {}),global.jQuery,global.Popper));
 }(this, (function (exports,$,Popper) { 'use strict';
@@ -37282,14 +37295,14 @@ $(function () {
 
 
 /***/ }),
-/* 144 */
+/* 145 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* WEBPACK VAR INJECTION */(function(global) {/**!
  * @fileOverview Kickass library to create and place poppers near their reference elements.
- * @version 1.14.4
+ * @version 1.14.5
  * @license
  * Copyright (c) 2016 Federico Zivolo and contributors
  *
@@ -37386,7 +37399,8 @@ function getStyleComputedProperty(element, property) {
     return [];
   }
   // NOTE: 1 DOM access here
-  var css = getComputedStyle(element, null);
+  var window = element.ownerDocument.defaultView;
+  var css = window.getComputedStyle(element, null);
   return property ? css[property] : css;
 }
 
@@ -37474,7 +37488,7 @@ function getOffsetParent(element) {
   var noOffsetParent = isIE(10) ? document.body : null;
 
   // NOTE: 1 DOM access here
-  var offsetParent = element.offsetParent;
+  var offsetParent = element.offsetParent || null;
   // Skip hidden elements which don't have an offsetParent
   while (offsetParent === noOffsetParent && element.nextElementSibling) {
     offsetParent = (element = element.nextElementSibling).offsetParent;
@@ -37486,9 +37500,9 @@ function getOffsetParent(element) {
     return element ? element.ownerDocument.documentElement : document.documentElement;
   }
 
-  // .offsetParent will return the closest TD or TABLE in case
+  // .offsetParent will return the closest TH, TD or TABLE in case
   // no offsetParent is present, I hate this job...
-  if (['TD', 'TABLE'].indexOf(offsetParent.nodeName) !== -1 && getStyleComputedProperty(offsetParent, 'position') === 'static') {
+  if (['TH', 'TD', 'TABLE'].indexOf(offsetParent.nodeName) !== -1 && getStyleComputedProperty(offsetParent, 'position') === 'static') {
     return getOffsetParent(offsetParent);
   }
 
@@ -38036,7 +38050,8 @@ function getReferenceOffsets(state, popper, reference) {
  * @returns {Object} object containing width and height properties
  */
 function getOuterSizes(element) {
-  var styles = getComputedStyle(element);
+  var window = element.ownerDocument.defaultView;
+  var styles = window.getComputedStyle(element);
   var x = parseFloat(styles.marginTop) + parseFloat(styles.marginBottom);
   var y = parseFloat(styles.marginLeft) + parseFloat(styles.marginRight);
   var result = {
@@ -39820,10 +39835,10 @@ Popper.Defaults = Defaults;
 /* harmony default export */ __webpack_exports__["default"] = (Popper);
 //# sourceMappingURL=popper.js.map
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(145)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(146)))
 
 /***/ }),
-/* 145 */
+/* 146 */
 /***/ (function(module, exports) {
 
 var g;
@@ -39848,173 +39863,6 @@ try {
 
 module.exports = g;
 
-
-/***/ }),
-/* 146 */
-/***/ (function(module, exports) {
-
-$(function () {
-    var table_schedule = $('TABLE#teacher-weekly-schedule');
-    if (table_schedule.length > 0) {
-        var form = $('FORM#frmReport');
-        var teacher_list = null;
-        var curr_page = 1;
-        var total_page = 1;
-        var teacher_per_page = 2;
-        var offset = 0;
-        var curr_teachers = [];
-        var classes = [];
-        var start = '2018-11-01';
-        var end = '2018-11-30';
-        var bootpag = null;
-
-        var init = function init() {
-            get_teacher_list(function (data) {
-                paginate(data);
-            });
-        };
-
-        var render_table = function render_table(list) {
-            $(table_schedule).find('thead tr#weekdays th:not(:first-child)').prop('colspan', curr_teachers.length);
-            $(table_schedule).find('thead tr#teacher_header').remove();
-            $(table_schedule).find('tbody').empty();
-
-            var teachers_row = $('<tr></tr>', {
-                id: 'teacher_header'
-            }).append($('<td></td>'));
-
-            for (var wd = 1; wd <= 7; wd++) {
-                for (var t = 0; t < curr_teachers.length; t++) {
-                    var td = $('<td></td>', {
-                        text: curr_teachers[t].name,
-                        'style': 'text-align:center'
-                    });
-                    $(teachers_row).append(td);
-                }
-            }
-
-            for (var hour in list) {
-                var tr = $('<tr></tr>');
-                var hour_cell = $('<th></th>', {
-                    class: 'schedule_hour',
-                    'style': 'text-align:center',
-                    text: hour
-                });
-
-                $(tr).append(hour_cell);
-                var schedule_obj = list[hour];
-                for (var wd in schedule_obj) {
-                    for (var tid in schedule_obj[wd]) {
-                        var content = '';
-                        var style = '';
-                        if (schedule_obj[wd][tid] != '') {
-                            for (var c in classes) {
-                                if (classes[c].id == schedule_obj[wd][tid]) {
-                                    content = classes[c].name;
-                                    console.log(classes[c]);
-                                    style = 'background-color:yellow;text-align:center';
-                                    break;
-                                }
-                            }
-                        }
-                        //var cell_id = 
-                        var td = $('<td></td>', {
-                            id: '',
-                            class: 'schedule_content',
-                            text: content,
-                            'style': style
-                        });
-
-                        $(tr).append(td);
-                    }
-                }
-                $(table_schedule).find('tbody').append(tr);
-            }
-
-            $(table_schedule).find('thead').append(teachers_row);
-        };
-
-        var get_schedule_list = function get_schedule_list(ids, callback) {
-            var params = ids.join('&teachers[]=');
-            var end_point = 'api/teacher_weekly_time_table?start=' + start + '&end=' + end + '&teachers[]=' + params;
-
-            $.ajax({
-                url: end_point,
-                method: 'GET',
-                contentType: 'application/json',
-                dataType: 'json',
-                success: function success(response) {
-                    if (response.code == 1) {
-                        classes = response.classes;
-                        callback(response.data);
-                    }
-                }
-            });
-        };
-
-        var get_teacher_list = function get_teacher_list(callback) {
-            $.ajax({
-                url: '/api/list-teachers',
-                method: 'GET',
-                dataType: 'json',
-                contentType: 'application/json',
-                success: function success(response) {
-                    if (response.code == 1) {
-                        teacher_list = response.data;
-                        if (callback != undefined) callback(teacher_list);
-                    }
-                }
-            });
-        };
-
-        var paginate = function paginate(teacher_list) {
-            if (teacher_list == null) return '';
-            total_page = Math.ceil(teacher_list.length / teacher_per_page);
-
-            if (curr_page == 1) {
-                offset = 0;
-            }
-
-            bootpag = $('.paginate').bootpag({
-                total: total_page,
-                next: 'Sau',
-                prev: 'Trước'
-            }).on("page", function (event, num) {
-                curr_page = num;
-                if (num == 1) {
-                    offset = 0;
-                } else {
-                    offset = teacher_per_page * (num - 1);
-                }
-
-                curr_teachers = teacher_list.slice(offset, offset + teacher_per_page);
-                var ids = [];
-
-                for (var i = 0; i < curr_teachers.length; i++) {
-                    ids[i] = curr_teachers[i].id;
-                }
-                get_schedule_list(ids, render_table);
-            });
-
-            bootpag.trigger('page', curr_page);
-        };
-
-        var refresh_schedule = function refresh_schedule() {
-            start = $(form).find('INPUT#start').val();
-            end = $(form).find('INPUT#end').val();
-            if (start != '' && end != '') {
-                bootpag.unbind('page');
-                init();
-            }
-        };
-
-        $(form).find('BUTTON#btnRefresh').on('click', function (e) {
-            refresh_schedule();
-        });
-
-        init();
-    }
-});
 
 /***/ })
 /******/ ]);
