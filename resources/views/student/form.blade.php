@@ -17,7 +17,7 @@
             <li><a data-tab="payment_histories">Lịch sử học phí</a></li>
         </ul>
     </div>
-    <div class="col-sm-1" style="height:40px;text-align:right;padding-left:0"><button style="height:42px" class="btn btn-lg btn-success">Lưu</button></div>
+    <div class="col-sm-1" style="height:40px;text-align:right;padding-left:0"><button style="height:42px" type="button" role="button" class="btn btn-lg btn-success" id="btnSaveAll">Lưu</button></div>
 </div>
 
 <div class="row">

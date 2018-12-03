@@ -1,4 +1,14 @@
 <form id="frmStudent" class="form-horizontal">
+
+    <input type="hidden" name="student_id" id="student_id">
+    <input type="hidden" name="parent_id" id="parent_id">
+    <input type="hidden" name="register_branch_id" id="register_branch_id">
+    <input type="hidden" name="dependent_branch_id" id="dependent_branch_id">
+    <input type="hidden" name="staff_id" id="staff_id">
+
+    <input type="hidden" name="assessment_teacher_id" id="assessment_teacher_id">
+    <input type="hidden" name="assessment_trial_class_id" id="assessment_trial_class_id">
+
     <div class="row" style="padding-top:20px;"></div>
     <div class="row">
         <div class="col-sm-4">
@@ -13,7 +23,7 @@
                     <div class="form-group">
                         <label for="name" class="col-sm-5 control-label">Tên tiếng Anh</label>
                         <div class="col-sm-7">
-                        <input type="text" class="form-control" id="student-english_name" placeholder="tên tiếng Anh">
+                        <input type="text" class="form-control" id="student-e_name" placeholder="tên tiếng Anh">
                         </div>
                     </div>
                     <div class="form-group">
@@ -70,6 +80,11 @@
                         <input type="text" class="form-control" id="parent-facebook" placeholder="trang facebook, twitter... của phụ huynh" readonly>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <div class="col-sm-12 text-right">
+                            <button type="button" class="btn btn-sm btn-info" id="btn_change_parent"><i class="fa fa-ellipsis-h"></i></button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -79,7 +94,12 @@
                     <div class="form-group">
                         <label for="name" class="col-sm-5 control-label">Đăng ký tại</label>
                         <div class="col-sm-7">
-                        <input type="text" class="form-control" id="branch-register_branch_name" placeholder="trung tâm đăng ký">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="branch-register_branch_name" placeholder="trung tâm đăng ký" readonly>
+                                <div class="input-group-addon" style="padding:0;margin:0">
+                                    <a id="btn_register_branch" style="display:block;height:20px;width:30px;margin:8px 0 0px 0;cursor:pointer"><i class="fa fa-ellipsis-h"></i></a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -91,13 +111,23 @@
                     <div class="form-group">
                         <label for="name" class="col-sm-5 control-label">Trung tâm phụ trách</label>
                         <div class="col-sm-7">
-                        <input type="text" class="form-control" id="branch-dependent_branch_name" placeholder="trung tâm phụ trách">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="branch-dependent_branch_name" placeholder="trung tâm phụ trách" readonly>
+                                <div class="input-group-addon" style="padding:0;margin:0">
+                                <a id="btn_dependent_branch" style="display:block;height:20px;width:30px;margin:8px 0 0px 0;cursor:pointer"><i class="fa fa-ellipsis-h"></i></a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="name" class="col-sm-5 control-label">Nhân viên phụ trách</label>
                         <div class="col-sm-7">
-                        <input type="text" class="form-control" id="dependent_staff_name" placeholder="nhân viên phụ trách">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="dependent_staff_name" placeholder="nhân viên phụ trách" readonly>
+                                <div class="input-group-addon" style="padding:0;margin:0">
+                                <a id="btn_staff" style="display:block;height:20px;width:30px;margin:8px 0 0px 0;cursor:pointer"><i class="fa fa-ellipsis-h"></i></a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -130,7 +160,12 @@
                     <div class="form-group">
                         <label for="name" class="col-sm-5 control-label">Giáo viên</label>
                         <div class="col-sm-7">
-                            <input type="text" class="form-control" id="assessment_teacher" placeholder="giáo viên assessment">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="assessment_teacher" placeholder="giáo viên assessment" readonly>
+                                <div class="input-group-addon" style="padding:0;margin:0">
+                                <a id="btn_teacher" style="display:block;height:20px;width:30px;margin:8px 0 0px 0;cursor:pointer"><i class="fa fa-ellipsis-h"></i></a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -154,7 +189,12 @@
                     <div class="form-group">
                         <label for="name" class="col-sm-5 control-label">Lớp học thử</label>
                         <div class="col-sm-7">
-                            <input type="text" class="form-control" id="trial_class" placeholder="lớp học thử">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="trial_class" placeholder="lớp học thử" readonly>
+                                <div class="input-group-addon" style="padding:0;margin:0">
+                                <a id="btn_trial_class" style="display:block;height:20px;width:30px;margin:8px 0 0px 0;cursor:pointer"><i class="fa fa-ellipsis-h"></i></a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -179,11 +219,11 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Hoạt động</th>
-                                <th scope="col">Mô tả</th>
-                                <th scope="col">Thời gian</th>
-                                <th scope="col"></th>
+                                <th scope="col" style="width:5%">#</th>
+                                <th scope="col" style="width:20%">Hoạt động</th>
+                                <th scope="col" style="width:50%">Mô tả</th>
+                                <th scope="col" style="width:20%">Thời gian</th>
+                                <th scope="col" style="width:5%"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -195,9 +235,26 @@
                                 <td><a>Thay đổi</a></td>
                             </tr>
                         </tbody>
+                        <tfoot>
+                                <tr>
+                                    <th scope="row"></th>
+                                    <td>
+                                        <select class="form-control" id="act_type">
+                                            <option>[Chọn hoạt động]</option>
+                                        </select>
+                                    </td>
+                                    <td><input type="text" class="form-control"></td>
+                                    <td><input type="datetime-local" class="form-control"></td>
+                                    <td><a role="button" class="btn btn-sm btn-success"><i class="fa fa-save"></i></a></td>
+                                </tr>
+                             </tfoot>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 </form>
+@include('student.modal.branch')
+@include('student.modal.teacher')
+@include('student.modal.classes')
+@include('student.modal.staff')

@@ -28,14 +28,16 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::get('/get-list-student', 'StudentController@index');
     Route::get('/get-student', 'StudentController@getStudent');
     Route::post('/delete-student', 'StudentController@deleteStudent');
-    Route::post('/update-student', 'StudentController@updateStudent');
+    //Route::post('/update-student', 'StudentController@updateStudent');
     Route::post('/add-student', 'StudentController@addStudent');
-    Route::post('/save-student', 'StudentController@saveStudent');
+    //Route::post('/save-student', 'StudentController@saveStudent');
 
     Route::get('/student/get-profile', 'StudentController@getStudent');
     Route::get('/student/get-activity', 'StudentController@getStudentActivity');
     Route::get('/student/get-exam-result', 'StudentController@getExamResult');
     Route::get('/student/get-payments', 'StudentController@getPaymentHistory');
+    Route::post('/student/save', 'StudentController@saveStudent');
+
 
     // Parent
     Route::get('/parent/list', 'ParentController@getParentList');

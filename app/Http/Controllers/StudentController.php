@@ -11,8 +11,10 @@ use App\StudentActivity;
 use App\PointExam;
 use App\Invoice;
 use App\Assessment;
-use Illuminate\Http\Request;
 use App\Teacher;
+use App\Classes;
+use Illuminate\Http\Request;
+
 
 class StudentController extends Controller
 {
@@ -105,9 +107,11 @@ class StudentController extends Controller
            
             if ((bool)$student) {
                 $parent = Parents::find($student->parent_id);
-                $branch = Branch::find($student->branch_id);
+                $register_branch = Branch::find($student->register_branch_id);
+                $dependent_branch = Branch::find($student->dependent_branch_id);
                 $staff = Staff::find($student->staff_id);
                 $assessment = Assessment::getAssesmentOfStudent($id);
+                $trial_class = null;
                 if ($assessment != null) {
                     $assessment->status = $assessment->assessment_date == null ? -1 : ($assessment->assessment_result != null ? 1:0);
                     $assessment->trial_status = $assessment->trial_start_date == null ? 0 : 1;
@@ -117,14 +121,13 @@ class StudentController extends Controller
                     }
                 }
 
-               // $activites = 
-
                 return response()->json(['code' => 1, 'data' => [
                     'student' => $student, 
                     'parent' => $parent, 
-                    'branch' => $branch, 
+                    'register_branch' => $register_branch, 
+                    'dependent_branch' => $dependent_branch, 
                     'staff' => $staff,
-                    'assessment' => $assessment
+                    'assessment' => $assessment,
                     ]], 200);
             }
             else {
@@ -171,22 +174,28 @@ class StudentController extends Controller
     public function saveStudent(Request $request) 
     {
         $inputs = $request->all();
+
         $student_data = $inputs['student'];
-        $parent_data =  $inputs['parent'];
-        
-        if ($student_data['id']) {
-            $student = Student::find($student_data['id']);
+        $assessment_data = $inputs['assessment'];
+
+        if ($inputs['student_id']) {
+            $student = Student::find($inputs['student_id']);
             foreach($student_data as $field => $value) {
                 $student->$field = $value;
             }
-            $student->update();
-        }
-        else {
-            unset($student_data['id']);
-            $student_data['id'] = Student::insert($student_data);
+            $result_student = $student->update();
+
+            $assessment = Assessment::getAssesmentOfStudent($inputs['student_id']);
+            if ($assessment) {
+                $result_assessment = Assessment::updateAssessment( $assessment->id, $assessment_data);
+            }
+            else {
+                $result_assessment = Assessment::insertAssessment($assessment_data);
+            }
+
         }
 
-        return response()->json(['code' => 1, 'data' => $student_data, 'message' => 'Cap nhat thanh cong'], 200);
+        return response()->json(['code' => 1, 'data' => ['student'=>$result_student, 'assessment'=>$result_assessment], 'message' => 'Cap nhat thanh cong'], 200);
     }
 
     public function getStudentActivity(Request $request)

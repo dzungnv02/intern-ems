@@ -17,36 +17,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Bố</td>
-                            <td>Trần Văn Bố</td>
-                            <td>0988567354</td>
-                            <td></td>
-                            <td>150 Trần Phú - Hà Đông</td>
-                            <td></td>
-                            <td><a>Sửa</a>&nbsp;|&nbsp;<a>Xoá</a></td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Mẹ</td>
-                            <td>Lê Thị Mẹ</td>
-                            <td>0911345786</td>
-                            <td></td>
-                            <td>150 Trần Phú - Hà Đông</td>
-                            <td><span style="margin-left:30px" title="" class="badge bg-light-blue"><i class="fa fa-check"></span></i></td>
-                            <td><a>Sửa</a>&nbsp;|&nbsp;<a>Xoá</a></td>
-                        </tr>
-                        <tr>
-                            <th scope="row">3</th>
-                            <td>Ông</td>
-                            <td>Trần Văn Ông</td>
-                            <td>0903229887</td>
-                            <td></td>
-                            <td>150 Trần Phú - Hà Đông</td>
-                            <td></td>
-                            <td><a>Sửa</a>&nbsp;|&nbsp;<a>Xoá</a></td>
-                        </tr>
+                        
                     </tbody>
                 </table>
             </div>

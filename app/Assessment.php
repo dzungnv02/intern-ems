@@ -12,7 +12,10 @@ class Assessment extends Model
 
     public static function getAssesmentOfStudent ($student_id) 
     {
-        $assessment = DB::table('assessments')->where('student_id', $student_id)->first();
+        $assessment = DB::table('assessments')
+            ->select('assessments.*', 'classes.name as class_name')
+            ->leftJoin('classes', 'classes.id', '=', 'assessments.trial_class_id')
+            ->where('assessments.student_id', $student_id)->first();
         return $assessment;
     }
 
@@ -29,6 +32,7 @@ class Assessment extends Model
             foreach($data as $field => $value) {
                 $assessment->$field = $value;
             }
+            $assessment->created_at = date('Y-m-d H:i:s');
             return $assessment->save();
         }
         return false;
@@ -41,6 +45,7 @@ class Assessment extends Model
             foreach($data as $field => $value) {
                 $assessment->$field = $value;
             }
+            $assessment->updated_at = date('Y-m-d H:i:s');
             return $assessment->save();
         }
         return false;
