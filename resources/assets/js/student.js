@@ -87,8 +87,8 @@ $(function () {
 
 				table_student.on('click', 'button.edit-student', function () {
 					var data = table_student.row($(this).parents('tr')).data();
-					show_student_form(data.id);
-					console.log('edit-student', data);
+					window.location.href = '/student/detail?student_id=' + data.id;
+					//show_student_form(data.id);
 				});
 
 				table_student.on('click', 'button.del-student', function () {
