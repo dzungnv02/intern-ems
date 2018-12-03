@@ -55,4 +55,10 @@ class Invoice extends Model
 
         return $end_date;
     }
+
+    public function getPaymentHistoryOfStudent($student_id)
+    {
+        $list = DB::table('rev_n_exp')->select('*')->where('student_id', $student_id);
+        return $list;
+    }
 }

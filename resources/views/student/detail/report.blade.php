@@ -1,7 +1,7 @@
 <div class="row" style="padding-top:20px;"></div>
 <div class="row">
     <div class="col-sm-12">
-        <div class="box box-info" id="box_parent">
+        <div class="box box-info" id="box_teacher_report">
             <div class="box-body">
                 <table class="table">
                     <thead>

@@ -84,8 +84,9 @@ class Student extends Model
      * @param  int $id
      * @return $student
      */
-    public static function edit($id){
-        $student = DB::table('students')->where('id',$id)->get();
+    public static function getStudent($id)
+    {
+        $student = Student::find($id);
         return $student;
     }
 

@@ -5,7 +5,14 @@ namespace App\Http\Controllers;
 use App\Student;
 use App\StudentClass;
 use App\Parents;
+use App\Branch;
+use App\Staff;
+use App\StudentActivity;
+use App\PointExam;
+use App\Invoice;
+use App\Assessment;
 use Illuminate\Http\Request;
+use App\Teacher;
 
 class StudentController extends Controller
 {
@@ -94,15 +101,35 @@ class StudentController extends Controller
     {
         $id = $request->id;
         if ($id) {
-            $student = Student::find($id)->toArray();
-            $parent = Parents::find($student['parent_id']);
-            if ($parent != null) $parent->toArray();
+            $student = Student::getStudent($id);
+           
+            if ((bool)$student) {
+                $parent = Parents::find($student->parent_id);
+                $branch = Branch::find($student->branch_id);
+                $staff = Staff::find($student->staff_id);
+                $assessment = Assessment::getAssesmentOfStudent($id);
+                if ($assessment != null) {
+                    $assessment->status = $assessment->assessment_date == null ? -1 : ($assessment->assessment_result != null ? 1:0);
+                    $assessment->trial_status = $assessment->trial_start_date == null ? 0 : 1;
+                    if ($assessment->teacher_id != null ) {
+                        $assessment_teacher = Teacher::find($assessment->teacher_id);
+                        $assessment->teacher_name = $assessment_teacher->name;
+                    }
+                }
 
-            if (count($student) == 0) {
-                return response()->json(['code' => 0, 'message' => 'khong ton tai hoc sinh nay'], 200);
+               // $activites = 
+
+                return response()->json(['code' => 1, 'data' => [
+                    'student' => $student, 
+                    'parent' => $parent, 
+                    'branch' => $branch, 
+                    'staff' => $staff,
+                    'assessment' => $assessment
+                    ]], 200);
             }
             else {
-                return response()->json(['code' => 1, 'data' => ['student' => $student, 'parent' => $parent]], 200);
+                return response()->json(['code' => 0, 'message' => 'khong ton tai hoc sinh nay'], 200);
+                
             }
         }
     }
@@ -162,4 +189,41 @@ class StudentController extends Controller
         return response()->json(['code' => 1, 'data' => $student_data, 'message' => 'Cap nhat thanh cong'], 200);
     }
 
+    public function getStudentActivity(Request $request)
+    {
+        $inputs = $request->all();
+        $student_id = isset($inputs['student_id']) ? $inputs['student_id'] : null;
+
+        if ($student_id) {
+            $list = StudentActivity::getActivityOfStudent($student_id);
+            return response()->json(['code' => 1, 'data' => $list], 200);
+        }
+
+        return response()->json(['code' => 1, 'message' => 'no data'], 204);
+    }
+
+    public function getExamResult(Request $request)
+    {
+        $inputs = $request->all();
+        $student_id = isset($inputs['student_id']) ? $inputs['student_id'] : null;
+
+        if ($student_id) {
+            $list = PointExam::getResultOfStudent($student_id);
+            return response()->json(['code' => 1, 'data' => $list], 200);
+        }
+
+        return response()->json(['code' => 1, 'message' => 'no data'], 204);
+    }
+
+    public function getPaymentHistory(Request $request)
+    {
+        $inputs = $request->all();
+        $student_id = isset($inputs['student_id']) ? $inputs['student_id'] : null;
+
+        if ($student_id) {
+            $list = Invoice::getPaymentHistoryOfStudent($student_id);
+            return response()->json(['code' => 1, 'data' => $list], 200);
+        }
+        return response()->json(['code' => 1, 'message' => 'no data'], 204);
+    }
 }

@@ -9,6 +9,7 @@ class PointExam extends Model
 
     public $timestamps = false;
     public $table = 'point_exams';
+
     /**
      * Danh sách học viên theo kì thi.
      *
@@ -101,5 +102,17 @@ class PointExam extends Model
             'updated_at' =>  date('Y-m-d H:i:s')
         ]);
         return $updateExam;
+    }
+
+
+    public static function getResultOfStudent($student_id)
+    {
+        $list = DB::table('point_exams')
+                ->select('point_exams.point', 'point_exams.note', 'point_exams.teacher_id', 'exams.*')
+                ->join('exams', 'exams.id', '=', 'point_exams.examination_id')
+                ->where('point_exams.student_id', $student_id)
+                ->get();
+
+         return $list;       
     }
 }

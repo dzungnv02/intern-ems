@@ -32,6 +32,15 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::post('/add-student', 'StudentController@addStudent');
     Route::post('/save-student', 'StudentController@saveStudent');
 
+    Route::get('/student/get-profile', 'StudentController@getStudent');
+    Route::get('/student/get-activity', 'StudentController@getStudentActivity');
+    Route::get('/student/get-exam-result', 'StudentController@getExamResult');
+    Route::get('/student/get-payments', 'StudentController@getPaymentHistory');
+
+    // Parent
+    Route::get('/parent/list', 'ParentController@getParentList');
+    Route::post('/parent/parent_student/change', 'ParentController@mapingParentStudent');
+
     // Course
     Route::get('/get-list-course', 'CourseController@getListCourse');
     Route::get('/delete-course', 'CourseController@deleteCourse');
