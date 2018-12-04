@@ -24,6 +24,5 @@ $(function () {
     $('A#btn_teacher').on('click', (e) => {
         modal_teacher.modal('show');
     });
-
     
 });
