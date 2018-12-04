@@ -5,7 +5,6 @@
     <input type="hidden" name="register_branch_id" id="register_branch_id">
     <input type="hidden" name="dependent_branch_id" id="dependent_branch_id">
     <input type="hidden" name="staff_id" id="staff_id">
-
     <input type="hidden" name="assessment_teacher_id" id="assessment_teacher_id">
     <input type="hidden" name="assessment_trial_class_id" id="assessment_trial_class_id">
 

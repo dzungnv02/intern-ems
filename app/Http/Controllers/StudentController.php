@@ -177,6 +177,7 @@ class StudentController extends Controller
 
         $student_data = $inputs['student'];
         $assessment_data = $inputs['assessment'];
+        $result_student = null;
 
         if ($inputs['student_id']) {
             $student = Student::find($inputs['student_id']);

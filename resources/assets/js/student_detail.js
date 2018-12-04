@@ -395,8 +395,6 @@ $(function () {
         });
     }
 
-
     require('./student_detail_modal.js');
     init();
-
 });
