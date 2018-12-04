@@ -28,8 +28,12 @@
                     <div class="form-group">
                         <label for="name" class="col-sm-5 control-label">Giới tính</label>
                         <div class="col-sm-7">
-                        <input type="text" class="form-control" id="student-gender" placeholder="giới tính">
+                            <select class="form-control" id="student-gender" placeholder="giới tính">
+                                <option value="0">Nữ<option>
+                                <option value="1">Nam<option>
+                            </select>
                         </div>
+                        
                     </div>
                     <div class="form-group">
                         <label for="name" class="col-sm-5 control-label">Năm sinh</label>
@@ -147,7 +151,7 @@
                     <div class="form-group">
                         <label for="name" class="col-sm-5 control-label">Tình trạng Assessment<i style="color:red">*</i></label>
                         <div class="col-sm-7">
-                            <input type="text" class="form-control" id="assessment_status" placeholder="tình trạng assessment">
+                            <input type="text" class="form-control" id="assessment_status" placeholder="tình trạng assessment" readonly>
                         </div>
                     </div>
                     <div class="form-group">
@@ -182,7 +186,7 @@
                     <div class="form-group">
                         <label for="name" class="col-sm-5 control-label">Tình trạng học thử<i style="color:red">*</i></label>
                         <div class="col-sm-7">
-                            <input type="text" class="form-control" id="trial_status" placeholder="tình trạng học thử">
+                            <input type="text" class="form-control" id="trial_status" placeholder="tình trạng học thử" readonly>
                         </div>
                     </div>
                     <div class="form-group">
@@ -242,9 +246,9 @@
                                             <option>[Chọn hoạt động]</option>
                                         </select>
                                     </td>
-                                    <td><input type="text" class="form-control"></td>
-                                    <td><input type="datetime-local" class="form-control"></td>
-                                    <td><a role="button" class="btn btn-sm btn-success"><i class="fa fa-save"></i></a></td>
+                                    <td><input type="text" id="note" class="form-control"></td>
+                                    <td><input type="datetime-local" id="start_time" class="form-control"></td>
+                                    <td><a role="button" id="btnSaveActivity" class="btn btn-sm btn-success" style="height:34px;width:34px"><i class="fa fa-save"></i></a></td>
                                 </tr>
                              </tfoot>
                     </table>

@@ -8,7 +8,7 @@
                 <h3 class="modal-title" id="branch-select-modal-title">Chọn trung tâm</h3>
             </div>
             <div class="modal-body">
-                <input type="hidden" id="target-form-control">
+                <input type="hidden" id="target-form-control" style="width:100%">
                 <table id="branch-list-student" class="table">
                     <thead>
                         <tr>

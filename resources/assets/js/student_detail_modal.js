@@ -9,8 +9,7 @@ $(function () {
     var table_classes = null;
     var table_staff = null;
 
-    var branch_list_render = () => {
-        
+    var branch_list_render = () => {     
         if ($.fn.dataTable.isDataTable('DIV#branch-select-modal TABLE#branch-list-student')) {
             table_student = $(modal_branch).find('TABLE#branch-list-student').DataTable();
             table_branch.ajax.reload();
@@ -18,6 +17,7 @@ $(function () {
             table_branch = $(modal_branch).find('TABLE#branch-list-student').DataTable({
                 language: datatable_language,
                 "ordering": false,
+                "lengthChange": false,
                 ajax: {
                     url: '/api/branch/list'
                 },
@@ -44,7 +44,7 @@ $(function () {
                         targets: 3,
                         "data": null,
                         "visible": true,
-                        "defaultContent": '<span class="badge bg-dark" style="margin-left:30px"><a title="Chọn làm liên hệ chính" class="text-white branch-selection" style="color:white;cursor: pointer">Chọn</a></span>'
+                        "defaultContent": '<span class="badge bg-dark" style="margin-left:30px"><a title="Chọn trung tâm" class="text-white branch-selection" style="color:white;cursor: pointer">Chọn</a></span>'
                     }
                 ],
             });
@@ -67,6 +67,187 @@ $(function () {
                 $(modal_branch).modal('hide');
             });
         }
+    }
+
+    var classes_list_render = () => {
+        if ($.fn.dataTable.isDataTable('DIV#classes-select-modal TABLE#classes-list-student')) {
+            table_classes = $(modal_classes).find('TABLE#classes-list-student').DataTable();
+        }
+        else {
+            table_classes = $(modal_classes).find('TABLE#classes-list-student').DataTable({
+                language: datatable_language,
+                "ordering": false,
+                "lengthChange": false,
+                ajax: {
+                    url: '/api/get-list-class'
+                },
+                columns: [{
+                        data: null
+                    },
+                    {
+                        data: 'name'
+                    },
+                    {
+                        data: 'branch_name'
+                    },
+                    {
+                        data: null
+                    }
+                ],
+                    "columnDefs": [
+                    {
+                        "targets": [0],
+                        "data": null,
+                        "defaultContent": ''
+                    }
+                    ,{
+                        targets: 3,
+                        "data": null,
+                        "visible": true,
+                        "defaultContent": '<span class="badge bg-dark" style="margin-left:30px"><a title="Chọn lớp" class="text-white classes-selection" style="color:white;cursor: pointer">Chọn</a></span>'
+                    }
+                ],
+            });
+
+            table_classes.on('order.dt search.dt', function () {
+                table_classes.column(0, {
+                    search: 'applied',
+                    order: 'applied'
+                }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+            table_classes.on('click', 'a.classes-selection', function () {
+                var data = table_classes.row($(this).parents('tr')).data();
+                var form = $('FORM#frmStudent');
+                $(form).find('INPUT#assessment_trial_class_id').val(data.id);
+                $(form).find('INPUT#trial_class').val(data.name);
+                $(modal_classes).modal('hide');
+            });
+        }
+    }
+
+    var teacher_list_render = () => {
+        if ($.fn.dataTable.isDataTable('DIV#teacher-select-modal TABLE#teacher-list-student')) {
+            table_teacher = $(modal_teacher).find('TABLE#teacher-list-student').DataTable();
+        }
+        else {
+            table_teacher = $(modal_teacher).find('TABLE#teacher-list-student').DataTable({
+                language: datatable_language,
+                "ordering": false,
+                "lengthChange": false,
+                ajax: {
+                    url: '/api/list-teachers'
+                },
+                columns: [{
+                        data: null
+                    },
+                    {
+                        data: 'name'
+                    },
+                    {
+                        data: 'email'
+                    },
+                    {
+                        data: null
+                    }
+                ],
+                    "columnDefs": [
+                    {
+                        "targets": [0],
+                        "data": null,
+                        "defaultContent": ''
+                    }
+                    ,{
+                        targets: 3,
+                        "data": null,
+                        "visible": true,
+                        "defaultContent": '<span class="badge bg-dark" style="margin-left:30px"><a title="Chọn lớp" class="text-white teacher-selection" style="color:white;cursor: pointer">Chọn</a></span>'
+                    }
+                ],
+            });
+
+            table_teacher.on('order.dt search.dt', function () {
+                table_teacher.column(0, {
+                    search: 'applied',
+                    order: 'applied'
+                }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+            table_teacher.on('click', 'a.teacher-selection', function () {
+                var data = table_teacher.row($(this).parents('tr')).data();
+                var form = $('FORM#frmStudent');
+                $(form).find('INPUT#assessment_teacher_id').val(data.id);
+                $(form).find('INPUT#assessment_teacher').val(data.name);
+                $(modal_teacher).modal('hide');
+            });
+        }
+    }
+
+    var staff_list_render = () => {
+        if ($.fn.dataTable.isDataTable('DIV#staff-select-modal TABLE#staff-list-student')) {
+            table_staff = $(modal_staff).find('TABLE#staff-list-student').DataTable();
+        }
+        else {
+            table_staff = $(modal_staff).find('TABLE#staff-list-student').DataTable({
+                language: datatable_language,
+                "ordering": false,
+                "lengthChange": false,
+                ajax: {
+                    url: '/api/get-list-staff'
+                },
+                columns: [{
+                        data: null
+                    },
+                    {
+                        data: 'name'
+                    },
+                    {
+                        data: 'email'
+                    },
+                    {
+                        data: 'branch_name'
+                    },
+                    {
+                        data: null
+                    }
+                ],
+                    "columnDefs": [
+                    {
+                        "targets": [0],
+                        "data": null,
+                        "defaultContent": ''
+                    }
+                    ,{
+                        targets: 4,
+                        "data": null,
+                        "visible": true,
+                        "defaultContent": '<span class="badge bg-dark" style="margin-left:30px"><a title="Chọn lớp" class="text-white staff-selection" style="color:white;cursor: pointer">Chọn</a></span>'
+                    }
+                ],
+            });
+
+            table_staff.on('order.dt search.dt', function () {
+                table_staff.column(0, {
+                    search: 'applied',
+                    order: 'applied'
+                }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+            table_staff.on('click', 'a.staff-selection', function () {
+                var data = table_staff.row($(this).parents('tr')).data();
+                var form = $('FORM#frmStudent');
+                $(form).find('INPUT#staff_id').val(data.id);
+                console.log(data);
+                $(form).find('INPUT#dependent_staff_name').val(data.name);
+                $(modal_staff).modal('hide');
+            });
+        }      
     }
 
     var events_binding = () => {
@@ -94,6 +275,18 @@ $(function () {
 
         modal_branch.on('show.bs.modal', (e) => {
             branch_list_render();
+        });
+
+        modal_classes.on('show.bs.modal', (e) => {
+            classes_list_render();
+        });
+
+        modal_teacher.on('show.bs.modal', (e) => {
+            teacher_list_render();
+        });
+
+        modal_staff.on('show.bs.modal', (e) => {
+            staff_list_render();
         });
     }
 

@@ -22,7 +22,8 @@ class Classes extends Model
     {
         $start = ($page - 1) * $record;
         $listClass = Classes::join('teachers', 'teachers.id', '=', 'classes.teacher_id')
-            ->select('classes.*', 'teachers.name as teacher_name');
+            ->leftJoin('branch','branch.id', '=', 'classes.branch_id' )
+            ->select('classes.*', 'teachers.name as teacher_name', 'branch.branch_name');
         if ($keyword != null) {
             $listClass->where('classes.name', 'like', '%' . $keyword . '%')
                 ->orwhere('classes.status', 'like', '%' . $keyword . '%')

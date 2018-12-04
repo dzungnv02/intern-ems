@@ -58,6 +58,11 @@ $(function () {
         tab_activate($(tab_col).find('a[data-tab="parents"]'));
     });
 
+    $('A#btnSaveActivity').on('click', (e) => {
+        save_activities();
+    });
+    
+
     var get_url_param = ($param_name) => {
         var hash;
         var q = document.URL.split('?')[1];
@@ -161,7 +166,7 @@ $(function () {
 
         } else {
             $(form).find('INPUT#assessment_status').val(assessment_status['-1']);
-            $(form).find('INPUT#assessment_status').val(trial_status['0']);
+            $(form).find('INPUT#trial_status').val(trial_status['0']);
         }
 
     }
@@ -192,7 +197,7 @@ $(function () {
                     class: 'btn btn-sm btn-danger',
                     role: 'button'
                 });
-                $(tr).append(index_cell, activity_cell, note_cell, start_date_cell, act_cell.append(act_del));
+                $(tr).append(index_cell, activity_cell, note_cell, start_date_cell, act_cell);
                 $(table).find('tbody').append(tr);
             }
         } else {
@@ -323,13 +328,14 @@ $(function () {
 
     var save_profile = () => {
         var form = $('FORM#frmStudent');
-
+        var assessment_date = $(form).find('INPUT#assessment_date').val().trim();
+        assessment_date = assessment_date == '' ? null : moment(assessment_date).format("YYYY-MM-DD HH:mm:ss");
         var data = {
             'student_id': student_id,
             'student': {
                 'name': $(form).find('INPUT#student-name').val().trim(),
                 'e_name': $(form).find('INPUT#student-e_name').val().trim(),
-                'gender': $(form).find('INPUT#student-gender').val().trim(),
+                'gender': $(form).find('SELECT#student-gender').val().trim(),
                 'birthyear': $(form).find('INPUT#student-birthyear').val().trim(),
                 'birthday': $(form).find('INPUT#student-birthday').val().trim(),
                 'parent_id': $(form).find('INPUT#parent_id').val().trim(),
@@ -339,7 +345,7 @@ $(function () {
                 'register_note': $(form).find('textarea#register_note').val().trim(),
             },
             'assessment': {
-                'assessment_date': moment($(form).find('INPUT#assessment_date').val().trim()).format("YYYY-MM-DD HH:mm:ss"),
+                'assessment_date': assessment_date,
                 'assessment_result': $(form).find('INPUT#assessment_result').val().trim(),
                 'teacher_id': $(form).find('INPUT#assessment_teacher_id').val().trim(),
                 'trial_class_id': $(form).find('INPUT#assessment_teacher_id').val().trim(),
@@ -353,17 +359,23 @@ $(function () {
     };
 
     var save_activities = () => {
-
-        var form = $('FORM#frmActivity');
+        var form = $('DIV#box_history');
+        var time = $(form).find('INPUT#start_time').val().trim();
         var data = {
-            'student_id': '',
-            'act_type': '',
-            'from_class': '',
-            'to_class': '',
-            'start_time': '',
-            'end_time': '',
-            'note': '',
+            'student_id': student_id,
+            'act_type': $(form).find('SELECT#act_type').val(),
+            'start_time': time == '' ? null : moment(time).format("YYYY-MM-DD HH:mm:ss"),
+            'note': $(form).find('INPUT#note').val().trim()
         }
+        
+        post('/api/student/save-activity', data, (response) => {
+            get_activities();
+        });
+
+        $(form).find('SELECT#act_type').val('');
+        $(form).find('INPUT#start_time').val('');
+        $(form).find('INPUT#note').val('');
+
     };
 
     var save = () => {
@@ -385,6 +397,12 @@ $(function () {
         }
 
         $('FORM#frmStudent').find('INPUT#student_id').val(student_id);
+
+        var form = $('FORM#frmStudent');
+        for(var i = 1; i <= 6; i++) {
+            var opt = $('<option></option>', {text:activity_types[i], value:i});
+            $(form).find('SELECT#act_type').append(opt);
+        }
 
         get_student_profile(() => {
             get_activities();

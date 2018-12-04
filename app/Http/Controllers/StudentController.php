@@ -187,6 +187,8 @@ class StudentController extends Controller
             $result_student = $student->update();
 
             $assessment = Assessment::getAssesmentOfStudent($inputs['student_id']);
+            $assessment_data['student_id'] = $inputs['student_id'];
+            $assessment_data['staff_id'] = $inputs['logged_user']->id;
             if ($assessment) {
                 $result_assessment = Assessment::updateAssessment( $assessment->id, $assessment_data);
             }
@@ -197,6 +199,26 @@ class StudentController extends Controller
         }
 
         return response()->json(['code' => 1, 'data' => ['student'=>$result_student, 'assessment'=>$result_assessment], 'message' => 'Cap nhat thanh cong'], 200);
+    }
+    
+    public function saveActivity (Request $request) 
+    {
+        $inputs = $request->all();
+        $student_id = isset($inputs['student_id']) ? $inputs['student_id'] : null;
+        $result = true;
+        if ($student_id) {
+            $data = [
+                'student_id' => $inputs['student_id'],
+                'act_type' => $inputs['act_type'],
+                'start_time' => $inputs['start_time'],
+                'note' => $inputs['note'],
+                'staff_id' => $inputs['logged_user']->id,
+            ];
+            $result = StudentActivity::createActivity($data);
+        }
+
+        return response()->json(['code' => 1, 'data' => ['result' => $result], 'message' => 'Cap nhat thanh cong'], 200);
+
     }
 
     public function getStudentActivity(Request $request)

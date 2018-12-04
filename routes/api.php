@@ -37,7 +37,7 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::get('/student/get-exam-result', 'StudentController@getExamResult');
     Route::get('/student/get-payments', 'StudentController@getPaymentHistory');
     Route::post('/student/save', 'StudentController@saveStudent');
-
+    Route::post('/student/save-activity', 'StudentController@saveActivity');
 
     // Parent
     Route::get('/parent/list', 'ParentController@getParentList');
