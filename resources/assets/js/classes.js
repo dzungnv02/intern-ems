@@ -18,7 +18,8 @@ $(function () {
         var table_act_buttons = '<button type="button" title="Danh sách lớp" class="list-student-class btn btn-sm btn-info"><i class="fa fa-address-book-o" aria-hidden="true"></i></button>\
                             <button type="button"  title="Thời Khóa Biểu" class="show-timetable btn btn-sm bg-purple"><i class="fa fa-calendar-times-o" aria-hidden="true"></i></button>\
                             <button type="button" title="Sửa thông tin lớp" class="edit-class btn btn-sm btn-warning"><i title="Sửa thông tin lớp" class="fa fa-pencil-square-o" aria-hidden="true"></i></button>\
-                            <button type="button" title="Xoá lớp" class="delete-class btn btn-sm btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+                            <button type="button" title="Điểm danh" class="call-roll-class btn btn-sm btn-primary"><i class="fa fa-check" aria-hidden="true"></i></button>';
+                            // <button type="button" title="Xoá lớp" class="delete-class btn btn-sm btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
 
         var vietnamese_weekday = {
             'mon': 'T2',
@@ -195,12 +196,15 @@ $(function () {
                     name: "teacher_name"
                 },
                 {
-                    data: "max_seat",
-                    name: "max_seat"
+                    data: "seat_count",
+                    name: "seat_count"
                 },
                 {
                     data: "start_date",
-                    name: "start_date"
+                    name: "start_date",
+                    render: (data, type, row) => {
+                        return data != null ? moment(data).format("DD/MM/YYYY") : '';
+                    }
                 },
                 {
                     data: "schedule",
@@ -214,6 +218,7 @@ $(function () {
                     name: "status",
                     render: (data, type, row) => {
                         var obj_status = {
+                            0: 'Chưa khai giảng',
                             1: 'Chưa khai giảng',
                             2: 'Đang học',
                             3: 'Kết thúc'
@@ -264,14 +269,14 @@ $(function () {
             edit_class(data.id);
         });
 
-        table_classes.on('click', 'button.delete-class', function () {
-            var data = table_classes.row($(this).parents('tr')).data();
-            modalConfirm((confirm) => {
-                if (confirm) {
-                    delete_class(data.id);
-                }
-            }, 'Bạn có muốn xoá lớp <strong>' + data.name + '</strong> không?')
-        });
+        // table_classes.on('click', 'button.delete-class', function () {
+        //     var data = table_classes.row($(this).parents('tr')).data();
+        //     modalConfirm((confirm) => {
+        //         if (confirm) {
+        //             delete_class(data.id);
+        //         }
+        //     }, 'Bạn có muốn xoá lớp <strong>' + data.name + '</strong> không?')
+        // });
 
         $('DIV#modal-class UL.status_select A').on('click', (e) => {
             var text = $(e.target).text();

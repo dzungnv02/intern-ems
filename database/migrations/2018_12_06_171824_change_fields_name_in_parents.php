@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AlterTableParentsAddAddressField extends Migration
+class ChangeFieldsNameInParents extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,9 @@ class AlterTableParentsAddAddressField extends Migration
     public function up()
     {
         Schema::table('parents', function (Blueprint $table) {
-            $table->string('address', 255)->nullable()->after('phone');
+            $table->renameColumn('cmr_deal', 'crm_deal');
+            $table->renameColumn('cmr_contact', 'crm_contact');
+            $table->renameColumn('cmr_owner', 'crm_owner');
         });
     }
 
@@ -25,5 +27,8 @@ class AlterTableParentsAddAddressField extends Migration
      */
     public function down()
     {
+        Schema::table('parents', function (Blueprint $table) {
+            //
+        });
     }
 }

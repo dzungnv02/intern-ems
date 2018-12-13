@@ -36,7 +36,7 @@ class Branch extends Model
         ->get()->toArray();
     }
 
-    public static function insertBranch($ary_data)
+    public static function insertBranch(Array $ary_data)
     {
         return DB::table('branch')->insertGetId($ary_data);
     }
@@ -49,6 +49,14 @@ class Branch extends Model
     public static function deleteBranch($branch_id)
     {
         return DB::table('branch')->where('id', $branch_id)->delete();
+    }
+
+    public static function getBranchByCrmOwner ($crm_owner_id)
+    {
+        return DB::table('branch')->select('*')
+        ->where('crm_owner', $crm_owner_id)
+        ->whereNotNull('crm_owner')
+        ->first();
     }
 
 }

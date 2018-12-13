@@ -18,14 +18,14 @@
               <table id="list_class" class="table table-bordered table-striped table-hover dataTable">
                 <thead>
                   <tr>
-                     <th data-field="id">STT</th>
-                     <th data-field="name">Tên Lớp</th>
-                     <th data-field="teacher_name">Giáo viên</th>
-                     <th data-field="max_seat">Số học sinh tối đa</th>
-                     <th data-field="start_date">Ngày khai giảng</th>
-                     <th data-field="schedule">Lịch học trong tuần</th>
-                     <th data-field="status">Trạng thái</th>
-                     <th data-field="action"></th>
+                     <th style="width:5%">#</th>
+                     <th style="width:15%">Tên Lớp</th>
+                     <th style="width:18%">Giáo viên</th>
+                     <th style="width:12%">Số HS trong lớp</th>
+                     <th style="width:12%">Ngày khai giảng</th>
+                     <th style="width:13%">Lịch học trong tuần</th>
+                     <th style="width:12%">Trạng thái</th>
+                     <th style="width:13%"></th>
                   </tr>
                   </thead>
                   <tbody>     

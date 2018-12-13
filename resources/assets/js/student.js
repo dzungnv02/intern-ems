@@ -22,7 +22,7 @@ $(function () {
 							"targets": 0
 						},
 						{
-							targets: [7],
+							targets: [6],
 							"data": null,
 							"visible": true,
 							"defaultContent": buttons
@@ -39,30 +39,36 @@ $(function () {
 							data: null
 						},
 						{
+							data: 'student_code',
+							name: 'student_code'
+						},
+						{
 							data: 'name',
 							name: 'name'
 						},
 						{
-							data: 'email',
-							name: 'email'
+							data: 'class_name',
+							name: 'class_name'
 						},
 						{
-							data: 'address',
-							name: 'address'
+							data: 'parent_name',
+							name: 'parent_name'
 						},
 						{
-							data: 'mobile',
-							name: 'mobile'
-						},
-						{
-							data: 'birthyear',
-							name: 'birthyear'
-						},
-						{
-							data: 'gender',
-							name: 'gender',
-							render: function (data) {
-								return data != null ? (data == '1' ? 'Nam' : 'Nữ') : '';
+							data: 'birthday',
+							name: 'birthday',
+							render: (data, type, row, meta) => {
+								if (data != null ) {
+									data = moment(data).format("DD-MM-YYYY")
+								}
+								else if (row.birthyear != null){
+									data = row.birthyear;
+								}
+								else {
+									data = '';
+								}
+								
+								return data;
 							}
 						},
 						{
@@ -88,7 +94,6 @@ $(function () {
 				table_student.on('click', 'button.edit-student', function () {
 					var data = table_student.row($(this).parents('tr')).data();
 					window.location.href = '/student/detail?student_id=' + data.id;
-					//show_student_form(data.id);
 				});
 
 				table_student.on('click', 'button.del-student', function () {

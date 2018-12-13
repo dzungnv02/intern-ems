@@ -103,7 +103,7 @@ class ZohoCrmConnect
             $records = [];
             if ($module !== '') {
                 $uri = '/crm/v2/' . $module . '?page=%d&per_page=%d';
-                $uri .=  $fields != '' ? '&fields='.$fields : '';
+                $uri .= $fields != '' ? '&fields=' . $fields : '';
                 $access_token = $this->getAccessToken();
                 if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
                     Log::error(var_export($access_token, true));
@@ -114,7 +114,7 @@ class ZohoCrmConnect
                     'http_errors' => true,
                     'headers' => [
                         'Authorization' => 'Zoho-oauthtoken ' . $access_token->access_token,
-                        'Content-Type' => 'application/json'
+                        'Content-Type' => 'application/json',
                     ],
                 ];
 
@@ -123,7 +123,7 @@ class ZohoCrmConnect
                 $record_count = $rec_per_page;
 
                 while ($record_count <= $rec_per_page && $record_count > 0) {
-                    
+
                     $endpoint = sprintf($uri, $page, $rec_per_page);
                     $response = $this->zoho_crm_client->request('GET', $endpoint, $options);
 
@@ -139,7 +139,7 @@ class ZohoCrmConnect
                     }
 
                     $page++;
-                    if ($page_limit > 0 && $page >= $page_limit )  {
+                    if ($page_limit > 0 && $page >= $page_limit) {
                         break;
                     }
                 }
@@ -184,35 +184,61 @@ class ZohoCrmConnect
         }
     }
 
-    public function search($module, $field, $value)
+    public function search($module, $field = '', $value = '', $criteria = '')
     {
-        $records = [];
-        if ($module !== '' && $field !== '') {
-            $uri = '/crm/v2/' . $module . '/search';
-            $access_token = $this->getAccessToken();
+        $page_limit = 0;
+        try {
+            $records = [];
+            if ($module !== '') {
+                $uri = '/crm/v2/' . $module . '/search?page=%d&per_page=%d';
+                $uri .= $criteria != '' ? '&criteria=' . $criteria : '';
+                $uri .= $field != '' ? '&' . $field . '=' . $value : '';
 
-            $options = [
-                'http_errors' => true,
-                'query' => [
-                    $field => $value,
-                ],
-                'headers' => [
-                    'Authorization' => 'Zoho-oauthtoken ' . $access_token->access_token,
-                ],
-            ];
+                $access_token = $this->getAccessToken();
+                if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
+                    Log::error(var_export($access_token, true));
+                    return false;
+                }
 
-            $response = $this->zoho_crm_client->request('GET', $uri, $options);
+                $options = [
+                    'http_errors' => true,
+                    'headers' => [
+                        'Authorization' => 'Zoho-oauthtoken ' . $access_token->access_token,
+                        'Content-Type' => 'application/json',
+                    ],
+                ];
 
-            if ($response->getStatusCode() == 200) {
+                $rec_per_page = config('zoho.ZOHO_API_MAX_RECORDS_PER_PAGE');
+                $page = 1;
+                $record_count = $rec_per_page;
 
-                $data = json_decode($response->getBody());
-                $records = $data->data;
-                Log::info(var_export($records, true));
+                while ($record_count <= $rec_per_page && $record_count > 0) {
+
+                    $endpoint = sprintf($uri, $page, $rec_per_page);
+                    $response = $this->zoho_crm_client->request('GET', $endpoint, $options);
+
+                    if ($response->getStatusCode() == 200) {
+                        $data = json_decode($response->getBody());
+                        $record_count = isset($data->data) ? count($data->data) : 0;
+                        $records = $record_count > 0 ? array_merge($records, $data->data) : $records;
+                        usleep(5000);
+                    } else if ($response->getStatusCode() == 204) {
+                        break;
+                    } else {
+                        return false;
+                    }
+
+                    $page++;
+                    if ($page_limit > 0 && $page >= $page_limit) {
+                        break;
+                    }
+                }
                 return $records;
             } else {
                 return false;
             }
-        } else {
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
             return false;
         }
     }
@@ -231,7 +257,7 @@ class ZohoCrmConnect
     {
         try {
             if ($module !== '' && $data !== null) {
-                $uri = '/crm/v2/' . $module. '/upsert';
+                $uri = '/crm/v2/' . $module . '/upsert';
                 $access_token = $this->getAccessToken();
 
                 if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
@@ -344,34 +370,90 @@ class ZohoCrmConnect
         }
     }
 
-    public function getRelatedList ($module, $id, $related) 
+    public function getRelatedList($module, $id, $related)
     {
-        $record = [];
-        if ($module !== '' && $id !== '' && $related != '') {
-            $uri = '/crm/v2/' . $module . '/' . $id . '/'. $related;
-            $access_token = $this->getAccessToken();
-            if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
-                Log::error(var_export($access_token, true));
-                return false;
-            }
+        try {
+            $record = [];
+            if ($module !== '' && $id !== '' && $related != '') {
+                $uri = '/crm/v2/' . $module . '/' . $id . '/' . $related;
+                $access_token = $this->getAccessToken();
+                if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
+                    Log::error(var_export($access_token, true));
+                    return false;
+                }
 
-            $options = [
-                'http_errors' => true,
-                'headers' => [
-                    'Authorization' => 'Zoho-oauthtoken ' . $access_token->access_token,
-                ],
-            ];
+                $options = [
+                    'http_errors' => true,
+                    'headers' => [
+                        'Authorization' => 'Zoho-oauthtoken ' . $access_token->access_token,
+                    ],
+                ];
 
-            $response = $this->zoho_crm_client->request('GET', $uri, $options);
-            if ($response->getStatusCode() == 200) {
-                $data = json_decode($response->getBody());
-                $records = $data->data;
-                return $records;
+                $response = $this->zoho_crm_client->request('GET', $uri, $options);
+                if ($response->getStatusCode() == 200) {
+                    $data = json_decode($response->getBody());
+                    $records = $data->data;
+                    return $records;
+                } else {
+                    return false;
+                }
             } else {
                 return false;
             }
-        } else {
+        } catch (GuzzleHttp\Exception\ClientException $e) {
+            Log::error($e->getMessage());
             return false;
         }
+    }
+
+    public function sync(array $crm_data, array $local_data, array &$insert_list, array &$update_list, String $fillter_field = '', String $fillter_value = '')
+    {
+        if (count($crm_data) == 0) {
+            return false;
+        }
+        $insert_list = [];
+        $update_list = [];
+
+        $local_exists = count($local_data) > 0;
+        if ($local_exists) {
+            foreach ($crm_data as $crm_obj) {
+                $filltered = ($fillter_field != '') ? data_get($crm_obj, $fillter_field) : null;
+                if ($filltered != null && $filltered != $fillter_value) {
+                    continue;
+                }
+
+                foreach ($local_data as $local_obj) {
+                    if ($local_obj['crm_id'] == $crm_obj->id) {
+                        $update_list[$local_obj['id']] = $crm_obj;
+                        break;
+                    }
+                }
+            }
+        }
+
+        foreach ($crm_data as $crm_obj) {
+            $filltered = ($fillter_field != '') ? data_get($crm_obj, $fillter_field) : null;
+            if ($filltered != null && $filltered != $fillter_value) {
+                continue;
+            }
+
+            if ($local_exists) {
+                $updated = false;
+                foreach ($update_list as $update_obj) {
+                    if ($update_obj->id == $crm_obj->id) {
+                        $updated = true;
+                        break;
+                    }
+                }
+
+                if (!$updated) {
+                    array_push($insert_list, $crm_obj);
+                }
+
+            } else {
+                array_push($insert_list, $crm_obj);
+            }
+        }
+        return true;
     }
 }

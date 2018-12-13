@@ -20,12 +20,27 @@ class Student extends Model
      */
 	public static function search($keyword, $record,$page = 1){
         $start = ($page - 1) * $record;
-		$search = Student::orderBy('id','desc')->where('name','like','%'.$keyword.'%')
+        /* $search = Student::orderBy('id','desc')->where('name','like','%'.$keyword.'%')
                                 ->orwhere('email','like','%'.$keyword.'%')
 	                            ->orwhere('student_code','like','%'.$keyword.'%')
 	                            ->orwhere('address','like','%'.$keyword.'%')
 	                            ->orwhere('mobile','like','%'.$keyword.'%')
-                                ->get();
+                                ->get(); */
+
+        
+        $search = DB::table('students')
+                    ->select('students.*', 'parents.fullname as parent_name', 'classes.name as class_name')
+                    ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
+                    ->leftJoin('classes', 'classes.id', '=', 'students.current_class')
+                    ->where('students.name','like','%'.$keyword.'%')
+                    ->orwhere('students.email','like','%'.$keyword.'%')
+                    ->orwhere('students.student_code','like','%'.$keyword.'%')
+                    ->orwhere('students.address','like','%'.$keyword.'%')
+                    ->orwhere('students.mobile','like','%'.$keyword.'%')
+                    ->orwhere('parents.fullname','like','%'.$keyword.'%')
+                    ->orwhere('classes.name','like','%'.$keyword.'%')
+                    ->orderBy('students.id','desc')->get();
+
 		return $search;
 	}
 

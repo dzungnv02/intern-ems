@@ -291,4 +291,5 @@ $(function () {
     }
 
     events_binding();
+
 });

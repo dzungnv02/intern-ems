@@ -32,8 +32,12 @@ class StudentParent extends Model
         return false;
     }
 
-    public static function deleteByStudent ($student_id) 
+    public static function deleteByStudent ($student_id, $parent_id = null) 
     {
-        return StudentParent::where('student_id', $student_id)->delete();
+        $result = StudentParent::where('student_id', $student_id);
+        if ($parent_id != null) {
+            $result->where('parent_id', $parent_id);
+        }
+        return $result->delete();
     }
 }

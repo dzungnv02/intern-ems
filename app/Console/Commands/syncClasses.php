@@ -7,6 +7,8 @@ use \App\Branch;
 use \App\Classes;
 use \App\Classes\ZohoCrmConnect;
 use \App\Teacher;
+use App\Student;
+use \App\StudentClass;
 
 class syncClasses extends Command
 {
@@ -15,8 +17,10 @@ class syncClasses extends Command
      *
      * @var string
      */
-    protected $signature = 'zoho:classes {--getlist} {--schedule}';
-
+    protected $signature = 'zoho:classes {--getlist} {--schedule} {--map_student} {--owner=}';
+    //php artisan zoho:classes --getlist --owner=2666159000000213025
+    //php artisan zoho:classes --schedule --owner=2666159000000213025
+    //php artisan zoho:classes --map_student
     /**
      * The console command description.
      *
@@ -46,274 +50,225 @@ class syncClasses extends Command
             date_default_timezone_set($defaultTimeZone);
         }
 
+        $fillter_owner_id = $this->option('owner') . '';
+
         $getlist = $this->option('getlist');
+        $map_student = $this->option('map_student');
         if ($getlist) {
-            $crm_module = config('zoho.MODULES.ZOHO_MODULE_EMS_CLASS');
-            $crm_mapping = config('zoho.MAPPING.ZOHO_MODULE_EMS_CLASS');
-            $this->info('Start sync module: ' . $crm_module);
-
-            $zoho_crm = new ZohoCrmConnect();
-            $fields = 'id,EMS_ID';
-            $crm_classes = $zoho_crm->getAllRecords($crm_module, $fields);
-
-            $insert_list = [];
-            $update_list = [];
-            $update_sync_status_crm = ['data' => []];
-
-            if (!$crm_classes) {
-                $this->info('Can not get any record!');
-                exit();
-            }
-
-            if (is_array($crm_classes)) {
-                foreach ($crm_classes as $crm_class) {
-                    if ($crm_class->EMS_ID !== null) {
-                        array_push($update_list, $crm_class);
-                    } else {
-                        array_push($insert_list, $crm_class);
-                    }
-                }
-
-                $this->info('INSERT ' . count($insert_list) . ' records');
-                $this->info('UPDATE ' . count($update_list) . ' records');
-
-                $branchs = Branch::all()->toArray();
-                $teachers = Teacher::all()->toArray();
-
-                if (count($insert_list)) {
-                    $data_mapping = [
-                        'name' => 'Product_Name',
-                        'teacher_id' => '',
-                        'branch_id' => '',
-                        'status' => 'Product_Active',
-                        'schedule' => '',
-                        'crm_id' => 'id',
-                        'crm_course' => 'Ch_ng_tr_nh_h_c',
-                        'crm_teacher' => 'Gi_o_vi_n1',
-                        'crm_schedule' => 'L_ch_h_c_trong_tu_n',
-                        'crm_branch' => 'Owner',
-                        'created_at' => '',
-                    ];
-
-                    foreach ($insert_list as $crm_class) {
-                        $data = [];
-                        $now = date('Y-m-d H:i:s');
-
-                        $ar = $zoho_crm->getRecordById($crm_module, $crm_class->id);
-                        $crm_class = $ar;
-
-                        foreach ($data_mapping as $field => $crm_field) {
-                            if ($field == 'created_at') {
-                                $data[$field] = $now;
-                            } else if ($field == 'crm_branch' || $field == 'crm_teacher') {
-                                $data[$field] = $crm_class->$crm_field != null ? json_encode($crm_class->$crm_field, JSON_UNESCAPED_UNICODE) : $crm_class->$crm_field;
-                            } else if ($field == 'branch_id') {
-                                $owner_id = $crm_class->Owner->id;
-                                foreach ($branchs as $branch) {
-                                    if ($branch['crm_owner_id'] == $owner_id) {
-                                        $data[$field] = $branch['id'];
-                                        break;
-                                    }
-                                }
-                            } else if ($field == 'teacher_id' && !is_null($crm_class->Gi_o_vi_n1)) {
-                                $crm_teacher_id = $crm_class->Gi_o_vi_n1->id;
-                                foreach ($teachers as $teacher) {
-                                    if ($teacher['crm_id'] == $crm_teacher_id) {
-                                        $data[$field] = $teacher['id'];
-                                        break;
-                                    }
-                                }
-                            } else if ($field == 'crm_schedule') {
-                                $data[$field] = '';
-                                if (property_exists($crm_class, 'L_ch_h_c_trong_tu_n')) {
-                                    if (count($crm_class->L_ch_h_c_trong_tu_n) > 0) {
-                                        $schedule = json_decode(json_encode($crm_class->L_ch_h_c_trong_tu_n[0], JSON_UNESCAPED_UNICODE), true);
-                                        unset($schedule['$approval']);
-                                        unset($schedule['$currency_symbol']);
-                                        unset($schedule['$process_flow']);
-                                        unset($schedule['$approved']);
-                                        unset($schedule['$editable']);
-                                        unset($schedule['id']);
-                                        $data[$field] = json_encode($schedule, JSON_UNESCAPED_UNICODE);
-                                    }
-                                }
-
-                            } else {
-                                if ($crm_field == '') {
-                                    continue;
-                                }
-
-                                $data[$field] = $crm_class->$crm_field;
-                            }
-                        }
-
-                        $id = Classes::insertOne($data);
-
-                        array_push($update_sync_status_crm['data'], [
-                            'id' => $crm_class->id,
-                            'EMS_ID' => '' . $id,
-                            'EMS_SYNC_TIME' => $now,
-                        ]);
-
-                        usleep(500);
-                    }
-                }
-
-                if (count($update_list)) {
-                    $data_mapping = [
-                        'id' => 'EMS_ID',
-                        'name' => 'Product_Name',
-                        'teacher_id' => '',
-                        'branch_id' => '',
-                        'status' => 'Product_Active',
-                        'schedule' => '',
-                        'crm_id' => 'id',
-                        'crm_course' => 'Ch_ng_tr_nh_h_c',
-                        'crm_teacher' => 'Gi_o_vi_n1',
-                        'crm_schedule' => 'L_ch_h_c_trong_tu_n',
-                        'crm_branch' => 'Owner',
-                        'updated_at' => '',
-                    ];
-
-                    foreach ($update_list as $crm_class) {
-                        $data = [];
-                        $now = date('Y-m-d H:i:s');
-
-                        $ar = $zoho_crm->getRecordById($crm_module, $crm_class->id);
-                        $crm_class = $ar;
-
-                        foreach ($data_mapping as $field => $crm_field) {
-                            if ($field == 'updated_at') {
-                                $data[$field] = $now;
-                            } else if ($field == 'crm_branch' || $field == 'crm_teacher') {
-                                $data[$field] = $crm_class->$crm_field != null ? json_encode($crm_class->$crm_field, JSON_UNESCAPED_UNICODE) : $crm_class->$crm_field;
-                            } else if ($field == 'branch_id') {
-                                $owner_id = $crm_class->Owner->id;
-                                foreach ($branchs as $branch) {
-                                    if ($branch['crm_owner_id'] == $owner_id) {
-                                        $data[$field] = $branch['id'];
-                                        break;
-                                    }
-                                }
-                            } else if ($field == 'teacher_id' && !is_null($crm_class->Gi_o_vi_n1)) {
-                                $crm_teacher_id = $crm_class->Gi_o_vi_n1->id;
-                                foreach ($teachers as $teacher) {
-                                    if ($teacher['crm_id'] == $crm_teacher_id) {
-                                        $data[$field] = $teacher['id'];
-                                        break;
-                                    }
-                                }
-                            } else if ($field == 'crm_schedule') {
-                                $data[$field] = '';
-                                if (property_exists($crm_class, 'L_ch_h_c_trong_tu_n')) {
-                                    if (count($crm_class->L_ch_h_c_trong_tu_n) > 0) {
-                                        $schedule = json_decode(json_encode($crm_class->L_ch_h_c_trong_tu_n[0], JSON_UNESCAPED_UNICODE), true);
-                                        unset($schedule['$approval']);
-                                        unset($schedule['$currency_symbol']);
-                                        unset($schedule['$process_flow']);
-                                        unset($schedule['$approved']);
-                                        unset($schedule['$editable']);
-                                        unset($schedule['id']);
-                                        $data[$field] = json_encode($schedule, JSON_UNESCAPED_UNICODE);
-                                    }
-                                }
-
-                            } else if ($field == 'id') {
-                                $id = $crm_class->$crm_field;
-                            } else {
-                                if ($crm_field == '') {
-                                    continue;
-                                }
-
-                                $data[$field] = $crm_class->$crm_field;
-                            }
-                        }
-
-                        $id = Classes::updateOne($id, $data);
-
-                        array_push($update_sync_status_crm['data'], [
-                            'id' => $crm_class->id,
-                            'EMS_ID' => '' . $id,
-                            'EMS_SYNC_TIME' => $now,
-                        ]);
-                        usleep(500);
-                    }
-                }
-
-                if (count($update_sync_status_crm['data']) > 0) {
-                    $data = ['data' => []];
-
-                    $max_record = 100;
-                    $start_offset = 0;
-                    $total_page = count($update_sync_status_crm['data']) <= $max_record ? 1 : ceil(count($update_sync_status_crm['data']) / $max_record);
-                    for ($i = 1; $i <= $total_page; $i++) {
-                        $ar = array_slice($update_sync_status_crm['data'], $start_offset, $max_record);
-                        $data['data'] = $ar;
-
-                        $this->info('UPDATE CRM: ' . count($data['data']));
-                        $this->info('FROM: ' . $data['data'][0]['id'] . ' -- TO: ' . $data['data'][count($data['data']) - 1]['id']);
-
-                        try {
-                            $zoho_crm->upsertRecord($crm_module, $data);
-                        } catch (Exception $e) {
-                            Log::error($e->getMessage());
-                            break;
-                        }
-
-                        $start_offset = $start_offset == 0 ? $max_record : $max_record * $i;
-
-                    }
-                }
-            }
+            $this->get_list($fillter_owner_id);
         }
-
-        $syncSchedule = $this->option('schedule');
-        
-        if ($syncSchedule) {
-            $classes_list = Classes::all()->toArray();
-            if (count($classes_list) > 0) {
-                foreach ($classes_list as $class) {
-                    $crm_schedule = trim($class['crm_schedule']) != '' ? json_decode($class['crm_schedule'], true) : '';
-                    if ($crm_schedule != '') {
-                        $class_schedule = [];
-                        $ar_keys = array_keys($crm_schedule);
-                        $ary_couple = [0 => [$ar_keys[0]]];
-                        $j = 0;
-                        for ($i = 1; $i < count($ar_keys); $i++) {
-                            if (substr($ar_keys[$i], -1) == substr($ar_keys[$i - 1], -1)) {
-                                $ary_couple[$j][] = $ar_keys[$i];
-                            } else {
-                                $j++;
-                                $ary_couple[$j][] = $ar_keys[$i];
-                            }
-                        }
-
-                        foreach ($ary_couple as $keys) {
-                            sort($keys);
-                            $wd = "";
-                            for ($i = 0; $i < count($keys); $i += 2) {
-                                $wd = strtolower($crm_schedule[$keys[$i]]);
-                                $hours = trim($crm_schedule[$keys[$i + 1]]);
-                                $ary_tmp = explode('-', $hours);
-                                array_walk($ary_tmp, function (&$item) {
-                                    $item = trim($item);
-                                });
-
-                                $ary_hours = [
-                                    'start' => isset($ary_tmp[0]) ? (strlen($ary_tmp[0]) < 5 ? '0'.$ary_tmp[0] : $ary_tmp[0]) : '',
-                                    'finish' => isset($ary_tmp[1]) ? (strlen($ary_tmp[1]) < 5 ? '0'.$ary_tmp[1] : $ary_tmp[1]) : '',
-                                ];
-
-                                $class_schedule[$wd] = $ary_hours;
-                                $old_class = Classes::find($class['id']);
-                                $old_class->schedule = json_encode($class_schedule);
-                                $old_class->update();
-                            }
-                        }
-
-                    }
-                }
-            }
+        else if ($map_student){
+            $this->map_student();
         }
     }
+
+    protected function get_list($fillter_owner_id)
+    {
+        $ems_list = Classes::all()->toArray();
+
+        $crm_module = config('zoho.MODULES.ZOHO_MODULE_EMS_CLASS');
+        $ems_fields = [];
+        $crm_fields = [];
+        $insert_list = [];
+        $update_list = [];
+
+        $mapping_fields = config('zoho.MAPPING.ZOHO_MODULE_EMS_CLASS');
+        foreach ($mapping_fields as $crm_field => $ems_field) {
+            array_push($ems_fields, $ems_field);
+            array_push($crm_fields, $crm_field);
+        }
+
+        $this->info('Start sync module: ' . $crm_module);
+        $zoho_crm = new ZohoCrmConnect();
+        $criteria = $fillter_owner_id != '' ? '(Owner.id:equals:' . $fillter_owner_id . ')' : '';
+        $crm_list = $zoho_crm->search($crm_module, '', '', $criteria);
+        $zoho_crm->sync($crm_list, $ems_list, $insert_list, $update_list);
+
+        $this->info('Classes count: ' . count($crm_list));
+
+        if (count($insert_list)) {
+            foreach ($insert_list as $item) {
+                $branch = Branch::getBranchByCrmOwner($item->Owner->id);
+                $crm_class = $zoho_crm->getRecordById($crm_module, data_get($item, 'id'));
+                $new_class = new Classes;
+                for ($i = 0; $i < count($crm_fields); $i++) {
+                    $c_field = $crm_fields[$i];
+                    $e_field = $ems_fields[$i];
+
+                    if ($c_field == 'L_ch_h_c_trong_tu_n') {
+                        $val = data_get($crm_class, $c_field);
+                        if ($val != null) {
+                            $schedule = json_decode(json_encode($val, JSON_UNESCAPED_UNICODE), true);
+                            $new_class->$e_field = $this->classes_schedule_render($schedule[0]);
+                            $new_class->crm_schedule = json_encode($val, JSON_UNESCAPED_UNICODE);
+                        }
+                        continue;
+                    } else if ($c_field == 'teacher') {
+                        $val = data_get($crm_class, $c_field);
+                        if ($val != null) {
+                            $teacher = Teacher::where('crm_id', data_get($val, 'id'))->first();
+                            $new_class->teacher_id = $teacher != null ? $teacher->id : null;
+                            $new_class->crm_teacher = json_encode($val, JSON_UNESCAPED_UNICODE);
+                        }
+                        continue;
+                    } else {
+                        $value = data_get($crm_class, $c_field);
+                        $new_class->$e_field = data_get($crm_class, $c_field);
+                    }
+                }
+                $new_class->branch_id = data_get($branch, 'id');
+                $new_class->save();
+            }
+        }
+        $this->info(count($insert_list) . ' record(s) inserted.');
+
+        if (count($update_list)) {
+            foreach ($update_list as $item) {
+                $branch = Branch::getBranchByCrmOwner($item->Owner->id);
+
+                $crm_class = $zoho_crm->getRecordById($crm_module, data_get($item, 'id'));
+                $old_class = Classes::where('crm_id', data_get($crm_class, 'id'))->first();
+                for ($i = 0; $i < count($crm_fields); $i++) {
+                    $c_field = $crm_fields[$i];
+                    $e_field = $ems_fields[$i];
+                    if ($c_field == 'L_ch_h_c_trong_tu_n') {
+                        $val = data_get($crm_class, $c_field);
+                        if ($val != null) {
+                            $schedule = json_decode(json_encode($val, JSON_UNESCAPED_UNICODE), true);
+                            $old_class->$e_field = $this->classes_schedule_render($schedule[0]);
+                            $old_class->crm_schedule = json_encode($val, JSON_UNESCAPED_UNICODE);
+                        }
+                        continue;
+                    } else if ($c_field == 'teacher') {
+                        $val = data_get($crm_class, $c_field);
+                        if ($val != null) {
+                            $teacher = Teacher::where('crm_id', data_get($val, 'id'))->first();
+                            $old_class->teacher_id = $teacher != null ? $teacher->id : null;
+                            $old_class->crm_teacher = json_encode($val, JSON_UNESCAPED_UNICODE);
+                        }
+                        continue;
+                    } else {
+                        $value = data_get($crm_class, $c_field);
+                        $old_class->$e_field = data_get($crm_class, $c_field);
+                    }
+                    $old_class->branch_id = data_get($branch, 'id');
+                    $old_class->save();
+                }
+            }
+        }
+        $this->info(count($update_list) . ' record(s) updated.');
+
+    }
+
+    protected function classes_schedule_render($schedule_data)
+    {
+        $field_list = ['time_1', 'weekday_1', 'time_2', 'weekday_2'];
+
+        $weekdays_vn = [
+            'thứ 2' => 'mon',
+            'thứ hai' => 'mon',
+            'thứ 3' => 'tue',
+            'thứ ba' => 'tue',
+            'thứ 4' => 'wed',
+            'thứ tư' => 'wed',
+            'thứ 5' => 'thu',
+            'thứ năm' => 'thu',
+            'thứ 6' => 'fri',
+            'thứ sáu' => 'fri',
+            'thứ 7' => 'sat',
+            'thứ bảy' => 'sat',
+            'cn' => 'sun',
+            'chủ nhật' => 'sun',
+        ];
+
+        $weekdays_en = [
+            'monday' => 'mon',
+            'tuesday' => 'tue',
+            'wednesday' => 'wed',
+            'thursday' => 'thu',
+            'friday' => 'fri',
+            'saturday' => 'sat',
+            'sunday' => 'sun',
+        ];
+
+        $weekdays_vn_keys = array_keys($weekdays_vn);
+        $weekdays_en_keys = array_keys($weekdays_en);
+        $weekdays_en_values = array_values($weekdays_en);
+
+        $schedule_rendered = new \stdClass;
+        $tmp = [];
+        foreach ($schedule_data as $field => $value) {
+            if (in_array($field, $field_list)) {
+                $tmp[$field] = strtolower($value);
+            }
+        }
+
+        $weekday_1 = '';
+        $weekday_2 = '';
+        $time_1 = ['start' => '', 'finish' => ''];
+        $time_2 = ['start' => '', 'finish' => ''];
+        if (in_array($tmp['weekday_1'], $weekdays_vn_keys)) {
+            $weekday_1 = $weekdays_vn[$tmp['weekday_1']];
+        } else if (in_array($tmp['weekday_1'], $weekdays_en_keys)) {
+            $weekday_1 = $weekdays_en[$tmp['weekday_1']];
+        } else if (in_array($tmp['weekday_1'], $weekdays_en_values)) {
+            $weekday_1 = $tmp['weekday_1'];
+        }
+
+        if (in_array($tmp['weekday_2'], $weekdays_vn_keys)) {
+            $weekday_2 = $weekdays_vn[$tmp['weekday_2']];
+        } else if (in_array($tmp['weekday_2'], $weekdays_en_keys)) {
+            $weekday_2 = $weekdays_en[$tmp['weekday_2']];
+        } else if (in_array($tmp['weekday_2'], $weekdays_en_values)) {
+            $weekday_2 = $tmp['weekday_2'];
+        }
+
+        $tmp_time = $tmp['time_1'] != '' ? explode('-', $tmp['time_1']) : [];
+        if (count($tmp_time) > 0) {
+            $time_1['start'] = trim($tmp_time[0]);
+            $time_1['finish'] = trim($tmp_time[1]);
+        }
+
+        $tmp_time = $tmp['time_2'] != '' ? explode('-', $tmp['time_2']) : [];
+        if (count($tmp_time) > 0) {
+            $time_2['start'] = trim($tmp_time[0]);
+            $time_2['finish'] = trim($tmp_time[1]);
+        }
+
+        if ($weekday_1) {$schedule_rendered->$weekday_1 = $time_1;}
+        if ($weekday_2) {$schedule_rendered->$weekday_2 = $time_2;}
+
+        return json_encode($schedule_rendered);
+    }
+
+    protected function map_student () 
+    {
+        try {
+            $ems_list = Classes::all();
+            $crm_module = config('zoho.MODULES.ZOHO_MODULE_EMS_CLASS');
+            $zoho_crm = new ZohoCrmConnect();
+
+            foreach ($ems_list as $cls) {
+                $this->info($cls->name);
+                $crm_students = $zoho_crm->getRelatedList($crm_module, data_get($cls, 'crm_id'), 'Deal');
+                $count = $crm_students ? count($crm_students) : 0;
+                $this->info('Class '. $cls->name. ' has '. $count . ' student(s)');
+                if ($count) {
+                    foreach($crm_students as $student) {
+                        $ems_student = Student::where('crm_id', data_get($student, 'id'))->first();
+                        if ($ems_student != null) {
+                            $map = new StudentClass;
+                            $map->student_id = data_get($ems_student, 'id');
+                            $map->class_id = data_get($cls, 'id');
+                            $map->save();
+                        }
+                    }
+                }
+            }
+        }
+        catch(\Exception $e) {
+            $this->info('Has error!');
+        }
+    }
+
 }

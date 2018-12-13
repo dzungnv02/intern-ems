@@ -4,7 +4,9 @@ namespace App\Console\Commands;
 
 use App\Classes\ZohoCrmConnect;
 use App\Teacher;
+use App\Branch;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Tests\Fixtures\DummyOutput;
 
 class getTeachers extends Command
 {
@@ -13,7 +15,9 @@ class getTeachers extends Command
      *
      * @var string
      */
-    protected $signature = 'zoho:teacher {--getlist}';
+    protected $signature = 'zoho:teacher {--owner=} {--getlist}';
+    //Teacher Yen Hoa
+    //php artisan zoho:teacher --getlist --owner=2666159000000213025
 
     /**
      * The console command description.
@@ -40,80 +44,66 @@ class getTeachers extends Command
     public function handle()
     {
         $option = $this->option('getlist');
+        $fillter_owner_id = $this->option('owner').'';
+
+        $fillter_field = $fillter_owner_id != '' ? 'Owner.id' : '';
+        $ems_fields = [];
+        $crm_fields = [];
+        $insert_list = [];
+        $update_list = [];
+
+        $mapping_fields = config('zoho.MAPPING.ZOHO_MODULE_EMS_TEACHER');
+        foreach ($mapping_fields as $crm_field => $ems_field) {
+            array_push($ems_fields, $ems_field);
+            array_push($crm_fields, $crm_field);
+        }
+
         if ($option) {
+            $ems_list = Teacher::all()->toArray();
+
             $crm_module = config('zoho.MODULES.ZOHO_MODULE_EMS_TEACHER');
-            $crm_mapping = config('zoho.MAPPING.ZOHO_MODULE_EMS_TEACHER');
             $zoho_crm = new ZohoCrmConnect();
-            $list = $zoho_crm->getAllRecords($crm_module);
+            $crm_list = $zoho_crm->getAllRecords($crm_module);
 
-            $update_list = [];
-            $insert_list = [];
-            $update_ems_by_email = [];
-            $update_sync_status_crm = ['data' => []];
-
-            if (is_array($list) && count($list) > 0) {
-                foreach ($list as $teacher) {
-                    if ($teacher->EMS_ID !== null) {
-                        array_push($update_list, $teacher);
-                    } else {
-                        array_push($insert_list, $teacher);
-                    }
-                }
-            }
+            $zoho_crm->sync($crm_list, $ems_list, $insert_list, $update_list, $fillter_field, $fillter_owner_id);
 
             if (count($insert_list) > 0) {
                 $data = [];
                 foreach ($insert_list as $teacher) {
-                    $old_teacher = Teacher::getTeacher($teacher->Email, 'email');
-                    if (count($old_teacher) == 0) {
-                        $now = date('Y-m-d H:i:s');
-                        $data = [
-                            'name' => $teacher->Name,
-                            'email' => $teacher->Email,
-                            'nationality' => $teacher->Qu_c_t_ch,
-                            'mobile' => $teacher->Phone,
-                            'certificate' => $teacher->Tr_nh,
-                            'created_by' => $teacher->Owner->name,
-                            'created_at' => $now,
-                            'crm_id' => $teacher->id,
-                        ];
-                        $id = Teacher::insert($data);
-                        
-                        array_push($update_sync_status_crm['data'], [
-                            'id' => $teacher->id,
-                            'EMS_ID' => ''.$id,
-                            'EMS_SYNC_TIME' => $now
-                        ]);
+                    $new_teacher = new Teacher;
+                    $branch = Branch::getBranchByCrmOwner($teacher->Owner->id);
+                    for ($i = 0; $i < count($ems_fields); $i++) {
+                        $ems_field = $ems_fields[$i];
+                        $crm_field = $crm_fields[$i];
+                        $value = $crm_field != 'Owner' ? $teacher->$crm_field : json_encode($teacher->$crm_field, JSON_UNESCAPED_UNICODE);
+                        $new_teacher->$ems_field = $value;
                     }
+
+                    $new_teacher->branch_id = $branch->id;
+                    $new_teacher->save();
                 }
             }
+
+            $this->info(count($insert_list) . ' record(s) inserted.');
 
             if (count($update_list) > 0) {
                 $data = [];
-                foreach ($update_list as $teacher) {
-                    $now = date('Y-m-d H:i:s');
-                    $old_teacher = Teacher::find($teacher->EMS_ID);
-                    if (is_object($old_teacher)) {
-                        $old_teacher->name = $teacher->Name;
-                        $old_teacher->email = $teacher->Email;
-                        $old_teacher->nationality = $teacher->Qu_c_t_ch;
-                        $old_teacher->mobile = $teacher->Phone;
-                        $old_teacher->certificate = $teacher->Tr_nh;
-                        $old_teacher->updated_at = $now;
-                        $old_teacher->crm_id = $teacher->id;
-                        $old_teacher->update();
-    
-                        array_push($update_sync_status_crm['data'], [
-                            'id' => $teacher->id,
-                            'EMS_SYNC_TIME' => $now
-                        ]);
+                foreach ($update_list as $ems_id => $teacher) {
+                    $old_teacher = Teacher::find($ems_id);
+                    $branch = Branch::getBranchByCrmOwner($teacher->Owner->id);
+                    for ($i = 0; $i < count($ems_fields); $i++) {
+                        $ems_field = $ems_fields[$i];
+                        $crm_field = $crm_fields[$i];
+                        $value = $crm_field != 'Owner' ? $teacher->$crm_field : json_encode($teacher->$crm_field, JSON_UNESCAPED_UNICODE);
+                        $old_teacher->$ems_field = $value;
                     }
+                    $old_teacher->branch_id = $branch->id;
+                    $old_teacher->save();
                 }
             }
 
-            if (count($update_sync_status_crm['data']) > 0) {
-                $zoho_crm->upsertRecord($crm_module, $update_sync_status_crm);
-            }
+            
+            $this->info(count($update_list) . ' record(s) updated.');
         }
     }
 }

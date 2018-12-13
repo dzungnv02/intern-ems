@@ -103,9 +103,9 @@ class ClassController extends Controller
                     $crm_data = ['data' => []];
                     $crm_data['data'][0]['EMS_ID'] = trim($class_id);
                     $crm_data['data'][0]['EMS_SYNC_TIME'] = date('Y-m-d H:i:s');
-                    $crm_data['data'][0]['Gi_o_vi_n1'] = ['id' => $teacher->crm_id, 'name' => $teacher->name];
+                    $crm_data['data'][0]['teacher'] = ['id' => $teacher->crm_id, 'name' => $teacher->name];
                     $crm_data['data'][0]['Product_Name'] = $data['name'];
-                    $crm_data['data'][0]['Ch_ng_tr_nh_h_c'] = $data['course_name'];
+                    $crm_data['data'][0]['course_name'] = $data['course_name'];
                     $crm_data['data'][0]['Product_Active'] = $data['status'] == 2 ? true : false;
                     $crm_data['data'][0]['Owner'] = ['id' => $branch->crm_owner_id, 'name' => $branch->crm_owner_name];
 
@@ -113,10 +113,10 @@ class ClassController extends Controller
                         $ary_wd = array_keys($inputs['schedule']);
                         $ary_hours = array_values($inputs['schedule']);
                         $crm_data['data'][0]['L_ch_h_c_trong_tu_n'] = [0 => [
-                            'Bu_i_1' => isset($ary_wd[0]) ? ucfirst($ary_wd[0]) : '',
-                            'Gi_bu_i_1' => isset($ary_hours[0]) ? implode(' - ', $ary_hours[0]) : '',
-                            'Bu_i_2' => isset($ary_wd[1]) ? ucfirst($ary_wd[1]) : '',
-                            'Gi_bu_i_2' => isset($ary_hours[0]) ? implode(' - ', $ary_hours[1]) : '',
+                            'weekday_1' => isset($ary_wd[0]) ? ucfirst($ary_wd[0]) : '',
+                            'time_1' => isset($ary_hours[0]) ? implode(' - ', $ary_hours[0]) : '',
+                            'weekday_2' => isset($ary_wd[1]) ? ucfirst($ary_wd[1]) : '',
+                            'time_2' => isset($ary_hours[0]) ? implode(' - ', $ary_hours[1]) : '',
                         ],
                         ];
                     }
@@ -180,9 +180,9 @@ class ClassController extends Controller
                     $crm_data['data'][0]['id'] = $class->crm_id;
                     $crm_data['data'][0]['EMS_ID'] = trim($id);
                     $crm_data['data'][0]['EMS_SYNC_TIME'] = date('Y-m-d H:i:s');
-                    $crm_data['data'][0]['Gi_o_vi_n1'] = ['id' => $teacher->crm_id, 'name' => $teacher->name];
+                    $crm_data['data'][0]['teacher'] = ['id' => $teacher->crm_id, 'name' => $teacher->name];
                     $crm_data['data'][0]['Product_Name'] = $data['name'];
-                    $crm_data['data'][0]['Ch_ng_tr_nh_h_c'] = $data['course_name'];
+                    $crm_data['data'][0]['course_name'] = $data['course_name'];
                     $crm_data['data'][0]['Product_Active'] = $data['status'] == 2 ? true : false;
                     $crm_data['data'][0]['Owner'] = ['id' => $branch->crm_owner_id, 'name' => $branch->crm_owner_name];
 
@@ -194,10 +194,10 @@ class ClassController extends Controller
                         $ary_wd = array_keys($inputs['schedule']);
                         $ary_hours = array_values($inputs['schedule']);
                         $crm_data['data'][0]['L_ch_h_c_trong_tu_n'] = [0 => [
-                            'Bu_i_1' => isset($ary_wd[0]) ? ucfirst($ary_wd[0]) : '',
-                            'Gi_bu_i_1' => isset($ary_hours[0]) ? implode(' - ', $ary_hours[0]) : '',
-                            'Bu_i_2' => isset($ary_wd[1]) ? ucfirst($ary_wd[1]) : '',
-                            'Gi_bu_i_2' => isset($ary_hours[0]) ? implode(' - ', $ary_hours[1]) : '',
+                            'weekday_1' => isset($ary_wd[0]) ? ucfirst($ary_wd[0]) : '',
+                            'time_1' => isset($ary_hours[0]) ? implode(' - ', $ary_hours[0]) : '',
+                            'weekday_2' => isset($ary_wd[1]) ? ucfirst($ary_wd[1]) : '',
+                            'time_2' => isset($ary_hours[0]) ? implode(' - ', $ary_hours[1]) : '',
                         ],
                         ];
 

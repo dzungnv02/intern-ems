@@ -23,7 +23,9 @@ class Classes extends Model
         $start = ($page - 1) * $record;
         $listClass = Classes::join('teachers', 'teachers.id', '=', 'classes.teacher_id')
             ->leftJoin('branch','branch.id', '=', 'classes.branch_id' )
-            ->select('classes.*', 'teachers.name as teacher_name', 'branch.branch_name');
+            ->leftJoin('student_classes', 'student_classes.class_id', '=', 'classes.id')
+            ->select('classes.*', 'teachers.name as teacher_name', 'branch.branch_name', DB::raw('count(student_id) as seat_count'))
+            ->groupBy('classes.id');
         if ($keyword != null) {
             $listClass->where('classes.name', 'like', '%' . $keyword . '%')
                 ->orwhere('classes.status', 'like', '%' . $keyword . '%')

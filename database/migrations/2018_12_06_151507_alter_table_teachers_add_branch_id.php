@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AlterTableParentsAddAddressField extends Migration
+class AlterTableTeachersAddBranchId extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AlterTableParentsAddAddressField extends Migration
      */
     public function up()
     {
-        Schema::table('parents', function (Blueprint $table) {
-            $table->string('address', 255)->nullable()->after('phone');
+        Schema::table('teachers', function (Blueprint $table) {
+            $table->integer('branch_id')->nullable()->before('created_by')->default(null);
         });
     }
 
@@ -25,5 +25,8 @@ class AlterTableParentsAddAddressField extends Migration
      */
     public function down()
     {
+        Schema::table('teachers', function (Blueprint $table) {
+            //
+        });
     }
 }

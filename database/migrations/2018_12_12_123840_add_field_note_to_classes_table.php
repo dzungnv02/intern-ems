@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AlterTableParentsAddAddressField extends Migration
+class AddFieldNoteToClassesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AlterTableParentsAddAddressField extends Migration
      */
     public function up()
     {
-        Schema::table('parents', function (Blueprint $table) {
-            $table->string('address', 255)->nullable()->after('phone');
+        Schema::table('classes', function (Blueprint $table) {
+            $table->text('note')->nullable()->after('max_seat');
         });
     }
 
@@ -25,5 +25,8 @@ class AlterTableParentsAddAddressField extends Migration
      */
     public function down()
     {
+        Schema::table('classes', function (Blueprint $table) {
+            //
+        });
     }
 }
