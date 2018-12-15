@@ -308,7 +308,7 @@
     </div>
 </div>
 {{--  END -Time table --}}
-
+@include('class.modal.attendance')
 {{--  Confirm dialog  --}}
 <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="confirm-delete">
     <div class="modal-dialog modal-sm modal-dialog-centered" style="width:400px">

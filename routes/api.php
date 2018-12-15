@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -66,6 +64,9 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::get('/get-student-not-in-class', 'ClassController@getListStudentNotInClass');
     Route::get('/auto-update-status', 'ClassController@autoUpdateStatus');
 
+    Route::get('/class/attendance', 'AttendanceController@attendanceTable');
+    Route::post('/class/attendance/check', 'AttendanceController@attendanceCheck');
+
     // Teacher
     Route::get('/get-list-teacher', 'TeacherController@index');
     Route::post('/create-teacher', 'TeacherController@store');
@@ -75,7 +76,6 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::get('/get-teacher-schedule', 'TeacherController@getTeacherSchedule');
     Route::post('/add_teacher_schedule', 'TeacherController@addTeacherSchedule');
     Route::get('/teacher_weekly_time_table', 'TeacherController@weeklyTimeTable');
-
 
     // Time table
     Route::get('/calc_time_table', 'TimeTableController@calculate_time_table');

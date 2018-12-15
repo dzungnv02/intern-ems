@@ -11,14 +11,18 @@ $(document).on({
     }
 });
 
+//require('./attendance.js');
+
 $(function () {
     if ($('TABLE#list_class').length > 0) {
+
         var form = $('DIV#modal-class FORM#form-class');
+        var attendance_modal = $('DIV#attendance-modal');
 
         var table_act_buttons = '<button type="button" title="Danh sách lớp" class="list-student-class btn btn-sm btn-info"><i class="fa fa-address-book-o" aria-hidden="true"></i></button>\
                             <button type="button"  title="Thời Khóa Biểu" class="show-timetable btn btn-sm bg-purple"><i class="fa fa-calendar-times-o" aria-hidden="true"></i></button>\
-                            <button type="button" title="Sửa thông tin lớp" class="edit-class btn btn-sm btn-warning"><i title="Sửa thông tin lớp" class="fa fa-pencil-square-o" aria-hidden="true"></i></button>\
-                            <button type="button" title="Điểm danh" class="call-roll-class btn btn-sm btn-primary"><i class="fa fa-check" aria-hidden="true"></i></button>';
+                            <button type="button" title="Sửa thông tin lớp" class="edit-class btn btn-sm btn-primary"><i title="Sửa thông tin lớp" class="fa fa-pencil-square-o" aria-hidden="true"></i></button>\
+                            <button type="button" title="Điểm danh" class="attendance-class btn btn-sm btn-warning"><i class="fa fa-check" aria-hidden="true"></i></button>';
                             // <button type="button" title="Xoá lớp" class="delete-class btn btn-sm btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
 
         var vietnamese_weekday = {
@@ -260,23 +264,18 @@ $(function () {
             $('DIV#modal-time-table').modal('show');
         });
 
-        // table_classes.on('click', 'button.show-list-exams', function () {
-        //     var data = table_classes.row($(this).parents('tr')).data();
-        // });
+        table_classes.on('click', 'button.attendance-class', function () {
+            var data = table_classes.row($(this).parents('tr')).data();
+            $(attendance_modal).find('H3.modal-title').html('Điểm danh cho lớp ' + data.name);
+            $(attendance_modal).find('input#current-class-id').val(data.id);
+            $(attendance_modal).find('input#current-class-name').val(data.name);
+            open_attendance(data.id);
+        });
 
         table_classes.on('click', 'button.edit-class', function () {
             var data = table_classes.row($(this).parents('tr')).data();
             edit_class(data.id);
         });
-
-        // table_classes.on('click', 'button.delete-class', function () {
-        //     var data = table_classes.row($(this).parents('tr')).data();
-        //     modalConfirm((confirm) => {
-        //         if (confirm) {
-        //             delete_class(data.id);
-        //         }
-        //     }, 'Bạn có muốn xoá lớp <strong>' + data.name + '</strong> không?')
-        // });
 
         $('DIV#modal-class UL.status_select A').on('click', (e) => {
             var text = $(e.target).text();
@@ -304,24 +303,6 @@ $(function () {
                 return result.join('');
             }
             return '';
-        }
-
-        var delete_class = (class_id) => {
-            $.ajax({
-                url: "api/delete-class",
-                method: "GET",
-                data: {
-                    id: class_id
-                },
-                success: function (response) {
-                    if (response.code == 1) {
-                        table_classes.ajax.reload();
-                        toastr.success(response.message);
-
-                    } else
-                        toastr.error(response.message);
-                }
-            });
         }
 
         var reset_class_form = (mode, data) => {
@@ -516,27 +497,10 @@ $(function () {
             });
         }
 
-        var modalConfirm = (callback, message) => {
-            if (message != undefined) {
-                $("#confirm-delete DIV.modal-header H5.modal-title").html(message);
-            }
-            $("#confirm-delete").modal('show');
-
-            $("#modal-btn-yes").unbind('click').bind("click", function () {
-                callback(true);
-                $("#confirm-delete").modal('hide');
-            });
-
-            $("#modal-btn-no").unbind('click').bind("click", function () {
-                callback(false);
-                $("#confirm-delete").modal('hide');
-            });
-        };
-
         var time_table_init = (list) => {
             var my_lang = datatable_language;
             my_lang.emptyTable = 'Chưa có thời khoá biểu';
-            var buttons = '<button type="button" title="Điểm danh" class="btn btn-warning rollcall"><i class="fa fa-check-square-o"></i></button>\
+            var buttons = '<button type="button" title="Điểm danh" class="btn btn-warning attendance"><i class="fa fa-check-square-o"></i></button>\
             <button type="button" title="Nhật ký" class="btn btn-info teaching-diary"><i class="fa fa-sticky-note"></i></button>\
             <button type="button" title="Chỉnh sửa" class="btn bg-olive edit"><i class="fa fa-pencil-square-o"></i></button>';
 
@@ -561,7 +525,7 @@ $(function () {
                         {
                             targets: [4],
                             "data": null,
-                            "visible": false,
+                            "visible": true,
                             "defaultContent": buttons
                         }
                     ],
@@ -598,7 +562,7 @@ $(function () {
                     });
                 }).draw();
 
-                table_timetable.on('click', 'button.rollcall', function () {
+                table_timetable.on('click', 'button.attendance', function () {
                     var data = table_timetable.row($(this).parents('tr')).data();
                     console.log('rollcall', data);
                 });
@@ -746,7 +710,6 @@ $(function () {
             });
         });
 
-
         $('DIV#modal-list-student-class BUTTON#btnAssignClass').on('click', (e) => {
             var students = $("SELECT#student_not_assigned").val();
             var class_id = $('DIV#modal-list-student-class DIV.modal-body INPUT#class_id').val();
@@ -818,6 +781,116 @@ $(function () {
             minimumInputLength: 3
         });
 
+        /* var modalConfirm = (callback, message) => {
+            if (message != undefined) {
+                $("#confirm-delete DIV.modal-header H5.modal-title").html(message);
+            }
+            $("#confirm-delete").modal('show');
+
+            $("#modal-btn-yes").unbind('click').bind("click", function () {
+                callback(true);
+                $("#confirm-delete").modal('hide');
+            });
+
+            $("#modal-btn-no").unbind('click').bind("click", function () {
+                callback(false);
+                $("#confirm-delete").modal('hide');
+            });
+
+            var delete_class = (class_id) => {
+                $.ajax({
+                    url: "api/delete-class",
+                    method: "GET",
+                    data: {
+                        id: class_id
+                    },
+                    success: function (response) {
+                        if (response.code == 1) {
+                            table_classes.ajax.reload();
+                            toastr.success(response.message);
+
+                        } else
+                            toastr.error(response.message);
+                    }
+                });
+            }
+        }; */
+
+
+        var contaner = $('DIV#attendance-modal');
+        var get_attendance_list = (class_id, callback)  => {
+            $.ajax({
+                url: '/api/class/attendance?class_id=' + class_id,
+                dataType: 'json',
+                contentType: 'application/json',
+                success: (response) => {
+                    if (callback != undefined && response.code == 1) {
+                        callback(response.data);
+                    }
+                    console.log('response', response);
+                }
+            });
+        }
+        var get_timetable = (class_id, callback) => {
+            $.ajax({
+                url: '/api/get-list-timetable?class_id=' + class_id,
+                dataType: 'json',
+                contentType: 'application/json',
+                success: (response) => {
+                    if (callback != undefined && response.code == 1) {
+                        callback(response.data, class_id);
+                    }
+                    console.log('response', response);
+                }
+            });
+        }
+    
+        var render_attendance_table = (list) => {
+            var list_container = $(contaner).find('TABLE#attendance-table tbody');
+            list_container.empty();
+            if (list.length > 0) {
+                for (var i = 0; i < list.length; i++) {
+                    var tr = $('<tr></tr>');
+                    var item = list[i];
+                    var td_no = $('<th></th>', {text: i + 1, 'style': 'text-align:center'});
+                    $(tr).append(td_no);
+                    for (var attr in item) {
+                        if (attr == 'id') continue; 
+                        var style = '';
+                        if (attr == 'present' || attr == 'absent'|| attr == 'late') {
+                            style = 'text-align:center';
+                        }
+                        var td = $('<td></td>', {text: item[attr], 'style': style});
+                        $(tr).append(td);
+                    }
+                    
+                    var td_input_present = $('<td></td>', {'style': 'text-align:center', html: '<input type="radio" data-student="'+item.id+'" value="1" name="'+item.id+'_status">'});
+                    var td_input_absent = $('<td></td>', {'style': 'text-align:center', html: '<input type="radio" data-student="'+item.id+'" value="-1" name="'+item.id+'_status">'});
+                    var td_input_late = $('<td></td>', {'style': 'text-align:center', html: '<input type="radio" data-student="'+item.id+'" value="-2" name="'+item.id+'_status">'});
+    
+                    $(tr).append(td_input_present, td_input_absent, td_input_late);
+                    $(list_container).append(tr);
+                }
+            }
+        }
+    
+        var open_attendance = (class_id) => {
+            get_timetable(class_id, (data, class_id) => {
+                if (data.length > 0) {
+                    get_attendance_list(class_id, (list) => {
+                        render_attendance_table(list);
+                        $(attendance_modal).modal('show');
+                    });
+                }
+                else {
+                    var msg = 'Lớp ' + $(attendance_modal).find('input#current-class-name').val() + ' chưa thiết lập thời khoá biểu!';
+                    alert(msg);
+                    return;
+                }
+            });
+            
+        }
+
         $.ajax({
             dataType: 'json',
             type: 'get',
@@ -828,7 +901,5 @@ $(function () {
                 });
             }
         });
-
-
     }
 });
