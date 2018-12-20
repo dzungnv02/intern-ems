@@ -32,7 +32,7 @@ class Attendance extends Model
                     LEFT JOIN attendance ON attendance.student_id = students.id
                 WHERE 
                     classes.id = :class_id_4
-                GROUP BY students.id,students.name, attendance.status
+                GROUP BY students.id,students.name
                 ORDER BY students.id';
 
         return DB::select($sql, $data);
