@@ -22,7 +22,7 @@ class Attendance extends Model
 
         $sql = 'SELECT 
                         students.id, 
-                        students.name, 
+                        students.name,
                         count(IF( (attendance.status= :present_status AND classes.id = :class_id_1) ,1,NULL)) as present, 
                         count(IF( (attendance.status= :absent_status AND classes.id = :class_id_2) ,1,NULL)) as absent,
                         count(IF( (attendance.status= :late_status AND classes.id = :class_id_3) ,1,NULL)) as late
@@ -32,7 +32,7 @@ class Attendance extends Model
                     LEFT JOIN attendance ON attendance.student_id = students.id
                 WHERE 
                     classes.id = :class_id_4
-                GROUP BY students.id,students.name
+                GROUP BY students.id,students.name, attendance.status
                 ORDER BY students.id';
 
         return DB::select($sql, $data);
@@ -62,5 +62,15 @@ class Attendance extends Model
             'staff_id' => $staff_id,
             'created_at' => date('Y-m-d H:i:s')]);
         }
+    }
+
+    public static function getAttendanceBySchedule ($timetable_id)
+    {
+        $attendances = DB::table('attendance')
+                ->where('timetable_id' , '=', $timetable_id)
+                ->select('attendance.*')
+                ->get();
+
+        return $attendances;
     }
 }

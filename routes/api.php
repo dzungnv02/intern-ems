@@ -65,6 +65,7 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::get('/auto-update-status', 'ClassController@autoUpdateStatus');
 
     Route::get('/class/attendance', 'AttendanceController@attendanceTable');
+    Route::get('/class/attendance/by-date', 'AttendanceController@getAttendanceByDate');
     Route::post('/class/attendance/check', 'AttendanceController@attendanceCheck');
 
     // Teacher

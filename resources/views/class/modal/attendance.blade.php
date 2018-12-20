@@ -11,14 +11,6 @@
                 <input type="hidden" id="current-class-id" value="">
                 <input type="hidden" id="current-class-name" value="">
 
-                {{--  <div class="row"> 
-                    <div class="col-sm-12 form-group bg-dark">
-                        <label for="name" class="col-sm-2 control-label">Nghỉ cả lớp</label>
-                        <div class="col-sm-10">
-                            <input type="checkbox" id="class-off">
-                        </div>
-                    </div>
-                </div>  --}}
                 <div class="row"> 
                     <div class="col-sm-12">
                         <table id="attendance-table" class="table table-striped">
@@ -29,7 +21,7 @@
                                     <th class="bg-dark border-top" style="width:12%;vertical-align: middle;text-align:center" rowspan="2">Số buổi<br>đi học</th>
                                     <th class="bg-dark border-top" style="width:12%;vertical-align: middle;text-align:center" rowspan="2">Số buổi<br>nghỉ</th>
                                     <th class="bg-dark border-top" style="width:12%;vertical-align: middle;text-align:center" rowspan="2">Số buổi<br>muộn</th>
-                                    <th class="bg-warning border-top" style="vertical-align: middle;text-align:center" colspan="3">Hôm nay</th>
+                                    <th class="bg-warning border-top" style="vertical-align: middle;text-align:center" colspan="3">Ngày&nbsp;&nbsp;<select id="timetable_id"></select></th>
                                 </tr>
                                 <tr>
                                     <th class="bg-success" style="width:13%;vertical-align: middle;text-align:center">Đi học</th>
@@ -45,7 +37,6 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-success"><i class="fa fa-save">&nbsp;</i>Lưu</button>
             </div>
         </div>
     </div>
