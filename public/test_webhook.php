@@ -1,5 +1,9 @@
 <?php
 var_dump($_POST);
+$f_handle = fopen('/apps/icanread/intern-ems/storage/webhook.log', 'a+');
+$data = var_export($_POST, TRUE) . "\n";
+fwrite($f_handle, json_encode($data));
+fclose($f_handle);
 
 // if (isset($_POST['crm'])) {
 //     $f_handle = fopen('/apps/icanread/intern-ems/storage/webhook.log', 'a+');
