@@ -41,8 +41,9 @@ class InvoiceController extends Controller
 
         $start_date = isset($input['start_date']) ? $input['start_date'] : '';
         $end_date = isset($input['end_date']) ? $input['end_date'] : '';
-        $class_id = isset($input['class_id']) ? $input['class_id'] : 0;
-        $duration = isset($input['duration']) ? $input['duration'] : 0;
+        $class_id = $input['class_id'] ? (int)$input['class_id'] : 0;
+        $duration = $input['duration'] ? (int)$input['duration'] : 0;
+        $price = isset($input['price']) ? (int)$input['price'] : 0;
 
         if ($start_date == '') {
             $err_msg = 'Chưa nhập ngày bắt đầu!';
@@ -62,7 +63,9 @@ class InvoiceController extends Controller
             $end_date = Invoice::calculate_enddate($start_date, $duration, $class_id);
         }
 
-        $amount = Invoice::calculate_tuition_fee($duration, $class_id);
-        return response()->json(['code' => 0, 'data' => ['duration' => $duration, 'end_date' => $end_date, 'amount' => $amount]], 200);
+        //$amount = Invoice::calculate_tuition_fee($duration, $class_id);
+        $amount = $duration * $price;
+
+        return response()->json(['code' => 0, 'data' => ['duration' => $duration, 'end_date' => $end_date, 'amount' => $amount, 'inputs' => $input]], 200);
     }
 }

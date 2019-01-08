@@ -261,6 +261,41 @@
                 "zeroRecords": "Không tìm thấy bản ghi nào phù hợp!",
                 "lengthMenu":     "Hiển thị _MENU_ bản ghi"
             };
+
+  var daterange_locale =  {
+              "format": "YYYY/MM/DD",
+              "separator": " - ",
+              "applyLabel": "Chọn",
+              "cancelLabel": "Huỷ",
+              "fromLabel": "Từ",
+              "toLabel": "Đến",
+              "customRangeLabel": "Tuỳ chọn",
+              "weekLabel": "W",
+              "daysOfWeek": [
+                  "CN",
+                  "T2",
+                  "T3",
+                  "T4",
+                  "T5",
+                  "T6",
+                  "T7"
+              ],
+              "monthNames": [
+                  "Th.1",
+                  "Th.2",
+                  "Th.3",
+                  "Th.4",
+                  "Th.5",
+                  "Th.6",
+                  "Th.7",
+                  "Th.8",
+                  "Th.9",
+                  "Th.10",
+                  "Th.11",
+                  "Th.12"
+              ],
+              "firstDay": 1
+          };
 </script>
 @yield('footer')
 </body>

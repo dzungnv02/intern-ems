@@ -35,20 +35,6 @@ class TimeTableController extends Controller
         $update_schedules = [];
 
         $old_timetables = TimeTable::get_time_table_by_class($class_id);
-        /* $start_date = $raw_schedule[0]['date'];
-        $end_date = $raw_schedule[count($raw_schedule) - 1]['date'];
-
-        foreach($raw_schedule as $schedule) {
-            if ($schedule['date'] < $start_date) {
-                $start_date = $schedule['date'];
-            }
-
-            if ($schedule['date'] > $end_date) {
-                $end_date = $schedule['date'];
-            }
-        } */
-        
-        //$date_range = ['start' => $start_date, 'end' => $end_date];
 
         $teacher_schedule_insert = [];
         $teacher_schedule_update = [];

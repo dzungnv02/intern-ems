@@ -1,80 +1,24 @@
 $(function () {
-    if ($('FORM#frm_invoice').length == 0) return false;
-    var form = $('FORM#frm_invoice');
-    var invoice_type = $(form).find('input#invoice_type_tuition[type="radio"]:checked').length > 0 ? 'TUITION_FEE' : 'OTHER_FEE';
-    
-    var invoice_type_radio = $(form).find('input[type="radio"][name="invoice_type"]');
-    var duration_group = $(form).find('DIV.form-group#group_duration');
-    var daterange_group = $(form).find('DIV.form-group#group_date_range');
-    var amount_group = $(form).find('DIV.form-group#group_amount');
-   
-    var student_id = $(form).find('SELECT#student_id');
-    var class_id = $(form).find('SELECT#class_id');
-    var reason = $(form).find('textarea#reason');
+    if ($('UL#invoice_tabs').length == 0) return false;
 
-    var start_date = $(form).find('INPUT#start_date');
-    var end_date = $(form).find('INPUT#end_date');
-    var duration = $(duration_group).find('input#duration');
-    var amount = $(amount_group).find('input#amount');
+    var form = $('FORM#frmTutorFee');
 
-    var init = () => {
-        change_invoice_type(invoice_type);
-        get_student_list();
+    var tab_headers = $('UL.nav#invoice_tabs');
+    var tab_contents = $('DIV.tab-content');
+    var tab_col = $(tab_headers).find('LI');
 
-        $(start_date).datetimepicker({
-            format: 'Y-m-d',
-            timepicker: false,
-            minDate: '-2017-01-1',
-        });
-
-        $(end_date).datetimepicker({
-            format: 'Y-m-d',
-            timepicker: false,
-            minDate: '-2017-01-1',
-        });
-
-        $(invoice_type_radio).on('change', (e) => {
-            change_invoice_type($(e.target).val());
-        });
-
-        $(student_id).on('change', (e) => {
-            get_class_list($(student_id).val());
-        })
-
-        $(class_id).on('change', (e) => {
-            tuition_fee_calculate();
-        });
-
-        $(start_date).on('change', (e) => {
-            tuition_fee_calculate();
-        });
-
-        $(end_date).on('change', (e) => {
-            $(duration).val('');
-            tuition_fee_calculate();
-            
-        });
-
-        $(duration).on('change', (e) => {
-            tuition_fee_calculate();
-        });   
-    };
-
-    var change_invoice_type = (invoice_type) => {
-        if (invoice_type != 'TUITION_FEE') {
-            $(duration_group).css('display', 'none');
-            $(daterange_group).css('display', 'none');
-            $(amount_group).find('input#amount').attr('readonly', false);        
-            $(reason).val('');
-        }
-        else {
-            $(duration_group).css('display', '');
-            $(daterange_group).css('display', '');
-            $(amount_group).find('input#amount').attr('readonly', true);
-            $(reason).val('Đóng học phí');
-            tuition_fee_calculate();
-        }
+    var tab_activate = (target) => {
+        $(tab_col).removeClass('active');
+        $(target).parent().addClass('active');
+        $(tab_contents).find("DIV[role='tabpanel']").removeClass('active');
+        $(tab_contents).find("DIV[role='tabpanel']#" + $(target).data('tab')).addClass('active');
     }
+
+    $(tab_headers).find('A').bind('click', (e) => {
+        tab_activate(e.target);
+        e.preventDefault();
+        e.stopPropagation();
+    });
 
     var get_student_list = () => {
         $(student_id).empty();
@@ -87,17 +31,21 @@ $(function () {
                     if (response.data.list.length > 0) {
                         for (var i = 0; i < response.data.list.length; i++) {
                             var student = response.data.list[i];
-                            var opt = $('<option></option>', {value: student.id, text:student.name});
+                            var display_text = (student.student_code ? 'Code: <span class="text-bold">' + student.student_code + '</span> - ' : 'NO CODE - ') + student.name;
+                            var opt = $('<option></option>', {
+                                value: student.id,
+                                html: display_text
+                            });
                             $(student_id).append(opt);
                         }
                     }
                 }
-                
             }
-        });       
+        });
     }
 
     var get_class_list = (student_id) => {
+        $(class_id).empty();
         $.ajax('/invoice/class-list?student_id=' + student_id, {
             type: 'GET',
             contentType: 'application/json',
@@ -106,28 +54,39 @@ $(function () {
                     if (response.data.list.length > 0) {
                         for (var i = 0; i < response.data.list.length; i++) {
                             var cls = response.data.list[i];
-                            var opt = $('<option></option>', {value: cls.id, text: cls.name});
+                            var opt = $('<option></option>', {
+                                value: cls.id,
+                                html: cls.name
+                            });
                             $(class_id).append(opt);
                         }
-
                         $($(class_id).find('OPTION')[0]).attr('selected', 'selected');
+                        toggle_tuition_form(true);
+                    } else {
+                        var opt = $('<option></option>', {
+                            value: 0,
+                            html: 'Chưa có lớp'
+                        });
+                        $(class_id).append(opt);
+                        $($(class_id).find('OPTION')[0]).attr('selected', 'selected');
+                        toggle_tuition_form(false);
                     }
                 }
-                
             }
         });
     }
 
     var tuition_fee_calculate = () => {
-        
+
         var data = {
-            'class_id': $(class_id).val(),
-            'start_date':$(start_date).val(),
-            'end_date':$(end_date).val(),
-            'duration' : $(duration).val()
+            'class_id': $(form).find('SELECT#class_id').val(),
+            'start_date': $(form).find('INPUT#start_date').val(),
+            'end_date': $(form).find('INPUT#end_date').val(),
+            'duration': $(form).find('INPUT#duration').val(),
+            'price': $(form).find('INPUT#price').val()
         }
 
-        if (data.class_id != '' && (data.start_date != '' && (data.end_date != '' || data.duration != ''))) {
+        if (data.class_id != '' && (data.start_date != '' && (data.end_date != '' || data.duration != '')) && data.price) {
             $.ajax('/invoice/tuition_fee_calculate', {
                 type: 'POST',
                 contentType: 'application/json',
@@ -135,19 +94,58 @@ $(function () {
                 success: function (response) {
                     if (response.code == 0) {
                         var res_data = response.data;
-                        if (data.duration == '' ) $(duration).val(res_data.duration);
-                        if (data.end_date == '' ) $(end_date).val(res_data.end_date);
+                        if (data.duration == '') $(duration).val(res_data.duration);
+                        if (data.end_date == '') $(end_date).val(res_data.end_date);
                         $(amount).val(res_data.amount);
-                    }
-                    else {
+                    } else {
                         alert(response.message);
                     }
                 }
             });
         }
-           
-
     }
 
+    var toggle_tuition_form = (toggle) => {
+        $(form).find('INPUT#reservation').prop('disabled', !toggle);
+        $(form).find('INPUT#duration').prop('disabled', !toggle);
+        $(form).find('INPUT#discount').prop('disabled', !toggle);
+        $(form).find('INPUT#discount-desc').prop('disabled', !toggle);
+        $(form).find('INPUT#prepaid').prop('disabled', !toggle);
+        $(form).find('INPUT#amount').prop('disabled', !toggle);
+        $(form).find('INPUT#payer').prop('disabled', !toggle);
+    }
+
+    var init = () => {
+        $('SELECT.select2[id="student_id"]').select2();
+        $('SELECT.select2[id="class_id"]').select2();
+        toggle_tuition_form(false);
+
+        $(form).find('INPUT#reservation').daterangepicker({
+                opens: 'right',
+                locale: daterange_locale
+            },
+            (start, end) => {
+                $(form).find('INPUT#start_date').val(start.format('YYYY-MM-DD'));
+                $(form).find('INPUT#end_date').val(end.format('YYYY-MM-DD'));
+                tuition_fee_calculate();
+            }
+        );
+
+        $(form).find('input#price,input#duration').on('change', (e) => {
+            var value = $(e.target).val().trim();
+            if( value != '' && !isNaN(value)) {
+                tuition_fee_calculate();
+            }
+        });
+
+
+        $(student_id).on('change', (e) => {
+            get_class_list($(student_id).val());
+        });
+
+        get_student_list();
+    };
+
     init();
+
 });

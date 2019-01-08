@@ -32419,10 +32419,34 @@ $(function () {
         }; */
 
         var contaner = $('DIV#attendance-modal');
+
+        var attendanceCheck = function attendanceCheck(timetable_id, student_id, status, callback) {
+            var data = {
+                'timetable_id': timetable_id,
+                'student_id': student_id,
+                'status': status
+            };
+
+            $.ajax({
+                url: '/api/class/attendance/check',
+                dataType: 'json',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function success(response) {
+                    if (callback != undefined && response.code == 1) {
+                        callback(response.data);
+                    }
+                    console.log('response', response);
+                }
+            });
+        };
+
         var get_attendance_list = function get_attendance_list(class_id, callback) {
             $.ajax({
                 url: '/api/class/attendance?class_id=' + class_id,
                 dataType: 'json',
+                method: 'GET',
                 contentType: 'application/json',
                 success: function success(response) {
                     if (callback != undefined && response.code == 1) {
@@ -32432,6 +32456,22 @@ $(function () {
                 }
             });
         };
+
+        var get_attendance_by_timetable = function get_attendance_by_timetable(timetable_id, callback) {
+            $.ajax({
+                url: '/api/class/attendance/by-date?timetable_id=' + timetable_id,
+                dataType: 'json',
+                method: 'GET',
+                contentType: 'application/json',
+                success: function success(response) {
+                    if (callback != undefined && response.code == 1) {
+                        callback(response.data);
+                    }
+                    console.log('response', response);
+                }
+            });
+        };
+
         var get_timetable = function get_timetable(class_id, callback) {
             $.ajax({
                 url: '/api/get-list-timetable?class_id=' + class_id,
@@ -32456,7 +32496,7 @@ $(function () {
                     var td_no = $('<th></th>', { text: i + 1, 'style': 'text-align:center' });
                     $(tr).append(td_no);
                     for (var attr in item) {
-                        if (attr == 'id') continue;
+                        if (attr == 'id' || attr == 'status') continue;
                         var style = '';
                         if (attr == 'present' || attr == 'absent' || attr == 'late') {
                             style = 'text-align:center';
@@ -32471,13 +32511,45 @@ $(function () {
 
                     $(tr).append(td_input_present, td_input_absent, td_input_late);
                     $(list_container).append(tr);
+
+                    var radio_present = $(td_input_present).find('INPUT[name="' + item.id + '_status"]');
+                    var radio_absent = $(td_input_absent).find('INPUT[name="' + item.id + '_status"]');
+                    var radio_late = $(td_input_late).find('INPUT[name="' + item.id + '_status"]');
+
+                    $(radio_present).on('click', function (e) {
+                        var timetable_id = $(attendance_modal).find('SELECT#timetable_id').val();
+                        var student_id = $(e.target).data('student');
+                        var status = $(e.target).val();
+                        attendanceCheck(timetable_id, student_id, status);
+                    });
+
+                    $(radio_absent).on('click', function (e) {
+                        var timetable_id = $(attendance_modal).find('SELECT#timetable_id').val();
+                        var student_id = $(e.target).data('student');
+                        var status = $(e.target).val();
+                        attendanceCheck(timetable_id, student_id, status);
+                    });
+
+                    $(radio_late).on('click', function (e) {
+                        var timetable_id = $(attendance_modal).find('SELECT#timetable_id').val();
+                        var student_id = $(e.target).data('student');
+                        var status = $(e.target).val();
+                        attendanceCheck(timetable_id, student_id, status);
+                    });
                 }
             }
         };
 
         var open_attendance = function open_attendance(class_id) {
-            get_timetable(class_id, function (data, class_id) {
-                if (data.length > 0) {
+            get_timetable(class_id, function (timetables, class_id) {
+                if (timetables.length > 0) {
+                    var timetable_id = $(attendance_modal).find('SELECT#timetable_id');
+                    $(timetable_id).empty();
+                    for (var i = 0; i < timetables.length; i++) {
+                        var timetable_opt = $('<option></option>', { value: timetables[i].id, text: timetables[i].date + ' (' + timetables[i].start + ' - ' + timetables[i].finish + ')' });
+                        $(timetable_id).append(timetable_opt);
+                    }
+
                     get_attendance_list(class_id, function (list) {
                         render_attendance_table(list);
                         $(attendance_modal).modal('show');
@@ -32489,6 +32561,27 @@ $(function () {
                 }
             });
         };
+
+        var fill_attendance = function fill_attendance(data) {
+            $(attendance_modal).find('TABLE#attendance-table TBODY INPUT[type="radio"]').prop('checked', false);
+            if (data.length > 0) {
+                for (var i = 0; i < data.length; i++) {
+                    var attendance = data[i];
+                    $(attendance_modal).find('TABLE#attendance-table TBODY INPUT[type="radio"][data-student="' + attendance.student_id + '"][value="' + attendance.status + '"]').prop('checked', true);
+                }
+            }
+        };
+
+        $(attendance_modal).on('show.bs.modal', function (e) {
+            $(attendance_modal).find('SELECT#timetable_id').trigger('change');
+        });
+
+        $(attendance_modal).find('SELECT#timetable_id').change(function (e) {
+            var timetable_id = $(attendance_modal).find('SELECT#timetable_id').val();
+            get_attendance_by_timetable(timetable_id, function (data) {
+                fill_attendance(data);
+            });
+        });
 
         $.ajax({
             dataType: 'json',
