@@ -81,9 +81,13 @@ Route::get('branch/add', 'BranchController@add')->middleware('auth');
 Route::get('branch/edit', 'BranchController@edit')->middleware('auth');
 
 Route::get('invoice', 'InvoiceController@index')->middleware('auth');
+Route::get('invoice/list', 'InvoiceController@getInvoiceList')->middleware('auth');
 Route::get('invoice/student-list', 'InvoiceController@getStudentList')->middleware('auth');
 Route::get('invoice/class-list', 'InvoiceController@getClassList')->middleware('auth');
 Route::post('invoice/tuition_fee_calculate', 'InvoiceController@tuition_calc')->middleware('auth');
+Route::post('invoice/save', 'InvoiceController@save_invoice')->middleware('auth');
+Route::get('invoice/print/{id}/{act}', 'InvoiceController@print_invoice')->middleware('auth');
+
 Route::get('invoice/print', function(){
     return view('invoice/invoice_print');
 })->middleware('auth');

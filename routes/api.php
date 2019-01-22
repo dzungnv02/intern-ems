@@ -28,7 +28,6 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::post('/delete-student', 'StudentController@deleteStudent');
     //Route::post('/update-student', 'StudentController@updateStudent');
     Route::post('/add-student', 'StudentController@addStudent');
-    //Route::post('/save-student', 'StudentController@saveStudent');
 
     Route::get('/student/get-profile', 'StudentController@getStudent');
     Route::get('/student/get-activity', 'StudentController@getStudentActivity');

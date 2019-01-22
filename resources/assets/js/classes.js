@@ -179,7 +179,7 @@ $(function () {
             }
         });
 
-        var table_classes = $('#list_class').DataTable({
+        var table_classes = $('TABLE#list_class').DataTable({
             language: datatable_language,
             "order": [
                 [1, 'asc']

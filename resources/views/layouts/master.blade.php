@@ -13,15 +13,22 @@
   <meta name="user-email" content="{{ Auth::user()->email }}">
   <meta name="user-branch_id" content="{{ Auth::user()->branch_id }}">
   <link rel="stylesheet" href="{{asset('admin/bootstrap/css/bootstrap.min.css')}}">
+  <link rel="stylesheet" href="{{asset('css/app.css')}}">
+
+
   <!-- Font Awesome -->
   <link rel="stylesheet" href="{{ asset('admin/font-awesome/css/font-awesome.min.css') }}">
   {{-- datetimepicker --}}
   <link rel="stylesheet" type="text/css" href="{{ asset('admin/datetimepicker/jquery.datetimepicker.css') }}">
   <!-- Datatable bootstrap -->
-  <link rel="stylesheet" href="{{ asset('admin/css/dataTables.bootstrap.min.css') }}">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="{{ asset('admin/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
   <!-- Select2 -->
-  <link rel="stylesheet" href="{{ asset('admin/select2/dist/css/select2.min.css') }}">
+  {{--  <link rel="stylesheet" href="{{ asset('admin/select2/dist/css/select2.min.css') }}">  --}}
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.css" rel="stylesheet" />
+
   <!-- Theme style -->
   <link rel="stylesheet" href="{{asset('admin/css/AdminLTE.css')}}">
   <!-- AdminLTE Skins. Choose a skin from the css/skins
@@ -219,6 +226,7 @@
 </div>
 <!-- ./wrapper -->
 <!-- jQuery 3 -->
+{{--  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>  --}}
 {{--  <script src="{{asset('admin/js/jquery.min.js')}}"></script>  --}}
 {{-- momentjs --}}
 <script>
@@ -226,19 +234,21 @@
   var img = "{{ asset('storage') }}/";
 </script>
 <script src="{{ asset('admin/js/moment.js') }}"></script>
+
 <!-- Bootstrap 3.3.7 -->
 <script src="{{ asset('js/app.js') }}"></script>
-<script src="{{asset('admin/bootstrap/js/bootstrap.min.js')}}"></script>
-<!-- Datatable -->
 <script src="{{ asset('admin/datetimepicker/build/jquery.datetimepicker.full.min.js') }}"></script>
-<script src="{{ asset('admin/js/jquery.dataTables.min.js') }}"></script>
+
 <script src="{{ asset('admin/js/dataTables.bootstrap.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('admin/js/jquery.bootpag.min.js') }}"></script>
 <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js" type="text/javascript"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
 <!-- Select2 -->
-<script src="{{ asset('admin/select2/dist/js/select2.full.min.js') }}"></script>
+{{--  <script src="{{ asset('admin/select2/dist/js/select2.full.min.js') }}"></script>  --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.full.min.js"></script>
+
 <!-- AdminLTE App -->
 <script src="{{asset('admin/js/adminlte.js')}}"></script>
 @yield('js')
