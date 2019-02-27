@@ -7,7 +7,7 @@
   <div class="content-class row">
       <div class="col-xs-12">
             <div class="box-header">
-            <button type="button" id="button-create-class" class="btn btn-success">
+            <button type="button" id="button-create-class" class="btn btn-success hidden">
                 Thêm lớp
             </button>
             </div>
