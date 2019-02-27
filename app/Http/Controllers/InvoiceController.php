@@ -166,6 +166,12 @@ class InvoiceController extends Controller
         return view( $view, $invoice);
     }
 
+    public function calc_prepaid_tutor_fee ($student_id, $class_id)
+    {
+        $data = Invoice::get_last_tutor_duration($student_id, $class_id);
+        return response()->json(['code' => 0, 'data' => $data], 200);
+    }
+
     protected function number_to_words($number)
     {
         $hyphen = ' ';

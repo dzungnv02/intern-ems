@@ -12,6 +12,7 @@ $(function () {
 
     var student_id = $('FORM#frmTutorFee SELECT.select2[id="student_id"]');
     var class_id = $('FORM#frmTutorFee SELECT.select2[id="class_id"]').select2();
+    var prepaid = $('FORM#frmTutorFee INPUT#prepaid');
 
     var student_other_id = $('FORM#frmOtherFee SELECT.select2[id="student_id"]').select2();
     var class_other_id =$('FORM#frmOtherFee SELECT.select2[id="class_id"]').select2();
@@ -275,6 +276,14 @@ $(function () {
         return is_valided;
     }
 
+    var get_last_tutor_invoice_duration = (student_id, class_id, callback) => {
+        $.ajax({
+            url: '/invoice/get-last-invoice/' + student_id + '/' + class_id
+        });
+    }
+
+
+
     var invoice_list_init = () => {
         if ($.fn.dataTable.isDataTable('TABLE#invoice-list')) {
             invoice_list_table = $('TABLE#invoice-list').DataTable();
@@ -418,6 +427,8 @@ $(function () {
                 $(container).find('.help-block').html('Hãy nhập Tổng số tiền').hide();
             }
         });
+
+        //$(prepaid).on('');
 
         $(student_id).on('change', (e) => {
             get_class_list($(student_id).val(), $(class_id), () => {

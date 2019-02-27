@@ -121,4 +121,7 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::post('/branch/insert', 'BranchController@insertBranch');
     Route::post('/branch/update', 'BranchController@updateBranch');
     Route::post('/branch/delete', 'BranchController@deleteBranch');
+
+    Route::get('invoice/get-last-invoice/{student_id}/{class_id}', 'InvoiceController@calc_prepaid_tutor_fee');
+
 });
