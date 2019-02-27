@@ -42,6 +42,11 @@ class Holiday extends Model
                     'created_at' => $data['created_at'],
                     'updated_at' => $data['updated_at'],
 				]);
-	}
+    }
+    
+    public static function pluckHolidays() 
+    {
+        return DB::table('holidays')->pluck('holiday')->toArray();
+    }
 
 }

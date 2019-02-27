@@ -13,14 +13,8 @@
 */
 Auth::routes();
 
-Route::get('/', function () {
-    //return view('welcome');
-    // $zoho_crm = new ZohoCrmConnect();
-    // $records = $zoho_crm->getAllRecords(config('zoho.MODULES.ZOHO_MODULE_LEADS'));
-    // var_dump($records[0]);
-    return view('layouts/dashboard');
-})->middleware('auth');
-// exam
+Route::get('/', 'HomeController@index')->middleware('auth');
+
 Route::get('/exam', function(){
 		return view('examination/list');
 })->middleware('auth');
@@ -41,8 +35,12 @@ Route::get('/dashboard', function () {
     return view('layouts/dashboard');
 });
 
-Route::get('student', function(){
+Route::get('/student', function(){
 	return view('student/list');
+})->middleware('auth');
+
+Route::get('/student/detail', function(){
+	return view('student/form');
 })->middleware('auth');
 
 Route::get('timetable', function(){
@@ -58,15 +56,12 @@ Route::get('holiday', function(){
 })->middleware('auth');
 
 Route::get('teacher-list', function(){
-    return view('teacher/list');
+    $schedule_types = config('app.teacher_schedule_type');
+    return view('teacher/list', ['schedule_types' => $schedule_types]);
 })->middleware('auth');
 
-Route::get('teacher-add', function(){
-    return view('teacher/add');
-})->middleware('auth');
-
-Route::get('teacher-edit', function(){
-    return view('teacher/edit');
+Route::get('teacher-weekly-schedule', function(){
+    return view('teacher/weekly-schedule');
 })->middleware('auth');
 
 Route::get('staff-list', function(){
@@ -86,9 +81,13 @@ Route::get('branch/add', 'BranchController@add')->middleware('auth');
 Route::get('branch/edit', 'BranchController@edit')->middleware('auth');
 
 Route::get('invoice', 'InvoiceController@index')->middleware('auth');
+Route::get('invoice/list', 'InvoiceController@getInvoiceList')->middleware('auth');
 Route::get('invoice/student-list', 'InvoiceController@getStudentList')->middleware('auth');
 Route::get('invoice/class-list', 'InvoiceController@getClassList')->middleware('auth');
 Route::post('invoice/tuition_fee_calculate', 'InvoiceController@tuition_calc')->middleware('auth');
+Route::post('invoice/save', 'InvoiceController@save_invoice')->middleware('auth');
+Route::get('invoice/print/{id}/{act}', 'InvoiceController@print_invoice')->middleware('auth');
+
 Route::get('invoice/print', function(){
     return view('invoice/invoice_print');
 })->middleware('auth');

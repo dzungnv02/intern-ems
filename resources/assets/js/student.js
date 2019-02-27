@@ -1,349 +1,288 @@
 $(function () {
-    var tableStudent = $('#list-student').DataTable({
-    	"columnDefs": [ {
-            "searchable": false,
-            "orderable": false,
-            "targets": 0
-        } ],
-        "order": [[ 1, 'asc' ]],
-        ajax: {
-	        url: 'api/get-list-student',
-	        dataSrc: 'data',
-	    },
-	    columns: [
-            { data: null},
-            { data: 'name', name: 'name'},
-            { data: 'email', name: 'email'},
-            { data: 'address', name: 'address'},
-            { data: 'mobile', name: 'mobile'},
-            { data: 'birthday', name: 'birthday'},
-            { data: 'gender', name: 'gender',
-            	render : function(data) {
-			        return data == '0' ? 'Nam' : 'Nữ';
-			    }
-        	},
-            {
-                'data': null,
-                'render': function (data, type, row) {
-                    return '<button studentID=\"'+row.id+'\" title=\"thêm học sinh vào lớp\"'+
-                    'class=\"btn btn-primary StudentAdd\"><i class=\"fa fa-plus\" aria-hidden=\"true\"></i>'+
-                    '</button> <button studentID=\"'+row.id+'\" title=\"sửa học sinh\"'+
-                    'class=\"editStudent btn btn-warning\"><i class=\"fa fa-pencil\" aria-hidden=\"true\"></i>'+
-                    '</button> <button studentID=\"'+row.id+'\" title=\"xóa học sinh\" '+
-                    'class=\"deleteStudent btn btn-danger\"><i class=\"fa fa-trash\" aria-hidden=\"true\"></i></button>'
-                }
-            },
-        ]
-    });
-    
-    tableStudent.on( 'order.dt search.dt', function () {
-        tableStudent.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-            cell.innerHTML = i+1;
-        } );
-    } ).draw();
+	if ($('TABLE#list-student').length > 0) {
+		var table_student = null;
+		var save_student_button = $('DIV#student-form-modal DIV.modal-footer BUTTON#btnSave');
+		var add_student_button = $('BUTTON.add-student');
+		var add_parent_button = $("DIV#student-form-modal DIV.modal-body BUTTON.add-parent");
+		var parent_info_panel = $("DIV#student-form-modal DIV.modal-body DIV.row#parent-info");
+		var student_form = $("DIV#student-form-modal DIV.modal-body FORM#frmStudent");
 
-    $('.add-student').click(function(){
-    	$('#add-student').modal('show');
-    });
-    jQuery.datetimepicker.setLocale('vi');
-    $('#birthday').datetimepicker({
-        format: 'Y-m-d',
-        timepicker: false,
-    });
-    $('#edit_birthday').datetimepicker({
-        format: 'Y-m-d',
-        timepicker: false,
-    });
+		var init = () => {
+			if ($.fn.dataTable.isDataTable('TABLE#list-student')) {
+				table_student = $('TABLE#list-student').DataTable();
+			} else {
+				var buttons = '<button title="thêm học sinh vào lớp" class="btn btn-primary assign-to-class"><i class="fa fa-plus" aria-hidden="true"></i></button>\
+							<button title="sửa học sinh" class="edit-student btn btn-warning"><i class="fa fa-pencil" aria-hidden="true"></i></button>\
+							<button title="xóa học sinh" class="del-student btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+				table_student = $('#list-student').DataTable({
+					language: datatable_language,
+					"columnDefs": [{
+							"searchable": false,
+							"orderable": false,
+							"targets": 0
+						},
+						{
+							targets: [6],
+							"data": null,
+							"visible": true,
+							"defaultContent": buttons
+						}
+					],
+					"order": [
+						[1, 'asc']
+					],
+					ajax: {
+						url: 'api/get-list-student',
+						dataSrc: 'data',
+					},
+					columns: [{
+							data: null
+						},
+						{
+							data: 'student_code',
+							name: 'student_code'
+						},
+						{
+							data: 'name',
+							name: 'name'
+						},
+						{
+							data: 'class_name',
+							name: 'class_name'
+						},
+						{
+							data: 'parent_name',
+							name: 'parent_name'
+						},
+						{
+							data: 'birthday',
+							name: 'birthday',
+							render: (data, type, row, meta) => {
+								if (data != null ) {
+									data = moment(data).format("DD-MM-YYYY")
+								}
+								else if (row.birthyear != null){
+									data = row.birthyear;
+								}
+								else {
+									data = '';
+								}
+								
+								return data;
+							}
+						},
+						{
+							'data': null
+						},
+					]
+				});
 
-    var formStudent = $('#form-add');
-    formStudent.validate({
-		rules: {
-			"name": {
-				required: true,
-			},
-			"email": {
-				required: true,
-				email: true
-			},
-			"address": {
-				required: true,
-			},
-			"mobile": {
-				required: true,
-				number: true
-			},
-			"birthday": {
-				required: true,
-				date: true
-			},
-		},
-		messages: {
-			"name": {
-				required: "Bắt buộc nhập tên",
-				maxlength: "Hãy nhập tối đa 15 ký tự"
-			},
-			"email": {
-				required: "Bắt buộc nhập email",
-				email: "Hãy nhập đúng định dạng email"
-			},
-			"address": {
-				required: "Bắt buộc nhập địa chỉ",
-			},
-			"mobile": {
-				required: "Bắt buộc nhập số điện thoại",
-				number: "Hãy nhập số"
-			},
-			"birthday": {
-				required: "Bắt buộc nhập ngày sinh",
-				date: "Hãy nhập đúng định dạng ngày"
-			},
-		},
-		highlight: function(element, errorClass) {
-			$(element).closest(".form-group").addClass("has-error");
-		},
-		unhighlight: function(element, errorClass) {
-			$(element).closest(".form-group").removeClass("has-error");
-		},
-		errorPlacement: function (error, element) {
-			error.appendTo(element.parent().next());
-		},
-		errorPlacement: function (error, element) {
-			if(element.attr("type") == "checkbox") {
-				element.closest(".form-group").children(0).prepend(error);
-			}
-			else
-				error.insertAfter(element);
-		}
-	});
-	var formEditStudent = $('#form-edit');
-    formEditStudent.validate({
-		rules: {
-			"name": {
-				required: true,
-			},
-			"email": {
-				required: true,
-				email: true
-			},
-			"address": {
-				required: true,
-			},
-			"mobile": {
-				required: true,
-				number: true
-			},
-			"birthday": {
-				required: true,
-				date: true
-			},
-		},
-		messages: {
-			"name": {
-				required: "Bắt buộc nhập tên",
-				maxlength: "Hãy nhập tối đa 15 ký tự"
-			},
-			"email": {
-				required: "Bắt buộc nhập email",
-				email: "Hãy nhập đúng định dạng email"
-			},
-			"address": {
-				required: "Bắt buộc nhập địa chỉ",
-			},
-			"mobile": {
-				required: "Bắt buộc nhập số điện thoại",
-				number: "Hãy nhập số"
-			},
-			"birthday": {
-				required: "Bắt buộc nhập ngày sinh",
-				date: "Hãy nhập đúng định dạng ngày"
-			},
-		},
-		highlight: function(element, errorClass) {
-			$(element).closest(".form-group").addClass("has-error");
-		},
-		unhighlight: function(element, errorClass) {
-			$(element).closest(".form-group").removeClass("has-error");
-		},
-		errorPlacement: function (error, element) {
-			error.appendTo(element.parent().next());
-		},
-		errorPlacement: function (error, element) {
-			if(element.attr("type") == "checkbox") {
-				element.closest(".form-group").children(0).prepend(error);
-			}
-			else
-				error.insertAfter(element);
-		}
-	});
-    
-    $('#store-student').click(function(e){
-    	e.preventDefault();
-    	var name = $('#name').val();
-    	var student_code = $('#student_code').val();
-    	var email = $('#email').val();
-    	var address = $('#address').val();
-    	var mobile = $('#mobile').val();
-    	var birthday = $('#birthday').val();
-    	var gender = $('#gender').val();
-    	if(formStudent.valid()){
-    		$.ajax({
-	            type: 'POST',
-	            url: 'api/add-student',
-	            data: {name: name, email: email, address: address, mobile:mobile, birthday:birthday,
-	            	gender:gender,student_code},
-	            success: function(response){
-	            	$('#add-student').modal('hide');
-	            	$('#add-student').on('hidden.bs.modal', function(){
-					    $(this).find('form')[0].reset();
+				table_student.on('order.dt search.dt', function () {
+					table_student.column(0, {
+						search: 'applied',
+						order: 'applied'
+					}).nodes().each(function (cell, i) {
+						cell.innerHTML = i + 1;
 					});
-	            	tableStudent.ajax.reload();
-	     			toastr.success('Thêm thành công!');
-	            },
-	        	error: function(data){
-			        var errors = data.responseJSON;
-			        $('.unique_email').html(errors.errors.email)
-			        $('.unique_student_code').html(errors.errors.student_code)
-			    }
-	        });
-    	}
-    });
+				}).draw();
 
-    $(document).on('click', '.deleteStudent', function(){
-    	var id = $(this).attr('studentID');
-        swal({
-	        title: "Bạn có chắc muốn xóa?",
-	        text: "Bạn sẽ không thể khôi phục lại bản ghi này!",
-	        icon: "warning",
-	        buttons: true,
-	        dangerMode: true,
-	    })
-	    .then((willDelete) => {
-	      	if (willDelete) {
-      			$.ajax({
-		            type: 'post',
-		            url: 'api/delete-student',
-		            data: {id:id},
-		            success: function(response){
-		            	if (response.code == 0) {
-		            		toastr.error('Không thể xóa học viên này!');
-		            	}else{
-		            		tableStudent.ajax.reload();
-		                	toastr.success('Xóa thành công!');
-		            	}
-		            }
-		        })
-	      	}
-	    });
-    });
+				table_student.on('click', 'button.assign-to-class', function () {
+					var data = table_student.row($(this).parents('tr')).data();
+					console.log('assign-to-class', data);
+				});
 
-    $(document).on('click', '.editStudent', function(){
-        var id = $(this).attr('studentID');
-        $.ajax({
-            type: 'get',
-            url: "api/edit-student",
-            data: {id:id},
-            success: function(response){
-                $('#edit-student').modal('show');
-                $('#edit_name').val(response['data'][0].name);
-                $('#edit_student_code').val(response['data'][0].student_code);
-                $('#edit_email').val(response['data'][0].email);
-                $('#edit_address').val(response['data'][0].address);
-                $('#edit_mobile').val(response['data'][0].mobile);
-                $('#edit_birthday').val(response['data'][0].birthday);
-                $('#edit_gender').val(response['data'][0].gender);
-                $('#update-student').attr('data-id', response['data'][0].id);
-            }
-        })
-    });
+				table_student.on('click', 'button.edit-student', function () {
+					var data = table_student.row($(this).parents('tr')).data();
+					window.location.href = '/student/detail?student_id=' + data.id;
+				});
 
-    $('#update-student').click(function(e){
-    	e.preventDefault();
-        var name = $('#edit_name').val();
-        var student_code = $('#edit_student_code').val();
-        var email = $('#edit_email').val();
-        var address = $('#edit_address').val();
-        var mobile = $('#edit_mobile').val();
-        var birthday = $('#edit_birthday').val();
-        var gender = $('#edit_gender').val();
-        var id = $(this).attr('data-id');
-        if(formEditStudent.valid()){
-        	$.ajax({
-	            type: 'post',
-	            url: 'api/update-student',
-	            data: {id:id,name: name, email: email,address:address,mobile:mobile,
-	            	birthday:birthday,gender:gender,student_code:student_code},
-	            success: function(response){
-	                $('#edit-student').modal('hide');
-	                tableStudent.ajax.reload();
-	                toastr.success('Sửa thành công !');
-	            },
-	            error: function(data){
-			        var errors = data.responseJSON;
-			        $('.unique_email').html(errors.errors.email)
-			        $('.unique_student_code').html(errors.errors.student_code)
-			    }
-	        });
-        }
-    });
+				table_student.on('click', 'button.del-student', function () {
+					var data = table_student.row($(this).parents('tr')).data();
+					show_delete_student_confirm_modal(data);
+					console.log('del-student', data);
+				});
+			}
 
-    $(document).on('click', '.StudentAdd', function(){
-    	IDstudent = $(this).attr('studentID');
-    	$('#get_student_id').val(IDstudent);
-    	$('#list-class').modal('show');
-    });
+			$(save_student_button).bind('click', (e) => {
+				$(e.target).button('loading');
+				$(e.target).prop('disabled', true);
+				save_student();
+			});
 
-    function getClassSize(data, type, dataToSet) {
-	    return data.number_student + "/" + data.class_size;
+			$(add_student_button).bind('click', (e) => {
+				var student_id = null;
+				show_student_form();
+			});
+
+			$(add_parent_button).bind('click', (e) => {
+				$(parent_info_panel).show();
+			});
+
+			$('DIV#student-form-modal').on('show.bs.modal', (e) => {
+				console.log(e);
+			})
+		}
+
+		var show_assign_class_modal = (student_id) => {}
+		var get_class_list_to_assign = (student_id) => {}
+		var assign_to_class = (student_id, class_id) => {}
+
+		var show_student_form = (student_id) => {
+			var modal_title = 'Thêm mới học sinh';
+			$("DIV#student-form-modal").find('FORM#frmStudent INPUT#id').val();
+			$("DIV#student-form-modal").find('FORM#frmStudent INPUT#crm_id').val();
+
+			if (student_id != null) {
+				modal_title = 'Sửa thông tin học sinh';
+				$("DIV#student-form-modal").find('FORM#frmStudent INPUT#id').val(student_id);
+				get_student(student_id, (student, parent) => {
+					reset_student_form(student, parent);
+					$("DIV#student-form-modal").modal('show');
+				});
+			} else {
+				reset_student_form(null, null);
+				$("DIV#student-form-modal").modal('show');
+			}
+
+			$("DIV#student-form-modal").find('.modal-title').html(modal_title);
+		}
+
+		var reset_student_form = (student, parent) => {
+			var form_inputs = $(student_form).find('INPUT');
+			if (student == null) {
+				$(form_inputs).val('');
+				$(student_form).find('SELECT#gender').val('0').change();
+				return;
+			}
+
+			$(form_inputs).each((index, el) => {
+				var field = el.id.indexOf('parent-') == 0 ? el.id.substr(7, el.id.length) : el.id;
+				if (student != null) {
+					if (student[field] != undefined && el.id.indexOf('parent-') == -1) {
+						$(el).val(student[field]);
+					} else if (student[field] == undefined) {
+						$(el).val('');
+					}
+				}
+
+				if (parent != null) {
+					if (parent[field] != undefined && el.id.indexOf('parent-') == 0) {
+						$(el).val(parent[field]);
+					} else if (parent[field] == undefined) {
+						$(el).val('');
+					}
+				}
+			});
+
+			$(student_form).find('SELECT#gender').val(student.gender).change();
+		}
+
+		var get_student = (student_id, callback) => {
+			$.ajax({
+				url: 'api/get-student',
+				data: {
+					'id': student_id
+				},
+				method: 'GET',
+				success: (response) => {
+					var student = response.data.student;
+					var parent = response.data.parent;
+					callback(student, parent);
+				}
+			});
+		}
+
+		var validate = (data) => 
+		{
+			var result = false;
+			if (data.student.name == '') {
+
+			}
+		}
+
+		var save_student = () => {
+
+			var data = {
+				"student": {
+					"id": "",
+					"name": "",
+					"crm_id": "",
+					"email": "",
+					"mobile": "",
+					"birthday": "",
+					"birthyear": "",
+					"address": "",
+					"gender": "",
+				},
+				"parent": {
+					"id": "",
+					"fullname": "",
+					"email": "",
+					"phone": "",
+					"role": "",
+					"facebook": "",
+				}
+			}
+
+			var form_parent_inputs = $(student_form).find('INPUT[id^="parent-"]');
+			var form_student_inputs = $(student_form).find('INPUT:not([id^="parent-"])');
+			form_student_inputs.push($(student_form).find('SELECT#gender')[0]);
+
+			$(form_parent_inputs).each((index, el) => {
+				var field = el.id.substr(7, el.id.length);
+				if (field == "search") return;
+				data.parent[field] = $(el).val();
+			});
+
+			$(form_student_inputs).each((index, el) => {
+				data.student[el.id] = $(el).val();
+			});
+
+			$.ajax({
+				url: 'api/save-student',
+				data: JSON.stringify(data),
+				contentType: 'application/json',
+				method: 'POST',
+				success: (response) => {
+					console.log(response);
+					table_student.ajax.reload();
+					$("DIV#student-form-modal").modal('hide');
+				}
+			}).done(() => {
+				$(save_student_button).prop('disabled', false);
+				$(save_student_button).button('reset');
+			});
+		}
+
+		var show_delete_student_confirm_modal = (data) => {
+			modalConfirm((confirm) => {
+				if (confirm) {
+					delete_student(data.id);
+				}
+			}, 'Bạn có muốn xoá học sinh <strong>' + data.name + '</strong> không?')
+		}
+
+		var delete_student = (student_id) => {
+			console.log(student_id);
+		}
+
+		var modalConfirm = (callback, message) => {
+			if (message != undefined) {
+				$("#confirm-delete DIV.modal-header H5.modal-title").html(message);
+			}
+			$("#confirm-delete").modal('show');
+
+			$("#modal-btn-yes").unbind('click').bind("click", function () {
+				callback(true);
+				$("#confirm-delete").modal('hide');
+			});
+
+			$("#modal-btn-no").unbind('click').bind("click", function () {
+				callback(false);
+				$("#confirm-delete").modal('hide');
+			});
+		};
+
+		init();
 	}
-    var tableEnrollClass = $('#table-enroll-class').DataTable({
-    	"columnDefs": [ {
-            "searchable": false,
-            "orderable": false,
-            "targets": 0
-        } ],
-        "order": [[ 1, 'asc' ]],
-        ajax: {
-	        url: 'api/get-list-enroll-class',
-	        dataSrc: 'data',
-	    },
-	    columns: [
-            { data: null},
-            { data: 'class_code', name: 'class_code'},
-            { data: 'name', name: 'name'},
-            { data: 'course_name', name: 'course_name'},
-            {data: getClassSize},
-            {
-                'data': null,
-                'render': function (data, type, row) {
-                    return '<button classID=\"'+row.id+'\" '+
-                    'title=\"thêm học sinh vào lớp\"'+
-                    'class=\"btn btn-success addStudentToClass\">Thêm</button>'
-                }
-            },
-        ]
-    });
-    tableEnrollClass.on( 'order.dt search.dt', function () {
-        tableEnrollClass.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-            cell.innerHTML = i+1;
-        } );
-    } ).draw();
-
-    $(document).on('click','.addStudentToClass', function(){
-    	var student_id = $('#get_student_id').val();
-    	var class_id = $(this).attr('classID');
-    	$.ajax({
-            type: 'post',
-            url: 'api/add-student-to-class',
-            data: {student_id:student_id,class_id:class_id},
-            success: function(response){
-                if(response.code == 1){
-           		  	$('#list-class').modal('hide');
-                	tableEnrollClass.ajax.reload();
-                	toastr.success(response.message);
-                }else{
-                	toastr.error('Lịch học bị trùng hoặc học sinh đã có trong lớp')
-                }
-            }
-        });
-    });
 });

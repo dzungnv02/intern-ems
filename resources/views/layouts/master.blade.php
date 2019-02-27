@@ -3,21 +3,32 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>@yield('page-title')</title>
+  <title>{{ config('app.name') }}</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.7 -->
   <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta name="user-id" content="{{ Auth::user()->id }}">
+  <meta name="user-name" content="{{ Auth::user()->name }}">
+  <meta name="user-email" content="{{ Auth::user()->email }}">
+  <meta name="user-branch_id" content="{{ Auth::user()->branch_id }}">
   <link rel="stylesheet" href="{{asset('admin/bootstrap/css/bootstrap.min.css')}}">
+  <link rel="stylesheet" href="{{asset('css/app.css')}}">
+
+
   <!-- Font Awesome -->
   <link rel="stylesheet" href="{{ asset('admin/font-awesome/css/font-awesome.min.css') }}">
   {{-- datetimepicker --}}
   <link rel="stylesheet" type="text/css" href="{{ asset('admin/datetimepicker/jquery.datetimepicker.css') }}">
   <!-- Datatable bootstrap -->
-  <link rel="stylesheet" href="{{ asset('admin/css/dataTables.bootstrap.min.css') }}">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="{{ asset('admin/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
   <!-- Select2 -->
-  <link rel="stylesheet" href="{{ asset('admin/select2/dist/css/select2.min.css') }}">
+  {{--  <link rel="stylesheet" href="{{ asset('admin/select2/dist/css/select2.min.css') }}">  --}}
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.css" rel="stylesheet" />
+
   <!-- Theme style -->
   <link rel="stylesheet" href="{{asset('admin/css/AdminLTE.css')}}">
   <!-- AdminLTE Skins. Choose a skin from the css/skins
@@ -104,12 +115,12 @@
         </li>
        
         
-        <li class="">
+        {{--  <li class="">
           <a href="{{ asset('course') }}">
             <i class="fa fa-book" aria-hidden="true"></i>
             <span>Quản lý khóa học</span>
           </a>
-        </li>
+        </li>  --}}
         <li class="">
           <a href="{{ asset('class') }}">
             <i class="fa fa-university" aria-hidden="true"></i>
@@ -144,7 +155,7 @@
           </a>
           <ul class="treeview-menu">
             <li><a href="{{asset('teacher-list')}}"><i class="fa fa-circle-o"></i> Danh sách giáo viên</a></li>
-            <li><a href="{{asset('teacher-add')}}"><i class="fa fa-circle-o"></i> Thêm giáo viên</a></li>
+            <li><a href="{{asset('teacher-weekly-schedule')}}"><i class="fa fa-circle-o"></i> Lịch hàng tuần</a></li>
           </ul>
         </li>
         <li class="treeview">
@@ -215,25 +226,29 @@
 </div>
 <!-- ./wrapper -->
 <!-- jQuery 3 -->
-<script src="{{asset('admin/js/jquery.min.js')}}"></script>
+{{--  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>  --}}
+{{--  <script src="{{asset('admin/js/jquery.min.js')}}"></script>  --}}
 {{-- momentjs --}}
 <script>
   var asset = "{{asset('')}}";
   var img = "{{ asset('storage') }}/";
 </script>
 <script src="{{ asset('admin/js/moment.js') }}"></script>
+
 <!-- Bootstrap 3.3.7 -->
 <script src="{{ asset('js/app.js') }}"></script>
-<script src="{{asset('admin/bootstrap/js/bootstrap.min.js')}}"></script>
-<!-- Datatable -->
 <script src="{{ asset('admin/datetimepicker/build/jquery.datetimepicker.full.min.js') }}"></script>
-<script src="{{ asset('admin/js/jquery.dataTables.min.js') }}"></script>
+
 <script src="{{ asset('admin/js/dataTables.bootstrap.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('admin/js/jquery.bootpag.min.js') }}"></script>
 <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js" type="text/javascript"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
 <!-- Select2 -->
-<script src="{{ asset('admin/select2/dist/js/select2.full.min.js') }}"></script>
+{{--  <script src="{{ asset('admin/select2/dist/js/select2.full.min.js') }}"></script>  --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.full.min.js"></script>
+
 <!-- AdminLTE App -->
 <script src="{{asset('admin/js/adminlte.js')}}"></script>
 @yield('js')
@@ -241,6 +256,56 @@
   $(document).ready(function () {
     $('.sidebar-menu').tree();
   })
+
+  var datatable_language = {
+                "paginate": {
+                  "previous": "Trước",
+                  "next": "Sau",
+                  "first": "Đầu tiên",
+                  "last": "Cuối cùng"
+                },
+                "emptyTable" : "Không có bản ghi nào!",
+                "info" : "Hiển thị từ _START_ đến _END_ trong tổng số _TOTAL_ bản ghi",
+                "infoEmpty": "Hiển thị 0 bản ghi",
+                "search": "Tìm kiếm:",
+                "zeroRecords": "Không tìm thấy bản ghi nào phù hợp!",
+                "lengthMenu":     "Hiển thị _MENU_ bản ghi"
+            };
+
+  var daterange_locale =  {
+              "format": "YYYY/MM/DD",
+              "separator": " - ",
+              "applyLabel": "Chọn",
+              "cancelLabel": "Huỷ",
+              "fromLabel": "Từ",
+              "toLabel": "Đến",
+              "customRangeLabel": "Tuỳ chọn",
+              "weekLabel": "W",
+              "daysOfWeek": [
+                  "CN",
+                  "T2",
+                  "T3",
+                  "T4",
+                  "T5",
+                  "T6",
+                  "T7"
+              ],
+              "monthNames": [
+                  "Th.1",
+                  "Th.2",
+                  "Th.3",
+                  "Th.4",
+                  "Th.5",
+                  "Th.6",
+                  "Th.7",
+                  "Th.8",
+                  "Th.9",
+                  "Th.10",
+                  "Th.11",
+                  "Th.12"
+              ],
+              "firstDay": 1
+          };
 </script>
 @yield('footer')
 </body>

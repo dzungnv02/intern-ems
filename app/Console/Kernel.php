@@ -13,7 +13,13 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\getTeachers::class,
+        Commands\syncBranch::class,
+        Commands\syncStudent::class,
+        Commands\syncOwner::class,
+        Commands\syncParent::class,
+        Commands\syncClasses::class,
+        Commands\syncStudentClasses::class,
     ];
 
     /**
@@ -24,8 +30,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $schedule->command('zoho:teacher --getlist')->everyMinute();
     }
 
     /**

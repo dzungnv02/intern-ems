@@ -1,5 +1,4 @@
 $(document).ready(function() {
-	console.log(img);
 	$(document).ready(function() {
 		function uploadImg(selectorClick, selectorShow) {
 			$(document).on('change', '#' + selectorClick, function() {
@@ -69,7 +68,7 @@ $(document).ready(function() {
 	}
 
 	$("#addStaff").bind("click", validate);
-});
+	});
 	/*
 	* validate form edit password
 	**/
@@ -131,6 +130,8 @@ $(document).ready(function() {
 		})
 	}
 });
+
+	if ($('TABLE#staff_list').length == 0) return false;
 	/*
 	* ajax get list staff
 	*/

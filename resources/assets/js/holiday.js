@@ -1,4 +1,5 @@
 $(function () {
+	if ($('#list-holiday').length == 0) return false;
     var tableHoliday = $('#list-holiday').DataTable({
     	"columnDefs": [ {
             "searchable": false,

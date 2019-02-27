@@ -1,27 +1,46 @@
 $(function () {
-    var tableClass = $('#branch-list').DataTable({
-        "columnDefs": [ {
-            "searchable": false,
-            "orderable": false,
-            "targets": 0
-        }],
+    if ($('#branch-list').length == 0) return false;
+    var tableBranch = $('#branch-list').DataTable({
+        language: datatable_language,
         ajax: {
-            url: 'api/branch/list',
-            dataSrc: function ( json ) {
-                var data = [];
-                for (var i = 0; i < json.data.length; i++) {
-                    data[i] = [
-                        json.data[i].id,
-                        json.data[i].branch_name,
-                        json.data[i].address,
-                        json.data[i].phone_1,
-                        json.data[i].phone_2,
-                        json.data[i].email,
-                        json.data[i].leader > 0 ? json.data[i].leader : ''
-                    ];
-                }
-                return data;
+            url: 'api/branch/list'
+        },
+        columns: [{
+                data: null
             },
-        }
+            {
+                data: 'branch_name'
+            },
+            {
+                data: 'address'
+            },
+            {
+                data: 'email',
+                render: (data, type, row) => {
+                    return data != '' ? '<a href="mailto:'+data+'">'+data+'</a>' : '';
+                }
+            },
+            {
+                data: 'phone_1'
+            },
+            {
+                data: null
+            }
+        ],
+        "columnDefs": [{
+            "targets": -1,
+            "data": null,
+            //"defaultContent": '<a class="edit">Sửa</a>&nbsp;&nbsp;<a class="delete">Xoá</a>'
+            "defaultContent": ''
+        }],
     });
+
+    tableBranch.on('order.dt search.dt', function () {
+        tableBranch.column(0, {
+            search: 'applied',
+            order: 'applied'
+        }).nodes().each(function (cell, i) {
+            cell.innerHTML = i + 1;
+        });
+    }).draw();
 });

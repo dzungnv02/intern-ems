@@ -8,7 +8,7 @@ use DB;
 class Student extends Model
 {
 	protected $table = 'students';
-    protected $fillable = ['name','email','address','mobile','birthday','gender','created_at','updated_at'];
+    protected $fillable = ['name','email','address','mobile','birthday','birthyear','parent_id','gender','created_at','updated_at'];
     
     /**
      * Hiển thị danh sách các bản ghi.
@@ -20,14 +20,27 @@ class Student extends Model
      */
 	public static function search($keyword, $record,$page = 1){
         $start = ($page - 1) * $record;
-		$search = Student::orderBy('id','desc')->where('name','like','%'.$keyword.'%')
+        /* $search = Student::orderBy('id','desc')->where('name','like','%'.$keyword.'%')
                                 ->orwhere('email','like','%'.$keyword.'%')
 	                            ->orwhere('student_code','like','%'.$keyword.'%')
 	                            ->orwhere('address','like','%'.$keyword.'%')
 	                            ->orwhere('mobile','like','%'.$keyword.'%')
-                                // ->offset($start)
-                                // ->limit($record)
-                                ->get();
+                                ->get(); */
+
+        
+        $search = DB::table('students')
+                    ->select('students.*', 'parents.fullname as parent_name', 'classes.name as class_name')
+                    ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
+                    ->leftJoin('classes', 'classes.id', '=', 'students.current_class')
+                    ->where('students.name','like','%'.$keyword.'%')
+                    ->orwhere('students.email','like','%'.$keyword.'%')
+                    ->orwhere('students.student_code','like','%'.$keyword.'%')
+                    ->orwhere('students.address','like','%'.$keyword.'%')
+                    ->orwhere('students.mobile','like','%'.$keyword.'%')
+                    ->orwhere('parents.fullname','like','%'.$keyword.'%')
+                    ->orwhere('classes.name','like','%'.$keyword.'%')
+                    ->orderBy('students.id','desc')->get();
+
 		return $search;
 	}
 
@@ -61,7 +74,24 @@ class Student extends Model
     		],
 		]);
 		return $student;
-	}
+    }
+
+    public static function getStudentByCrmID ($crm_id) 
+    {
+        return DB::table('students')->select('*')->where('crm_id',$crm_id)->get()->toArray();
+    }
+    
+        /**
+     * Thêm mới một bản ghi.
+     *
+     * @param  array $data
+     * @return void
+     */
+    public static function insert($data)
+    {
+        $id = DB::table('students')->insertGetId($data);
+        return $id;
+    }
 
     /**
      * Hiển thị danh sách các bản ghi.
@@ -69,8 +99,9 @@ class Student extends Model
      * @param  int $id
      * @return $student
      */
-    public static function edit($id){
-        $student = DB::table('students')->where('id',$id)->get();
+    public static function getStudent($id)
+    {
+        $student = Student::find($id);
         return $student;
     }
 

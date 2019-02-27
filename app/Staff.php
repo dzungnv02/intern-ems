@@ -29,12 +29,13 @@ public static function addStaff($data){
 public static function search($keyword, $record_per_page,$page = 1){
     $start = ($page - 1) * $record_per_page;
     $search = DB::table('staffs')
-        ->select('name', 'email', 'gender', 'image', 'birth_date', 'address', 'phone_number')
-        ->orderBy('id','desc')
-        ->where('name','like','%'.$keyword.'%')
-        ->orwhere('email','like','%'.$keyword.'%')
-        ->orwhere('address','like','%'.$keyword.'%')
-        ->orwhere('phone_number','like','%'.$keyword.'%')
+        ->leftJoin('branch', 'branch.id', '=', 'staffs.branch_id')
+        ->select('staffs.id', 'staffs.name', 'staffs.email', 'staffs.gender', 'staffs.image', 'staffs.birth_date', 'staffs.address', 'staffs.phone_number', 'branch.branch_name')
+        ->orderBy('staffs.id','desc')
+        ->where('staffs.name','like','%'.$keyword.'%')
+        ->orwhere('staffs.email','like','%'.$keyword.'%')
+        ->orwhere('staffs.address','like','%'.$keyword.'%')
+        ->orwhere('staffs.phone_number','like','%'.$keyword.'%')
         ->offset($start)->limit($record_per_page)->get();
     return $search;
 }

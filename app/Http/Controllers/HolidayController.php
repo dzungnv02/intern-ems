@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Holiday;
+use Countries;
 
 class HolidayController extends Controller
 {
@@ -96,5 +97,10 @@ class HolidayController extends Controller
         $id = request('id');
         $delete = Holiday::deleteHoliday($id);
         return response()->json(['code' => 1,'message' => 'Xóa thành công'],200);
+    }
+
+    public function getCountries (Request $request) {
+        $list = Countries::getList();
+        return response()->json(['code' => 1,'message' => '', 'data' => $list],200);
     }
 }

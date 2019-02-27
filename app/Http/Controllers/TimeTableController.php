@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Holiday;
 use App\TimeTable;
 use App\Classes;
-use App\Holiday;
+use App\Teacher;
+use App\Classes\ClassesTimeTable;
+use App\TeacherSchedules;
 
 class TimeTableController extends Controller
 {
@@ -16,90 +19,104 @@ class TimeTableController extends Controller
      */
     public function index(Request $request)
     {
-    	$id = $request->id;
-        $timetable = TimeTable::getListTimeTable($id);
-        return response()->json(['code' => 1,'message' => 'ket qua','data' => $timetable],200);
+        $class_id = $request->class_id;
+        $timetable = TimeTable::get_list_time_table($class_id);
+        return response()->json(['code' => 1, 'message' => 'ket qua', 'data' => $timetable], 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Request $request)
+    public function save_time_table (Request $request)
     {
-        $id = $request->id;
-        if ($id){
-            if (TimeTable::find($id) == null){
-                return response()->json(['code' => 0,'message' => 'khong ton tai ngay nay'],200);
-            }else{
-                $timetable = TimeTable::edit($id);
-                return response()->json(['code' => 1,'data' => $timetable],200);
+        $input = $request->all();
+        $class_id = $input['class_id'];
+        $now = date('Y-m-d H:i:s');
+
+        $raw_schedule = $input['time_table'];
+        $new_schedules = [];
+        $update_schedules = [];
+
+        $old_timetables = TimeTable::get_time_table_by_class($class_id);
+
+        $teacher_schedule_insert = [];
+        $teacher_schedule_update = [];
+
+        $class = Classes::find($class_id);
+
+        foreach($raw_schedule as $schedule) {
+            $schedule['class_id'] = $class_id;
+            $schedule['created_at'] = $now;
+
+            unset ($schedule['teacher_name']);
+
+            $old_teacher_schedule = TeacherSchedules::getByTeacher($schedule['teacher_id'], $class_id);
+
+            if (count($old_teacher_schedule)) 
+            {
+                foreach($old_teacher_schedule as $teacher_schedule)  {
+                    $tsch = TeacherSchedules::find($teacher_schedule->id);
+                    $tsch->delete();
+                }
             }
-        }
-    }
+            
+            array_push($teacher_schedule_insert, [
+                'teacher_id' => $schedule['teacher_id'],
+                'class_id' => $schedule['class_id'],
+                'start_time' => $schedule['date'] . ' ' . $schedule['start'],
+                'end_time' => $schedule['date'] . ' ' . $schedule['finish'],
+                'desc' => 'Lớp ' . $class->name,
+                'appoinment_type' => 1,
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function update2(Request $request)
-    {
-        $id = $request->id;
-        $class_id = request('class_id');
-        $date = request('date');
-        $week_days = date('w',strtotime($request->date));
-        $time_start = request('time');
-        $data = array(
-            'date' => $request->date,
-            'time' => $request->time,
-            'week_days' => $week_days,
-            'created_at' => date("Y-m-d"),
-            'updated_at' => date("Y-m-d"),
-        );
-        $request->validate([
-            'date' => 'required',
-            'time' => 'required',
-        ]);
+            if (count($old_timetables)) {
+                foreach ($old_timetables  as $old) {
+                    if (strtotime($old->date) == strtotime($schedule['date']) && !in_array($schedule, $update_schedules)) {
+                        unset($schedule['created_at']);
+                        $schedule['updated_at'] = $now;
+                        array_push($update_schedules, $schedule);
+                        break;
+                    }
+                }
 
-        $holiday = [];
-        $items = Holiday::getListHoliday();
-        foreach ($items as $holi) {
-            $holiday[] = $holi->holiday;
-        };
-
-        $timetable = TimeTable::join('classes','classes.id','=','timetables.class_id')
-                    ->select('timetables.time', 'timetables.date','classes.duration')
-                    ->where('timetables.class_id',$class_id)->get();
-        $day_start = TimeTable::where('class_id',$class_id)->min('date');
-        $ngay_hien_tai = date("Y/m/d");
-        $time_end = date(' H:i:s',strtotime('+'.$timetable[0]['duration'].'hour',strtotime($time_start)));
-        $z =0;
-        for ($x=0; $x < count($holiday); $x++) {
-            if (strtotime($date) == strtotime($holiday[$x]) || strtotime($date) < strtotime($day_start) || strtotime($date) < strtotime($ngay_hien_tai)) {
-                $z++;
-            }else{
-                for ($i=0; $i < count($timetable); $i++) {
-                    if ($date == $timetable[$i]['date']) {
-                        $time_end_tkb = date(' H:i:s',strtotime('+'.$timetable[$i]['duration'].'hour',strtotime($timetable[$i]['time'])));
-                        if (strtotime($time_end) < strtotime($timetable[$i]['time']) || strtotime($time_start) > strtotime($time_end_tkb)) {
-                            // echo "ok them";
-                        }else{
-                            $z++;
-                        }
+                foreach ($old_timetables  as $old) {
+                    if (strtotime($old->date) != strtotime($schedule['date'])  && !in_array($schedule, $update_schedules) &&  !in_array($schedule, $new_schedules)) {
+                        array_push($new_schedules, $schedule);
                     }
                 }
             }
+            else {
+                array_push($new_schedules, $schedule);
+            }
         }
 
-        if ($z != 0) {
-            return response()->json(['code' => 0, 'message' => 'Trùng lịch học, ngày nghỉ lễ hoặc ngày không hợp lệ'],200);
-        }else{
-            $dataTime = TimeTable::update1($data,$id);
-            return response()->json(['code' => 1,'message' => 'Cap nhat thanh cong'],200);
+        if (count($new_schedules)) TimeTable::insert($new_schedules);
+        if (count($update_schedules)) {
+            foreach ($update_schedules as $schedule) {
+                TimeTable::update_by_class($class_id, $schedule['date'], $schedule);
+            }
         }
+
+        if (count($teacher_schedule_insert)) TeacherSchedules::insert($teacher_schedule_insert);
+
+        return response()->json(['code' => 1, 'update' => $update_schedules, 'old' => $old_timetables], 200);
     }
-    
+
+    public function calculate_time_table (Request $request)
+    {
+        $input = $request->all();
+        $class_id = $input['class_id'];
+        $start_date = $input['start_date'];
+        $end_date = $input['end_date'];
+
+        $class = Classes::find($class_id)->toArray();
+        $holidays = Holiday::pluckHolidays();
+        $schedule = $class['schedule'] ? json_decode($class['schedule'], true) : [];
+
+        $teacher = Teacher::find($class['teacher_id'])->toArray();
+
+        $params = ['schedule' => $schedule, 'holidays' => $holidays, 'date_range' => ['start_date' => $start_date, 'end_date' => $end_date]];
+        $obj_time_table = new ClassesTimeTable($params);
+        $time_table = $obj_time_table->calc_time_table(['teacher_id' => $class['teacher_id'], 'teacher_name' => $teacher['name']]);
+        return response()->json(['code' => 1, 'data' => $time_table ], 200);
+    }
+
 }

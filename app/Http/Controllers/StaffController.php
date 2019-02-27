@@ -1,8 +1,9 @@
 <?php
 namespace App\Http\Controllers;
-use Illuminate\Http\Request;
+
 use App\Staff;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+
 class StaffController extends Controller
 {
     /**
@@ -10,7 +11,8 @@ class StaffController extends Controller
      *
      * @return void
      */
-    public function getListStaff(Request $request){
+    public function getListStaff(Request $request)
+    {
         $record_per_page = $request->record;
         $keyword = $request->keyword;
         $page = $request->page;
@@ -22,22 +24,23 @@ class StaffController extends Controller
         if ($page > $sum_page || !is_numeric($page)) {
             $page = 1;
         }
-        $all= Staff::Search($keyword,$record_per_page,$page);
-        return response()->json(['code' => 1,'message' => 'ket qua','data' => $all],200);
+        $all = Staff::Search($keyword, $record_per_page, $page);
+        return response()->json(['code' => 1, 'message' => 'ket qua', 'data' => $all], 200);
     }
     /**
      * Create a function deleteStaff
      *
      * @return void
      */
-    public function deleteStaff(Request $request){
+    public function deleteStaff(Request $request)
+    {
         $staff_id = $request->id;
-        if ($staff_id){
-            if (Staff::find($staff_id) == null){
-                return response()->json(['code' => 0,'message' => 'khong ton tai nhan vien nay'],200);
-            }else{
+        if ($staff_id) {
+            if (Staff::find($staff_id) == null) {
+                return response()->json(['code' => 0, 'message' => 'khong ton tai nhan vien nay'], 200);
+            } else {
                 Staff::deleteStaff($staff_id);
-                return response()->json(['code' => 1,'message' => 'Xoa thanh cong'],200);
+                return response()->json(['code' => 1, 'message' => 'Xoa thanh cong'], 200);
             }
         }
     }
@@ -46,16 +49,17 @@ class StaffController extends Controller
      *
      * @return void
      */
-    public function addStaff(Request $request){
+    public function addStaff(Request $request)
+    {
 
-     if (($request->hasFile('file'))) {
-            //$destinationPath = 'app/public/'; 
+        if (($request->hasFile('file'))) {
+            //$destinationPath = 'app/public/';
             $destinationPath = storage_path('app/public/');
-            $extension = $request->file('file')->getClientOriginalExtension(); 
+            $extension = $request->file('file')->getClientOriginalExtension();
             $tempName = $request->file("file")->getClientOriginalName();
-            $fileName = uniqid("MW") . '.' . $extension; 
-            $request->file('file')->move($destinationPath, $fileName); 
-            $imagepath = $destinationPath.'/'.$fileName;
+            $fileName = uniqid("MW") . '.' . $extension;
+            $request->file('file')->move($destinationPath, $fileName);
+            $imagepath = $destinationPath . '/' . $fileName;
         }
 
         $dataStaff = array(
@@ -67,35 +71,37 @@ class StaffController extends Controller
             'address' => $request->address,
             'phone_number' => $request->phone_number,
             'image' => $fileName,
-            'created_at' => date("Y-m-d")
+            'created_at' => date("Y-m-d"),
         );
 
         $data = Staff::addStaff($dataStaff);
-        return response()->json(['code' => 1,'message'=>'Them thanh cong'],200);
+        return response()->json(['code' => 1, 'message' => 'Them thanh cong'], 200);
     }
     /*
-    * edit password staff
+     * edit password staff
      **/
-    public function editPasswordStaff(Request $request){
+    public function editPasswordStaff(Request $request)
+    {
         $id = $request->id;
         $currentPassword = $request->currentPassword;
         $newPassword = $request->newPassword;
         $editStaff = Staff::editPasswordStaff($id, $currentPassword, $newPassword);
-        return response()->json(['code' => 1,'message' => 'Cap nhat thanh cong'],200);
+        return response()->json(['code' => 1, 'message' => 'Cap nhat thanh cong'], 200);
     }
     /*
      * edit staff_id
      */
-    public function editStaff(Request $request){
+    public function editStaff(Request $request)
+    {
         $id = $request->id;
-        
-         if (($request->hasFile('file'))) {
-            $destinationPath = 'storage/files'; 
+
+        if (($request->hasFile('file'))) {
+            $destinationPath = 'storage/files';
             $extension = $request->file('file')->getClientOriginalExtension();
             $tempName = $request->file("file")->getClientOriginalName();
-            $fileName = uniqid("MW") . '.' . $extension; 
-            $request->file('file')->move($destinationPath, $fileName); 
-            $imagepath = $destinationPath.'/'.$fileName;
+            $fileName = uniqid("MW") . '.' . $extension;
+            $request->file('file')->move($destinationPath, $fileName);
+            $imagepath = $destinationPath . '/' . $fileName;
         }
         $data = array(
             'email' => $request->email,
@@ -109,6 +115,6 @@ class StaffController extends Controller
             'updated_at' => date("Y-m-d"),
         );
         $data = Staff::editStaff($data, $id);
-        return response()->json(['code' => 1,'message' => 'Cap nhat thanh cong'],200);
+        return response()->json(['code' => 1, 'message' => 'Cap nhat thanh cong'], 200);
     }
 }

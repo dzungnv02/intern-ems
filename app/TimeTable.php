@@ -8,7 +8,7 @@ use DB;
 class TimeTable extends Model
 {
     protected $table = 'timetables';
-    protected $fillable = ['week_days','date','time','class_id','created_at','updated_at'];
+    protected $fillable = ['week_day','date','week_day','start','finish', 'teacher_id','time','class_id','created_at','updated_at'];
 
     /**
      * Hiển thị danh sách thời khóa biểu.
@@ -16,10 +16,27 @@ class TimeTable extends Model
      * @param int $id
      * @return $time_table
      */
-    public static function getListTimeTable($id){
-    	$time_table = DB::table('timetables')->join('classes','classes.id','=','timetables.class_id')
-        ->where('timetables.class_id',$id)->select('classes.duration','timetables.*')->get();
+    public static function get_list_time_table($class_id){
+        $time_table = DB::table('timetables')
+                ->join('teachers','teachers.id','=','timetables.teacher_id')
+                ->where('timetables.class_id', $class_id)
+                ->select('timetables.*', 'teachers.name as teacher_name')->get()->toArray();
     	return $time_table;
+    }
+
+    public static function insert ($data) {
+        return DB::table('timetables')->insert($data);
+    }
+
+    public static function update_by_class ($class_id, $date, $data) {
+        return DB::table('timetables')
+                ->where('class_id', $class_id)
+                ->where('date', $date)
+                ->update($data);
+    }
+
+    public static function get_time_table_by_class($class_id) {
+        return DB::table('timetables')->select('*')->where('class_id', $class_id)->get()->toArray();
     }
 
     /**
