@@ -50,7 +50,9 @@ Route::group(['middleware' => 'api.headers'], function () {
     //Class
     Route::get('/get-list-class', 'ClassController@getListClass');
     Route::get('/delete-class', 'ClassController@deleteClass');
-    Route::post('/create-class', 'ClassController@createClass');
+    
+    //Disable create class
+    //Route::post('/create-class', 'ClassController@createClass');
     Route::get('/edit-class', 'ClassController@getEditClass');
     Route::post('/edit-class', 'ClassController@editClass');
     Route::get('/get-list-class-student', 'ClassController@getListStudentOfClass');
