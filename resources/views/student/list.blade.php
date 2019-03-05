@@ -6,7 +6,7 @@
 	<li class="active">danh sách học viên</li>
 @endsection
 @section('content')
-	<div><button class="btn btn-info add-student">Thêm học sinh</button></div><br>
+	<div><button class="btn btn-info add-student hidden">Thêm học sinh</button></div><br>
 	<div class="card-body table-reponsive">
 		<table class="table table-bordered table-striped" id="list-student">
 			<thead>

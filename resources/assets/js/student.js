@@ -106,7 +106,7 @@ $(function () {
 			$(save_student_button).bind('click', (e) => {
 				$(e.target).button('loading');
 				$(e.target).prop('disabled', true);
-				save_student();
+				//save_student();
 			});
 
 			$(add_student_button).bind('click', (e) => {
@@ -194,10 +194,11 @@ $(function () {
 
 		var validate = (data) => 
 		{
-			var result = false;
-			if (data.student.name == '') {
+			return true;
+			// var result = false;
+			// if (data.student.name == '') {
 
-			}
+			// }
 		}
 
 		var save_student = () => {
