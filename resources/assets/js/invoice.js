@@ -9,6 +9,7 @@ $(function () {
     var tab_col = $(tab_headers).find('LI');
     var actived_tab = $(tab_contents).find("DIV[role='tabpanel'].active");
     var invoice_list_table = null;
+    var students = {};
 
     var student_id = $('FORM#frmTutorFee SELECT.select2[id="student_id"]');
     var class_id = $('FORM#frmTutorFee SELECT.select2[id="class_id"]').select2();
@@ -57,11 +58,12 @@ $(function () {
                 if (response.code == 0) {
                     var first_val = null;
                     if (response.data.list.length > 0) {
-                        
                         for (var i = 0; i < response.data.list.length; i++) {
                             var student = response.data.list[i];
-
+                            
                             first_val = (first_val == null) ? student.id : first_val;
+                            
+                            students[student.id] = student;
                             
                             var display_text = (student.student_code ? 'Code: <span class="text-bold">' + student.student_code + '</span> - ' : 'NO CODE - ') + student.name;
                             var opt = $('<option></option>', {
@@ -72,7 +74,6 @@ $(function () {
                         }
                         if (callback != undefined) {
                             callback(first_val, class_target);
-                            console.log(class_target);
                         }
                     }
                 }
@@ -81,7 +82,6 @@ $(function () {
     }
 
     var get_class_list = (std_id, target, callback) => {
-        console.log(target);
         $(target).empty();
         $.ajax('/invoice/class-list?student_id=' + std_id, {
             type: 'GET',
@@ -112,6 +112,20 @@ $(function () {
                     }
                 }
             }
+        });
+    }
+
+    var get_parent_list = (student_id, callback) => {
+        $(frmTutorFee).find('INPUT#payer').val('');
+        $.get('/api/parent/list', {
+            student_id: student_id
+        }, (response) => {
+            for(var i = 0; i < response.data.length; i++) {
+                if (response.data[i].id === students[student_id].parent_id) {
+                    $(frmTutorFee).find('INPUT#payer').val(response.data[i].fullname);
+                }
+            }
+            if (callback != undefined) callback();
         });
     }
 
@@ -282,8 +296,6 @@ $(function () {
         });
     }
 
-
-
     var invoice_list_init = () => {
         if ($.fn.dataTable.isDataTable('TABLE#invoice-list')) {
             invoice_list_table = $('TABLE#invoice-list').DataTable();
@@ -431,8 +443,10 @@ $(function () {
         //$(prepaid).on('');
 
         $(student_id).on('change', (e) => {
-            get_class_list($(student_id).val(), $(class_id), () => {
-                toggle_tuition_frmTutorFee(false);
+            get_parent_list($(student_id).val(), () => {
+                get_class_list($(student_other_id).val(), $(class_id),() => {
+                    toggle_tuition_frmTutorFee(false);
+                });
             });
         });
 
