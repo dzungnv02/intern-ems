@@ -10,7 +10,7 @@ use TimeTable;
 class Classes extends Model
 {
     protected $table = 'classes';
-    protected $fillable = ['name', 'status', 'schedule', 'time', 'teacher_id', 'course_id', 'class_size', 'created_at', 'updated_at'];
+    protected $fillable = ['name', 'branch_id', 'status', 'schedule', 'time', 'teacher_id', 'course_id', 'course_name', 'price', 'max_seat', 'created_at', 'updated_at'];
 
     /**
      * Lấy danh sách lớp học.

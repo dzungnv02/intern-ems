@@ -442,6 +442,10 @@ $(function () {
 
         //$(prepaid).on('');
 
+        $(class_id).on('change', (e) => {
+            console.log(e.target);
+        });
+
         $(student_id).on('change', (e) => {
             get_parent_list($(student_id).val(), () => {
                 get_class_list($(student_other_id).val(), $(class_id),() => {
