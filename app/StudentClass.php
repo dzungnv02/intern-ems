@@ -12,7 +12,7 @@ class StudentClass extends Model
     protected $fillable = ['student_id','class_id'];
 
     public static function getClassOfStudent ($student_id) {
-        $query = DB::table('student_classes')->select(DB::raw('classes.id, classes.name, classes.class_code'))
+        $query = DB::table('student_classes')->select(DB::raw('classes.id, classes.name, classes.class_code, classes.price'))
         ->join('classes', 'student_classes.class_id', '=', 'classes.id')
         ->where('student_classes.student_id' ,'=', $student_id)
         ->get();
