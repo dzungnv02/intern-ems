@@ -28,9 +28,10 @@ $(function () {
         '1': 'Làm assessment',
         '2': 'Học thử',
         '3': 'Nhập học chính thức',
-        '4': 'Chuyển lớp',
-        '5': 'Kiểm tra',
-        '6': 'Kết thúc'
+        '4': 'Đã gửi nội dung học 2 tuần tới',
+        '5': 'Chuyển lớp',
+        '6': 'Kiểm tra',
+        '7': 'Kết thúc'
     };
 
     if (tab_headers.length == 0) return false;
