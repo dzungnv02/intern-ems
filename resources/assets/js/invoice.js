@@ -97,7 +97,7 @@ $(function () {
                             });
                             $(target).append(opt);
                         }
-                        $($(target).find('OPTION')[0]).attr('selected', 'selected');
+                        $(frmTutorFee).find('INPUT#price').val(numeral(response.data.list[0].price).format('0,0'));
                         toggle_tuition_frmTutorFee(true);
                     } else {
                         var opt = $('<option></option>', {
@@ -105,10 +105,10 @@ $(function () {
                             html: 'Chưa có lớp'
                         });
                         $(target).append(opt);
-                        $($(target).find('OPTION')[0]).attr('selected', 'selected');
-                        if (callback != undefined) {
-                            callback();
-                        }
+                    }
+                    $($(target).find('OPTION')[0]).attr('selected', 'selected');
+                    if (callback != undefined) {
+                        callback();
                     }
                 }
             }
