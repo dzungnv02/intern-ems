@@ -9,7 +9,8 @@ $(function () {
         activities: null,
         exams: null,
         teacher_reports: null,
-        payment: null
+        payment: null,
+        attendance: null
     }
 
     var assessment_status = {
@@ -62,7 +63,6 @@ $(function () {
     $('A#btnSaveActivity').on('click', (e) => {
         save_activities();
     });
-    
 
     var get_url_param = ($param_name) => {
         var hash;
@@ -116,6 +116,13 @@ $(function () {
         }, (data) => {
             student_data.activities = data;
             fill_activities(data);
+        });
+    }
+
+    var get_attendance_history = () => {
+        get('/api/student/attendance', {student_id: student_id} ,(data) => {
+            student_data.attendance = data;
+            fill_attendance(data);
         });
     }
 
@@ -294,12 +301,89 @@ $(function () {
 
     }
 
+    var fill_attendance = (data) => {
+        var container = $('DIV#box_attendance');
+        var table = $(container).find('TABLE > TBODY');
+        $(table).empty();
+
+        if (data.length > 0) {
+            for (var i = 0; i < data.length; i++) {
+                var cls = data[i];
+                
+                var class_cell = $('<td></td>', {
+                    'colspan': '6',
+                    'class': 'text-left',
+                    'html': '<h4>Lớp <b>' + cls.name + '</b></h4>'
+                });
+
+                var class_row = $('<tr></tr>').append(class_cell);
+
+                $(table).append(class_row);
+
+                if (cls.attendance.length > 0) {
+                    for (var x = 0; x < cls.attendance.length; x++) {
+                        var attend = cls.attendance[x];
+                        var attend_row = $('<tr></tr>');
+                        var td_num = $('<td></td>', {
+                            'text': x + 1
+                        });
+
+                        var td_date = $('<td></td>', {
+                            'text': attend.date
+                        });
+
+                        var td_present = $('<td></td>', {
+                            'html': attend.present !== '' ? '<i class="fa fa-check text-success" style="font-size: 1.5em"></i>' : ''
+                        });
+
+                        var td_absent = $('<td></td>', {
+                            'html': attend.absent !== '' ? '<i class="fa fa-check text-danger" style="font-size: 1.5em"></i>' : ''
+                        });
+
+                        var td_late = $('<td></td>', {
+                            'html': attend.late !== '' ? '<i class="fa fa-check text-warning" style="font-size: 1.5em"></i>' : ''
+                        });
+
+                        var td_note = $('<td></td>', {
+                            'text': attend.note
+                        });
+
+                        $(attend_row).append(td_num, td_date, td_present, td_absent, td_late, td_note);
+                        $(table).append(attend_row);
+                    }
+                }
+                else {
+                    var class_cell = $('<td></td>', {
+                        'colspan': '6',
+                        'class': 'text-center',
+                        'text': 'Không có dữ liệu'
+                    });
+        
+                    var class_row = $('<tr></tr>').append(class_cell);
+                    $(table).append(class_row);
+                }
+            }
+        }
+        else {
+            var class_cell = $('<td></td>', {
+                'colspan': '6',
+                'class': 'text-center',
+                'text': 'Không có dữ liệu'
+            });
+
+            var class_row = $('<tr></tr>').append(class_cell);
+            $(table).append(class_row);
+        }
+
+
+    }
+
     var get = (end_point, data, callback) => {
         $.ajax({
             url: end_point + '/?' + $.param(data, true),
             method: 'GET',
             dataType: 'json',
-            contentType: 'application/json',
+            //contentType: 'application/json',
             success: (response) => {
                 if (response.code == 1) {
                     callback(response.data);
@@ -411,6 +495,7 @@ $(function () {
             get_exam_results();
             get_teacher_reports();
             get_payment_history();
+            get_attendance_history();
         });
     }
 

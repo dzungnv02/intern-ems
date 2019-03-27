@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use \App\Attendance;
+use \App\StudentClass;
 
 class AttendanceController extends Controller
 {
@@ -40,6 +41,29 @@ class AttendanceController extends Controller
             return response()->json(['code' => 1, 'data' => $data], 200);
         } else {
             return response()->json(['code' => 0, 'result' => 'fail'], 200);
+        }
+    }
+
+    public function getAttendanceByStudent (Request $request) 
+    {
+        try {
+            $input = $request->all();
+            $student_id = $input['student_id'];
+            $attendance = [];
+    
+            $classes = StudentClass::getClassOfStudent($student_id);
+            $data = [];
+
+            if (count($classes)) {
+                foreach ($classes as $class) {
+                    $data[] = ['id' => $class->id, 'name' => $class->name, 'attendance' => Attendance::getAttendanceByStudent($student_id, $class->id)];
+                }
+            }
+
+            return response()->json(['code' => 1, 'data' => $data], 200);
+        }
+        catch(\Exception $e) {
+            return response()->json(['code' => 0, 'result' => 'fail', 'message' => $e->getMessage()], 200);
         }
     }
     
