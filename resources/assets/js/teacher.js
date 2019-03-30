@@ -262,9 +262,6 @@ $(function () {
     var show_add_schedule_modal = () => {
         if ($(modal_teacher_schedule).is(':visible')) {
             var teacher_id = $(modal_teacher_schedule).find('FORM#frmTeacher INPUT#teacher_id').val();
-
-            console.log('teacher_id', teacher_id);
-
             $(modal_teacher_schedule).removeClass("fade").modal("hide");
             $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val(teacher_id);
             $(modal_add_schedule).modal("show").addClass("fade");
@@ -316,6 +313,38 @@ $(function () {
         });
     }
 
+    var get_student_list = (callback) => {
+        $(student_id).empty();
+        $.ajax('/invoice/student-list', {
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (response) {
+                var student_target = $(modal_add_schedule).find('SELECT#student_id');
+                if (response.code == 0) {
+                    var first_val = null;
+                    if (response.data.list.length > 0) {
+                        for (var i = 0; i < response.data.list.length; i++) {
+                            var student = response.data.list[i];
+                            
+                            first_val = (first_val == null) ? student.id : first_val;
+                                                        
+                            var display_text = (student.student_code ? 'Code: <span class="text-bold">' + student.student_code + '</span> - ' : 'NO CODE - ') + student.name;
+                            var opt = $('<option></option>', {
+                                value: student.id,
+                                html: display_text
+                            });
+                            $(student_target).append(opt);
+                        }
+                        if (callback != undefined) {
+                            callback();
+                        }
+                    }
+                    $(modal_add_schedule).find('SELECT#appoinment_type').change();
+                }
+            }
+        });
+    }
+
     var add_teacher_schedule = (callback) => {
         var data = {};
         var form = $(modal_add_schedule).find('FORM#frmTeacherSchedule');
@@ -344,6 +373,19 @@ $(function () {
         });
     };
 
+    if ($(modal_add_schedule).length > 0) {
+        $(modal_add_schedule).find('SELECT#appoinment_type').on('change', (e) => {
+            var selected_type = $(e.target).children("option:selected").val();
+            if (selected_type == 2) {
+                $('DIV#related_class').addClass('hidden');
+                $('DIV#related_student').removeClass('hidden');
+            }
+            else {
+                $('DIV#related_student').addClass('hidden');
+                $('DIV#related_class').removeClass('hidden');
+            }
+        });
+    }
 
     if (table_teachers.length > 0) {
         getTeacherList('load');
@@ -385,6 +427,7 @@ $(function () {
         $(modal_add_schedule).on('show.bs.modal', (e) => {
             schedule_type_select();
             get_class_list();
+            get_student_list();
         })
     }
 

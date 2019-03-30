@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\TeacherSchedules;
 
 class Assessment extends Model
 {
@@ -28,6 +29,8 @@ class Assessment extends Model
     public static function insertAssessment ($data)
     {
         if (is_array($data) && count($data) > 0) {
+            TeacherSchedules::update_assesment_schedule($data['student_id'], $data['teacher_id'], $data['assessment_date']);
+
             $assessment = new Assessment;
             foreach($data as $field => $value) {
                 $assessment->$field = $value;
@@ -40,7 +43,10 @@ class Assessment extends Model
 
     public static function updateAssessment ($id, $data) 
     {
+
         if (is_array($data) && count($data) > 0) {
+            TeacherSchedules::update_assesment_schedule($data['student_id'], $data['teacher_id'], $data['assessment_date']);
+
             $assessment = Assessment::find($id);
             foreach($data as $field => $value) {
                 $assessment->$field = $value;

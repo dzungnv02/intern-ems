@@ -13,6 +13,7 @@ use App\Invoice;
 use App\Assessment;
 use App\Teacher;
 use App\Classes;
+use App\TeacherSchedules;
 use Illuminate\Http\Request;
 
 
@@ -189,17 +190,20 @@ class StudentController extends Controller
             $assessment = Assessment::getAssesmentOfStudent($inputs['student_id']);
             $assessment_data['student_id'] = $inputs['student_id'];
             $assessment_data['staff_id'] = $inputs['logged_user']->id;
+            
             if ($assessment) {
                 $result_assessment = Assessment::updateAssessment( $assessment->id, $assessment_data);
             }
             else {
                 $result_assessment = Assessment::insertAssessment($assessment_data);
             }
-
+           
         }
 
-        return response()->json(['code' => 1, 'data' => ['student'=>$result_student, 'assessment'=>$result_assessment], 'message' => 'Cap nhat thanh cong'], 200);
+        return response()->json(['code' => 1, 'data' => ['student'=>$result_student, 'assessment'=>$result_assessment, 'teacher_schedule' => $teacher_schedule], 'message' => 'Cap nhat thanh cong'], 200);
     }
+
+
     
     public function saveActivity (Request $request) 
     {
