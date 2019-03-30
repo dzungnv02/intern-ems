@@ -49223,7 +49223,7 @@ $(function () {
 			$(save_student_button).bind('click', function (e) {
 				$(e.target).button('loading');
 				$(e.target).prop('disabled', true);
-				save_student();
+				//save_student();
 			});
 
 			$(add_student_button).bind('click', function (e) {
@@ -49310,8 +49310,11 @@ $(function () {
 		};
 
 		var validate = function validate(data) {
-			var result = false;
-			if (data.student.name == '') {}
+			return true;
+			// var result = false;
+			// if (data.student.name == '') {
+
+			// }
 		};
 
 		var save_student = function save_student() {
@@ -49416,7 +49419,8 @@ $(function () {
         activities: null,
         exams: null,
         teacher_reports: null,
-        payment: null
+        payment: null,
+        attendance: null
     };
 
     var assessment_status = {
@@ -49435,9 +49439,10 @@ $(function () {
         '1': 'Làm assessment',
         '2': 'Học thử',
         '3': 'Nhập học chính thức',
-        '4': 'Chuyển lớp',
-        '5': 'Kiểm tra',
-        '6': 'Kết thúc'
+        '4': 'Đã gửi nội dung học 2 tuần tới',
+        '5': 'Chuyển lớp',
+        '6': 'Kiểm tra',
+        '7': 'Kết thúc'
     };
 
     if (tab_headers.length == 0) return false;
@@ -49515,6 +49520,13 @@ $(function () {
         }, function (data) {
             student_data.activities = data;
             fill_activities(data);
+        });
+    };
+
+    var get_attendance_history = function get_attendance_history() {
+        get('/api/student/attendance', { student_id: student_id }, function (data) {
+            student_data.attendance = data;
+            fill_attendance(data);
         });
     };
 
@@ -49683,12 +49695,85 @@ $(function () {
 
     var fill_payment_history = function fill_payment_history(data) {};
 
+    var fill_attendance = function fill_attendance(data) {
+        var container = $('DIV#box_attendance');
+        var table = $(container).find('TABLE > TBODY');
+        $(table).empty();
+
+        if (data.length > 0) {
+            for (var i = 0; i < data.length; i++) {
+                var cls = data[i];
+
+                var class_cell = $('<td></td>', {
+                    'colspan': '6',
+                    'class': 'text-left',
+                    'html': '<h4>Lớp <b>' + cls.name + '</b></h4>'
+                });
+
+                var class_row = $('<tr></tr>').append(class_cell);
+
+                $(table).append(class_row);
+
+                if (cls.attendance.length > 0) {
+                    for (var x = 0; x < cls.attendance.length; x++) {
+                        var attend = cls.attendance[x];
+                        var attend_row = $('<tr></tr>');
+                        var td_num = $('<td></td>', {
+                            'text': x + 1
+                        });
+
+                        var td_date = $('<td></td>', {
+                            'text': attend.date
+                        });
+
+                        var td_present = $('<td></td>', {
+                            'html': attend.present !== '' ? '<i class="fa fa-check text-success" style="font-size: 1.5em"></i>' : ''
+                        });
+
+                        var td_absent = $('<td></td>', {
+                            'html': attend.absent !== '' ? '<i class="fa fa-check text-danger" style="font-size: 1.5em"></i>' : ''
+                        });
+
+                        var td_late = $('<td></td>', {
+                            'html': attend.late !== '' ? '<i class="fa fa-check text-warning" style="font-size: 1.5em"></i>' : ''
+                        });
+
+                        var td_note = $('<td></td>', {
+                            'text': attend.note
+                        });
+
+                        $(attend_row).append(td_num, td_date, td_present, td_absent, td_late, td_note);
+                        $(table).append(attend_row);
+                    }
+                } else {
+                    var class_cell = $('<td></td>', {
+                        'colspan': '6',
+                        'class': 'text-center',
+                        'text': 'Không có dữ liệu'
+                    });
+
+                    var class_row = $('<tr></tr>').append(class_cell);
+                    $(table).append(class_row);
+                }
+            }
+        } else {
+            var class_cell = $('<td></td>', {
+                'colspan': '6',
+                'class': 'text-center',
+                'text': 'Không có dữ liệu'
+            });
+
+            var class_row = $('<tr></tr>').append(class_cell);
+            $(table).append(class_row);
+        }
+    };
+
     var get = function get(end_point, data, callback) {
         $.ajax({
             url: end_point + '/?' + $.param(data, true),
             method: 'GET',
             dataType: 'json',
-            contentType: 'application/json',
+            //contentType: 'application/json',
             success: function success(response) {
                 if (response.code == 1) {
                     callback(response.data);
@@ -49720,6 +49805,7 @@ $(function () {
         var form = $('FORM#frmStudent');
         var assessment_date = $(form).find('INPUT#assessment_date').val().trim();
         assessment_date = assessment_date == '' ? null : moment(assessment_date).format("YYYY-MM-DD HH:mm:ss");
+        console.log(assessment_date);
         var data = {
             'student_id': student_id,
             'student': {
@@ -49798,6 +49884,7 @@ $(function () {
             get_exam_results();
             get_teacher_reports();
             get_payment_history();
+            get_attendance_history();
         });
     };
 
@@ -52378,9 +52465,6 @@ $(function () {
     var show_add_schedule_modal = function show_add_schedule_modal() {
         if ($(modal_teacher_schedule).is(':visible')) {
             var teacher_id = $(modal_teacher_schedule).find('FORM#frmTeacher INPUT#teacher_id').val();
-
-            console.log('teacher_id', teacher_id);
-
             $(modal_teacher_schedule).removeClass("fade").modal("hide");
             $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val(teacher_id);
             $(modal_add_schedule).modal("show").addClass("fade");
@@ -52429,6 +52513,38 @@ $(function () {
         });
     };
 
+    var get_student_list = function get_student_list(callback) {
+        $(student_id).empty();
+        $.ajax('/invoice/student-list', {
+            type: 'GET',
+            contentType: 'application/json',
+            success: function success(response) {
+                var student_target = $(modal_add_schedule).find('SELECT#student_id');
+                if (response.code == 0) {
+                    var first_val = null;
+                    if (response.data.list.length > 0) {
+                        for (var i = 0; i < response.data.list.length; i++) {
+                            var student = response.data.list[i];
+
+                            first_val = first_val == null ? student.id : first_val;
+
+                            var display_text = (student.student_code ? 'Code: <span class="text-bold">' + student.student_code + '</span> - ' : 'NO CODE - ') + student.name;
+                            var opt = $('<option></option>', {
+                                value: student.id,
+                                html: display_text
+                            });
+                            $(student_target).append(opt);
+                        }
+                        if (callback != undefined) {
+                            callback();
+                        }
+                    }
+                    $(modal_add_schedule).find('SELECT#appoinment_type').change();
+                }
+            }
+        });
+    };
+
     var add_teacher_schedule = function add_teacher_schedule(callback) {
         var data = {};
         var form = $(modal_add_schedule).find('FORM#frmTeacherSchedule');
@@ -52456,6 +52572,19 @@ $(function () {
             }
         });
     };
+
+    if ($(modal_add_schedule).length > 0) {
+        $(modal_add_schedule).find('SELECT#appoinment_type').on('change', function (e) {
+            var selected_type = $(e.target).children("option:selected").val();
+            if (selected_type == 2) {
+                $('DIV#related_class').addClass('hidden');
+                $('DIV#related_student').removeClass('hidden');
+            } else {
+                $('DIV#related_student').addClass('hidden');
+                $('DIV#related_class').removeClass('hidden');
+            }
+        });
+    }
 
     if (table_teachers.length > 0) {
         getTeacherList('load');
@@ -52497,6 +52626,7 @@ $(function () {
         $(modal_add_schedule).on('show.bs.modal', function (e) {
             schedule_type_select();
             get_class_list();
+            get_student_list();
         });
     }
 
@@ -52522,9 +52652,11 @@ $(function () {
     var tab_col = $(tab_headers).find('LI');
     var actived_tab = $(tab_contents).find("DIV[role='tabpanel'].active");
     var invoice_list_table = null;
+    var students = {};
 
     var student_id = $('FORM#frmTutorFee SELECT.select2[id="student_id"]');
     var class_id = $('FORM#frmTutorFee SELECT.select2[id="class_id"]').select2();
+    var prepaid = $('FORM#frmTutorFee INPUT#prepaid');
 
     var student_other_id = $('FORM#frmOtherFee SELECT.select2[id="student_id"]').select2();
     var class_other_id = $('FORM#frmOtherFee SELECT.select2[id="class_id"]').select2();
@@ -52569,11 +52701,12 @@ $(function () {
                 if (response.code == 0) {
                     var first_val = null;
                     if (response.data.list.length > 0) {
-
                         for (var i = 0; i < response.data.list.length; i++) {
                             var student = response.data.list[i];
 
                             first_val = first_val == null ? student.id : first_val;
+
+                            students[student.id] = student;
 
                             var display_text = (student.student_code ? 'Code: <span class="text-bold">' + student.student_code + '</span> - ' : 'NO CODE - ') + student.name;
                             var opt = $('<option></option>', {
@@ -52584,7 +52717,6 @@ $(function () {
                         }
                         if (callback != undefined) {
                             callback(first_val, class_target);
-                            console.log(class_target);
                         }
                     }
                 }
@@ -52593,7 +52725,6 @@ $(function () {
     };
 
     var get_class_list = function get_class_list(std_id, target, callback) {
-        console.log(target);
         $(target).empty();
         $.ajax('/invoice/class-list?student_id=' + std_id, {
             type: 'GET',
@@ -52609,7 +52740,7 @@ $(function () {
                             });
                             $(target).append(opt);
                         }
-                        $($(target).find('OPTION')[0]).attr('selected', 'selected');
+                        $(frmTutorFee).find('INPUT#price').val(numeral(response.data.list[0].price).format('0,0'));
                         toggle_tuition_frmTutorFee(true);
                     } else {
                         var opt = $('<option></option>', {
@@ -52617,13 +52748,27 @@ $(function () {
                             html: 'Chưa có lớp'
                         });
                         $(target).append(opt);
-                        $($(target).find('OPTION')[0]).attr('selected', 'selected');
-                        if (callback != undefined) {
-                            callback();
-                        }
+                    }
+                    $($(target).find('OPTION')[0]).attr('selected', 'selected');
+                    if (callback != undefined) {
+                        callback();
                     }
                 }
             }
+        });
+    };
+
+    var get_parent_list = function get_parent_list(student_id, callback) {
+        $(frmTutorFee).find('INPUT#payer').val('');
+        $.get('/api/parent/list', {
+            student_id: student_id
+        }, function (response) {
+            for (var i = 0; i < response.data.length; i++) {
+                if (response.data[i].id === students[student_id].parent_id) {
+                    $(frmTutorFee).find('INPUT#payer').val(response.data[i].fullname);
+                }
+            }
+            if (callback != undefined) callback();
         });
     };
 
@@ -52787,6 +52932,12 @@ $(function () {
         return is_valided;
     };
 
+    var get_last_tutor_invoice_duration = function get_last_tutor_invoice_duration(student_id, class_id, callback) {
+        $.ajax({
+            url: '/invoice/get-last-invoice/' + student_id + '/' + class_id
+        });
+    };
+
     var invoice_list_init = function invoice_list_init() {
         if ($.fn.dataTable.isDataTable('TABLE#invoice-list')) {
             invoice_list_table = $('TABLE#invoice-list').DataTable();
@@ -52919,9 +53070,17 @@ $(function () {
             }
         });
 
+        //$(prepaid).on('');
+
+        $(class_id).on('change', function (e) {
+            console.log(e.target);
+        });
+
         $(student_id).on('change', function (e) {
-            get_class_list($(student_id).val(), $(class_id), function () {
-                toggle_tuition_frmTutorFee(false);
+            get_parent_list($(student_id).val(), function () {
+                get_class_list($(student_other_id).val(), $(class_id), function () {
+                    toggle_tuition_frmTutorFee(false);
+                });
             });
         });
 

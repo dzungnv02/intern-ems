@@ -9,3 +9,12 @@ iframe#invoice-preview {
   height: 100%;
 }
 
+.box-title {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  padding: 10px;
+  font-weight: bold;
+}
+

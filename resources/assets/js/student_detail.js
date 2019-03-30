@@ -415,6 +415,7 @@ $(function () {
         var form = $('FORM#frmStudent');
         var assessment_date = $(form).find('INPUT#assessment_date').val().trim();
         assessment_date = assessment_date == '' ? null : moment(assessment_date).format("YYYY-MM-DD HH:mm:ss");
+        console.log(assessment_date);
         var data = {
             'student_id': student_id,
             'student': {
