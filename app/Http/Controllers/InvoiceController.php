@@ -6,9 +6,14 @@ use App\Classes;
 use App\Invoice;
 use App\Student;
 use App\StudentClass;
+use App\Parents;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\InvoicePrinted;
+
+use PDF;
 
 class InvoiceController extends Controller
 {
@@ -130,40 +135,88 @@ class InvoiceController extends Controller
 
     public function print_invoice($id, $act)
     {
-        $invoice = Invoice::findOrfail($id)->toArray();
-        $student = Student::findOrfail($invoice['student_id']);
-        $class = Classes::findOrfail($invoice['class_id']);
-        $user = User::findOrfail($invoice['created_by']);
+        $invoice = Invoice::findOrfail($id);
 
-        $invoice['student_name'] = $student->name;
-        $invoice['student_code'] = $student->student_code;
-        $invoice['class_name'] = $class->name;
-        $invoice['discount'] = (int) $invoice['discount'];
-        $invoice['prepaid'] = $invoice['prepaid'] ? $invoice['prepaid'] : 0;
-        $invoice['amount_text'] = $invoice['amount'] ? $this->number_to_words($invoice['amount']) : 0;
-        $invoice['created_by_name'] = $user->name;
+        $invoice_data = $invoice->toArray();
 
-        $invoice['amount'] = number_format ( $invoice['amount'] , 0 , '' , ',' );
-        $invoice['prepaid'] = number_format ( $invoice['prepaid'] , 0 , '' , ',' );
-        
-        $invoice['start_date'] = date('d/m/Y', strtotime($invoice['start_date']));
-        $invoice['end_date'] = date('d/m/Y', strtotime($invoice['end_date']));
-        $invoice['created_at'] = date('d/m/Y H:i', strtotime($invoice['created_at']));
-        $invoice['act'] = $act;
+        $student = Student::findOrfail($invoice_data['student_id']);
+        $class = Classes::findOrfail($invoice_data['class_id']);
+        $user = User::findOrfail($invoice_data['created_by']);
 
-        if ($act == 'print') {
-            $clone_invoice = Invoice::find($id);
-            if ($clone_invoice->invoice_status == 0) {
-                $clone_invoice->invoice_status = 1;
-            } else if ($clone_invoice->invoice_status == 1) {
-                $clone_invoice->invoice_status = 2;
-            }
-            $clone_invoice->save();
+        $resource_path = dirname(app_path()).'/public/';
+
+        $ary_css_files = [
+            $resource_path.'admin/bootstrap/css/bootstrap.min.css',
+            $resource_path.'admin/font-awesome/css/font-awesome.min.css',
+            $resource_path.'admin/Ionicons/css/ionicons.min.css',
+            $resource_path.'admin/css/AdminLTE.css',
+        ];
+
+        $css = '';
+
+        foreach($ary_css_files as $file) {
+            $css .= file_get_contents( $file) . "\n";
         }
 
-        $view = ((int)$invoice['type'] == 1) ? 'invoice/detail/tutorfee_print' : 'invoice/detail/otherfee_print';
+        $invoice_data['css'] = $css;
+
+        $invoice_data['student_name'] = $student->name;
+        $invoice_data['student_code'] = $student->student_code;
+        $invoice_data['class_name'] = $class->name;
+        $invoice_data['discount'] = (int) $invoice_data['discount'];
+        $invoice_data['prepaid'] = $invoice_data['prepaid'] ? $invoice_data['prepaid'] : 0;
+        $invoice_data['amount_text'] = $invoice_data['amount'] ? $this->number_to_words($invoice_data['amount']) : 0;
+        $invoice_data['created_by_name'] = $user->name;
+
+        $invoice_data['amount'] = number_format ( $invoice_data['amount'] , 0 , '' , ',' );
+        $invoice_data['prepaid'] = number_format ( $invoice_data['prepaid'] , 0 , '' , ',' );
         
-        return view( $view, $invoice);
+        $invoice_data['start_date'] = date('d/m/Y', strtotime($invoice_data['start_date']));
+        $invoice_data['end_date'] = date('d/m/Y', strtotime($invoice_data['end_date']));
+        $invoice_data['created_at'] = date('d/m/Y H:i', strtotime($invoice_data['created_at']));
+        $invoice_data['act'] = $act;
+        //$invoice_data['logo'] = 'data:image/png;base64, ' . base64_encode(file_get_contents($resource_path.'images/logo.png'));
+
+        $view = ((int)$invoice_data['type'] == 1) ? 'invoice/detail/tutorfee_print' : 'invoice/detail/otherfee_print';
+        $view_pdf = ((int)$invoice_data['type'] == 1) ? 'invoice/detail/tutorfee_print_pdf' : 'invoice/detail/otherfee_print';
+
+        $content = view( $view, $invoice_data);
+        $content_pdf = view( $view_pdf, $invoice_data);
+
+        if ($act == 'print') {
+            if ($invoice->invoice_status == 0) {
+                $invoice->invoice_status = 1;
+            } else if ($invoice->invoice_status == 1) {
+                $invoice->invoice_status = 2;
+            }
+        }
+
+        $invoice->invoice_content = $content_pdf;
+        $invoice->save();
+
+        if ($act == 'print') {
+            $this->send_invoice($invoice->id);
+        }
+        
+        return $content;
+    }
+
+    public function send_invoice($id) 
+    {
+        $invoice = Invoice::findOrfail($id);
+        $student = Student::findOrfail($invoice->student_id);
+        if ($student->parent_id == null) {
+            return false;
+        }
+
+        $parent = Parents::findOrfail($student->parent_id);
+        $to = $parent->email;
+
+        if ($to == null) {
+            $to = 'dungnv02@gmail.com';
+        }
+
+        Mail::to($to)->send(new InvoicePrinted($invoice));
     }
 
     public function calc_prepaid_tutor_fee ($student_id, $class_id)

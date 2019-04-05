@@ -161,7 +161,7 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         Webpatser\Countries\CountriesServiceProvider::class,
-
+        Barryvdh\Snappy\ServiceProvider::class,
     ],
 
     /*
@@ -211,6 +211,9 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Countries' => Webpatser\Countries\CountriesFacade::class,
+
+        'PDF' => Barryvdh\Snappy\Facades\SnappyPdf::class,
+        'SnappyImage' => Barryvdh\Snappy\Facades\SnappyImage::class,
     ],
 
     'teacher_schedule_type' => [
