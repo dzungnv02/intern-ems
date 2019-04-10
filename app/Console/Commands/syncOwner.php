@@ -13,7 +13,7 @@ class syncOwner extends Command
      *
      * @var string
      */
-    protected $signature = 'zoho:owner {--syncbranch}';
+    protected $signature = 'zoho:owner {--syncbranch} {--owner=}';
 
     /**
      * The console command description.
@@ -47,7 +47,6 @@ class syncOwner extends Command
 
         $zoho_crm = new ZohoCrmConnect();
         $users = $zoho_crm->getUsers();
-        
 
         $option = $this->option('syncbranch');
         if ($option) {
@@ -56,14 +55,12 @@ class syncOwner extends Command
                     $result = Branch::getBranchByEmail($user_crm->email);
                     $branch = count($result) > 0 ?  Branch::find($result[0]->id) : null;
                     if ($branch != null) {
-                        $branch->crm_owner_id = $user_crm->id;
+                        $branch->crm_owner = $user_crm->id;
                         $branch->crm_owner_name = $user_crm->full_name;
                         $branch->update();
                     }
                 }
             }
-            
         }
-
     }
 }

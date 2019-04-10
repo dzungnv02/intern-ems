@@ -57,8 +57,11 @@ class TeacherSchedules extends Model
         $student = Student::find($student_id);
         $note = 'Kiểm tra đầu vào cho học sinh '. $student->name;
         $end_time = date('Y-m-d H:i', strtotime($assessment_date . ' +1hour'));
-        $data = ['teacher_id' => $teacher_id, 'start_time' =>  $assessment_date, 'end_time' => $end_time, 'student_id' => $student_id, 'desc' => $note, 'appoinment_type' => 2];
-        return self::insert($data);
+        if ($teacher_id !== null) {
+            $data = ['teacher_id' => $teacher_id, 'start_time' =>  $assessment_date, 'end_time' => $end_time, 'student_id' => $student_id, 'desc' => $note, 'appoinment_type' => 2];
+            return self::insert($data);
+        }
+        return false;
     }
 
     public static function check_teacher_busy ($teacher_id, $appoinment_time) 

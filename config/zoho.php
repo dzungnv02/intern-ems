@@ -112,6 +112,16 @@ return [
             'Description' => 'note',
             'start_date' => 'start_date',
         ],
+        'ZOHO_MODULE_EMS_BRANCH' => [
+            'id' => 'crm_id',
+            'Owner' => 'crm_owner_name',
+            'Name' => 'branch_name',
+            'address' => 'address',
+            'Hotline' => 'phone_1',
+            'phone' => 'phone_2',
+            'Email' => 'email',
+            'Secondary_Email' => 'email_2',
+        ],
     ],
     'RELATED_LIST' => [
         'Accounts' => 'Deals',

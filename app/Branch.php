@@ -11,7 +11,7 @@ class Branch extends Model
 
     public static function getBranchs()
     {
-        return DB::table('branch')->select('*')->get()->toArray();
+        return DB::table('branch')->select('*')->orderBy('city', 'DESC')->get()->toArray();
     }
 
     public static function getBranch($branch_id)
