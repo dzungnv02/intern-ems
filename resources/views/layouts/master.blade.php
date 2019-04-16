@@ -9,9 +9,10 @@
   <!-- Bootstrap 3.3.7 -->
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="user-id" content="{{ Auth::user()->id }}">
-  <meta name="user-name" content="{{ Auth::user()->name }}">
+  <meta name="user-name" content="{{ utf8_encode(Auth::user()->name) }}">
   <meta name="user-email" content="{{ Auth::user()->email }}">
   <meta name="user-branch_id" content="{{ Auth::user()->branch_id }}">
+  <meta name="user-role" content="{{ Auth::user()->role }}">
   <link rel="stylesheet" href="{{asset('admin/bootstrap/css/bootstrap.min.css')}}">
   <link rel="stylesheet" href="{{asset('css/app.css')}}">
 

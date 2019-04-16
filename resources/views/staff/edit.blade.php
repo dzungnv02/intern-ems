@@ -64,14 +64,14 @@
  			<span id="errorPhone" class="bell errorPhone">Số điện thoại không đúng định dạng!</span>
  		</div>
  	</div>
- 	<div class="form-group row">
+ 	{{--  <div class="form-group row">
  		<label for="inputPassword3" class="col-sm-2 col-form-label">Hình ảnh *</label>
  		<div class="col-sm-8">
  			<input type="file" class="form-control" id="inputFile">
  			<span id="errorImg" class="bell errorImg">Ảnh không đúng định dạng!</span>
  			<img src="" alt="" id="showImg" style="">
  		</div>
- 	</div>
+ 	</div>  --}}
  	<div class="form-group row">
  		<div class="col-sm-2">
  			<button type="button" class="btn btn-primary" id="editStaff_1">Sửa nhân viên</button>

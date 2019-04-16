@@ -3,9 +3,12 @@ namespace App;
 
 use DB;
 use Illuminate\Database\Eloquent\Model;
+use App\AccessControl\Scopes\CrmOwnerTrait;
 
 class Teacher extends Model
 {
+    use CrmOwnerTrait;
+
     protected $table = 'teachers';
     protected $fillable = ['name', 'del_flg', 'birthdate', 'mobile', 'email', 'address', 'experience', 'certificate', 'description', 'nationality'];
 

@@ -10,10 +10,12 @@ try {
 
     var user_info = {
         id: $('meta[name="user-id"]').attr('content'),
-        name: $('meta[name="user-name"]').attr('content'),
+        name: btoa($('meta[name="user-name"]').attr('content')),
         email: $('meta[name="user-email"]').attr('content'),
-        branch: $('meta[name="user-branch_id"]').attr('content')
+        branch: $('meta[name="user-branch_id"]').attr('content'),
+        role: $('meta[name="user-role"]').attr('content')
     }
+    
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),

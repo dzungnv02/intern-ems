@@ -35,7 +35,15 @@
  			<input type="text" class="form-control" id="inputName" placeholder="Tên nhân viên ">
  			<span id="errorName" class="bell errorName">Tên nhân viên không được bỏ trống!</span>
  		</div>
- 	</div>
+	 </div>
+	 <div class="form-group row">
+		<label for="inputPassword3" class="col-sm-2 col-form-label">Chi nhánh *</label>
+		<div class="col-sm-8">
+			<select id="branch_id">
+				<option value="">[Chọn chi nhánh]</option>
+			</select>
+		</div>
+	</div>
  	<div class="form-group row">
  		<label for="inputPassword3" class="col-sm-2 col-form-label">Giới tính *</label>
  		<div class="col-sm-8">
@@ -47,7 +55,7 @@
  		</div>
  	</div>
  	<div class="form-group row">
- 		<label for="inputPassword3" class="col-sm-2 col-form-label">Ngay Sinh *</label>
+ 		<label for="inputPassword3" class="col-sm-2 col-form-label">Ngày Sinh *</label>
  		<div class="col-sm-8">
  			<input type="date" class="form-control" id="inputBirthDate">
  		</div>
@@ -65,14 +73,7 @@
  			<span id="errorPhone" class="bell errorPhone">Số điện thoại không đúng định dạng!</span>
  		</div>
  	</div>
- 	<div class="form-group row">
- 		<label for="inputPassword3" class="col-sm-2 col-form-label">Hình ảnh *</label>
- 		<div class="col-sm-8">
- 			<input type="file" class="form-control" id="inputFile">
- 			<span id="errorImg" class="bell errorImg">Ảnh không đúng định dạng!</span>
- 			<img src="" alt="" id="showImg" style="">
- 		</div>
- 	</div>
+ 	
  	<div class="form-group row">
  		<div class="col-sm-2">
  			<button class="btn btn-primary" id="addStaff" type="button">Thêm nhân viên</button>

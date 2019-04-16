@@ -1,20 +1,24 @@
 <?php
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Facades\DB;
+use App\AccessControl\Scopes\CrmOwnerTrait;
+use App\Student;
 
-class Invoice extends Model
+class Invoice extends Eloquent
 {
+    use CrmOwnerTrait;
+
     protected $table = 'rev_n_exp';
 
     public static function get_list_invoice()
     {
-        return DB::table('rev_n_exp')
-            ->select('rev_n_exp.*', 'students.name as std_name', 'students.student_code', 'classes.name as c_name')
-            ->join('students', 'rev_n_exp.student_id', '=', 'students.id')
-            ->join('classes', 'rev_n_exp.class_id', '=', 'classes.id')
-            ->get();
+
+        return Student::select('rev_n_exp.*', 'students.name as std_name', 'students.student_code', 'classes.name as c_name')
+                        ->join('rev_n_exp', 'rev_n_exp.student_id', '=', 'students.id')
+                        ->join('classes', 'rev_n_exp.class_id', '=', 'classes.id')
+                        ->get();
     }
 
     public static function get_last_tutor_duration($student_id, $class_id)
