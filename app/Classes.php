@@ -6,9 +6,11 @@ use Course;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use TimeTable;
+use App\AccessControl\Scopes\CrmOwnerTrait;
 
 class Classes extends Model
 {
+    use CrmOwnerTrait;
     protected $table = 'classes';
     protected $fillable = ['name', 'branch_id', 'status', 'schedule', 'time', 'teacher_id', 'course_id', 'course_name', 'price', 'max_seat', 'created_at', 'updated_at'];
 

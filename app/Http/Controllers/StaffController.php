@@ -27,6 +27,7 @@ class StaffController extends Controller
         $all = Staff::Search($keyword, $record_per_page, $page);
         return response()->json(['code' => 1, 'message' => 'ket qua', 'data' => $all], 200);
     }
+    
     /**
      * Create a function deleteStaff
      *
@@ -51,17 +52,6 @@ class StaffController extends Controller
      */
     public function addStaff(Request $request)
     {
-
-        if (($request->hasFile('file'))) {
-            //$destinationPath = 'app/public/';
-            $destinationPath = storage_path('app/public/');
-            $extension = $request->file('file')->getClientOriginalExtension();
-            $tempName = $request->file("file")->getClientOriginalName();
-            $fileName = uniqid("MW") . '.' . $extension;
-            $request->file('file')->move($destinationPath, $fileName);
-            $imagepath = $destinationPath . '/' . $fileName;
-        }
-
         $dataStaff = array(
             'email' => $request->email,
             'password' => $request->password,
@@ -70,7 +60,7 @@ class StaffController extends Controller
             'birth_date' => $request->birth_date,
             'address' => $request->address,
             'phone_number' => $request->phone_number,
-            'image' => $fileName,
+            'branch_id' => $request->branch_id,
             'created_at' => date("Y-m-d"),
         );
 

@@ -19,9 +19,9 @@ public static function addStaff($data){
         'address' => $data['address'],
         'phone_number' => $data['phone_number'],
         'birth_date' => $data['birth_date'],
-        'image' => $data['image'],    
+        'branch_id' => $data['branch_id'],
         'created_at' => $data['created_at'],
-        'password' => $data['password'],
+        'password' => bcrypt($data['password']),
     ],
 ]);
     return $staff;

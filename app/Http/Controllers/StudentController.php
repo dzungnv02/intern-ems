@@ -15,6 +15,8 @@ use App\Teacher;
 use App\Classes;
 use App\TeacherSchedules;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+
 
 
 class StudentController extends Controller
@@ -30,16 +32,21 @@ class StudentController extends Controller
         $record = $request->record;
         $keyword = $request->keyword;
         $page = $request->page;
+
+        $student_model = new Student($request->logged_user->crm_owner);
+
         if ($record == "") {
             $record = 10;
         }
-        $sum_row = count(Student::all());
+
+        $sum_row = count($student_model->all());
         $sum_page = ceil($sum_row / $record);
         if ($page > $sum_page || !is_numeric($page)) {
             $page = 1;
         }
-        $all = Student::Search($keyword, $record, $page);
-        return response()->json(['code' => 1, 'message' => 'ket qua', 'data' => $all], 200);
+        $all = $student_model->search($keyword, $record, $page);
+
+        return response()->json(['code' => 1, 'message' => 'ket qua', 'data' => $all, 'user_info' => $request->logged_user], 200);
     }
 
     /**

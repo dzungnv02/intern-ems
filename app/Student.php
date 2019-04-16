@@ -2,14 +2,30 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model as Eloquent;
 use DB;
+use Illuminate\Support\Facades\Auth;
+use App\AccessControl\Scopes\CrmOwnerTrait;
 
-class Student extends Model
+
+class Student extends Eloquent
 {
+    use CrmOwnerTrait;
+
 	protected $table = 'students';
     protected $fillable = ['name','email','address','mobile','birthday','birthyear','parent_id','gender','created_at','updated_at'];
     
+    protected static function boot()
+    {
+        parent::boot();
+    }
+
+    public function __construct($crm_owner = '', $attributes = [])
+    {
+        parent::__construct($attributes);
+        $this->_crm_owner = $crm_owner;
+    }
+
     /**
      * Hiển thị danh sách các bản ghi.
      *
@@ -19,17 +35,9 @@ class Student extends Model
      * @return $search
      */
 	public static function search($keyword, $record,$page = 1){
-        $start = ($page - 1) * $record;
-        /* $search = Student::orderBy('id','desc')->where('name','like','%'.$keyword.'%')
-                                ->orwhere('email','like','%'.$keyword.'%')
-	                            ->orwhere('student_code','like','%'.$keyword.'%')
-	                            ->orwhere('address','like','%'.$keyword.'%')
-	                            ->orwhere('mobile','like','%'.$keyword.'%')
-                                ->get(); */
+        //$start = ($page - 1) * $record;
 
-        
-        $search = DB::table('students')
-                    ->select('students.*', 'parents.fullname as parent_name', 'classes.name as class_name')
+        $search = Student::select('students.*', 'parents.fullname as parent_name', 'classes.name as class_name')
                     ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
                     ->leftJoin('classes', 'classes.id', '=', 'students.current_class')
                     ->where('students.name','like','%'.$keyword.'%')
