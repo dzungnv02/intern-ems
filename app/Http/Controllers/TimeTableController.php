@@ -107,7 +107,13 @@ class TimeTableController extends Controller
         $start_date = $input['start_date'];
         $end_date = $input['end_date'];
 
-        $class = Classes::find($class_id)->toArray();
+
+        $class = Classes::select('classes.*')
+                ->join('branch', 'classes.branch_id', '=', 'branch.id')
+                ->where('classes.id', '=', $class_id)
+                ->first()
+                ->toArray();
+
         $holidays = Holiday::pluckHolidays();
         $schedule = $class['schedule'] ? json_decode($class['schedule'], true) : [];
 

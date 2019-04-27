@@ -11,8 +11,8 @@ $(function () {
 			if ($.fn.dataTable.isDataTable('TABLE#list-student')) {
 				table_student = $('TABLE#list-student').DataTable();
 			} else {
-				var buttons = '<button title="thêm học sinh vào lớp" class="btn btn-primary assign-to-class"><i class="fa fa-plus" aria-hidden="true"></i></button>\
-							<button title="sửa học sinh" class="edit-student btn btn-warning"><i class="fa fa-pencil" aria-hidden="true"></i></button>\
+				var buttons = '<button title="thêm học sinh vào lớp" class="btn btn-primary assign-to-class hidden"><i class="fa fa-plus" aria-hidden="true"></i></button>\
+							<button title="Hồ sơ chi tiết học sinh" class="edit-student btn btn-warning"><i class="fa fa-pencil" aria-hidden="true"></i></button>\
 							<button title="xóa học sinh" class="del-student btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>';
 				table_student = $('#list-student').DataTable({
 					language: datatable_language,
