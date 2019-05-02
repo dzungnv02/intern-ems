@@ -23,7 +23,7 @@ trait CrmOwnerTrait
 	public function getRole()
 	{
 		$all = app('Illuminate\Http\Request')->all();
-		return $all['logged_user']->role;
+		return isset($all['logged_user']) ? $all['logged_user']->role : 1;
 	}
 
 	public function getQualifiedCrmOwnerColumn()
