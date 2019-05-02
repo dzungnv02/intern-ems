@@ -23,7 +23,7 @@ class Student extends Eloquent
     public function __construct($crm_owner = '', $attributes = [])
     {
         parent::__construct($attributes);
-        $this->_crm_owner = $crm_owner;
+        //$this->_crm_owner = $crm_owner;
     }
 
     /**
