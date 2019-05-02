@@ -19,7 +19,7 @@ class CrmOwnerScope implements ScopeInterface
         $owner_id = $model->getOwner();
         $role = $model->getRole();
         $column = $model->getQualifiedCrmOwnerColumn();
-        if ($role != 1) {
+        if ($role != 1 && $owner_id != null) {
             $builder->where($column, 'like', '%' . $owner_id . '%');
         }
     }

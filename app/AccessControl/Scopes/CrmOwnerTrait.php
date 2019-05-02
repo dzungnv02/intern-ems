@@ -17,7 +17,7 @@ trait CrmOwnerTrait
 	public function getOwner()
 	{
 		$all = app('Illuminate\Http\Request')->all();
-		return $all['logged_user']->crm_owner;
+		return isset($all['logged_user']) ? $all['logged_user']->crm_owner : null;
 	}
 
 	public function getRole()
