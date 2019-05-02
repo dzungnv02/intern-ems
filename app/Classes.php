@@ -130,7 +130,9 @@ class Classes extends Model
 
     public static function getEditClass($idClass)
     {
-        $infoClass = Classes::where('id', $idClass)->select("*")->first();
+        $infoClass = Classes::where('classes.id', $idClass)->select("classes.*")
+                    ->join('branch', 'classes.branch_id', '=', 'branch.id')
+                    ->first();
         return $infoClass;
     }
 
@@ -172,7 +174,8 @@ class Classes extends Model
 
     public static function findStudentOfClass($class_id, $student_id)
     {
-        $result = StudentClass::where('student_id', $student_id)->where('class_id', $class_id)->get();
+        $result = StudentClass::where('student_id', $student_id)
+                    ->where('class_id', $class_id)->get();
         return $result->count();
     }
     /**
@@ -185,7 +188,9 @@ class Classes extends Model
 
     public static function createTimeTable($dataTimeTable, $classCode)
     {
-        $idClass = Classes::whereclass_code($classCode)->first();
+        $idClass = Classes::whereclass_code($classCode)
+                    ->join('branch', 'classes.branch_id', '=', 'branch.id')
+                    ->first();
         $timeTable = DB::table('timetables')->insert(
             [
                 'week_days' => $dataTimeTable['week_days'],

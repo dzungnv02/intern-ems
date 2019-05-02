@@ -17,13 +17,13 @@ trait CrmOwnerTrait
 	public function getOwner()
 	{
 		$all = app('Illuminate\Http\Request')->all();
-		return $all['logged_user']->crm_owner;
+		return isset($all['logged_user']) ? $all['logged_user']->crm_owner : null;
 	}
 
 	public function getRole()
 	{
 		$all = app('Illuminate\Http\Request')->all();
-		return $all['logged_user']->role;
+		return isset($all['logged_user']) ? $all['logged_user']->role : 1;
 	}
 
 	public function getQualifiedCrmOwnerColumn()

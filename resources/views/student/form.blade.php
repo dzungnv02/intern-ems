@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-	Thông tin chi tiết học sinh
+	Hồ sơ chi tiết của học sinh
 @endsection
 @section('breadcrumb')
 	<li class="active">Danh sách học sinh</li>
