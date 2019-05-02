@@ -23,7 +23,7 @@ class Classes extends Model
     public static function getListClass($keyword = null, $record = 0, $page = 1)
     {
         $start = ($page - 1) * $record;
-        $listClass = Classes::join('teachers', 'teachers.id', '=', 'classes.teacher_id')
+        $listClass = Classes::leftJoin('teachers', 'teachers.id', '=', 'classes.teacher_id')
             ->leftJoin('branch','branch.id', '=', 'classes.branch_id' )
             ->leftJoin('student_classes', 'student_classes.class_id', '=', 'classes.id')
             ->select('classes.*', 'teachers.name as teacher_name', 'branch.branch_name', DB::raw('count(student_id) as seat_count'))
