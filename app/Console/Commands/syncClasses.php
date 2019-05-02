@@ -268,6 +268,7 @@ class syncClasses extends Command
         }
         catch(\Exception $e) {
             $this->info('Has error!');
+            $this->info($e->getMessage());
         }
     }
 
