@@ -252,7 +252,9 @@ class syncClasses extends Command
                 $this->info($cls->name);
                 $crm_students = $zoho_crm->getRelatedList($crm_module, data_get($cls, 'crm_id'), 'Deal');
                 $count = $crm_students ? count($crm_students) : 0;
+
                 $this->info('Class '. $cls->name. ' has '. $count . ' student(s)');
+
                 if ($count) {
                     foreach($crm_students as $student) {
                         $ems_student = Student::where('crm_id', data_get($student, 'id'))->first();
