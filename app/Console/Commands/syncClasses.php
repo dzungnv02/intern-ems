@@ -258,11 +258,9 @@ class syncClasses extends Command
                 if ($count) {
                     foreach($crm_students as $student) {
                         $ems_student = Student::where('crm_id', data_get($student, 'id'))->first();
+
                         if ($ems_student != null) {
-                            $map = new StudentClass;
-                            $map->student_id = data_get($ems_student, 'id');
-                            $map->class_id = data_get($cls, 'id');
-                            $map->save();
+                            StudentClass::assignClass(data_get($cls, 'id'), data_get($ems_student, 'id'));
                         }
                     }
                 }
