@@ -30,12 +30,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('zoho:teacher --getlist')->everyMinute();
-        $schedule->command('zoho:student --getlist')->everyMinute();
-        $schedule->command('zoho:parent --getlist')->everyMinute();
-        $schedule->command('zoho:student --map_parent')->everyMinute();
-        $schedule->command('zoho:classes --getlist')->everyMinute();
-        $schedule->command('zoho:classes --map_student')->everyMinute();
+        $schedule->command('zoho:teacher --getlist')->hourly();
+        $schedule->command('zoho:student --getlist')->everyFifteenMinutes();
+        $schedule->command('zoho:parent --getlist')->hourly();
+        $schedule->command('zoho:student --map_parent')->hourly();
+        $schedule->command('zoho:classes --getlist')->dailyAt('23:00');
+        $schedule->command('zoho:classes --map_student')->dailyAt('23:15');
     }
 
     /**
