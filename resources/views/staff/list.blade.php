@@ -79,7 +79,4 @@
  {{-- end modal --}}
  @endsection
  @section('footer')
-<script>
-console.log(img);
- </script>
-  @endsection
+ @endsection

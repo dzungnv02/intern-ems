@@ -34,54 +34,54 @@ $(document).ready(function () {
 	function validate() {
 		var isValid = false;
 		var $result = $("#errorEmail");
-		var email = $("#inputEmail3").val();
+		var email = $("#inputEmail").val();
 		var password = $('#inputPassword').val();
 		var password_1 = $('#inputPassword_1').val();
 		var name = $('#inputName').val();
 		var phoneNumber = $('#inputPhone').val();
 
-		//var img = $('#inputFile').val().split('.').pop().toLowerCase();
-
-		if (validateEmail(email)) {
-			$result.css("display", "none");
+		$('SPAN.bell [id^="error"]').addClass('hidden');
+		var emailValid = validateEmail(email);
+		if (emailValid) {
 			isValid = true;
+			$result.addClass('hidden');
 		} else {
-			$result.css("display", "block");
+			$result.removeClass('hidden');
+			isValid = false;
 		}
 		if (password.length <= 8 || password == "") {
-			$('#errorPassword').css('display', 'block');
+			$('#errorPassword').addClass('hidden');
 			isValid = true;
 		}
 		else {
-			$('#errorPassword').css('display', 'none');
+			$('#errorPassword').removeClass('hidden');
+			isValid = false;
 		}
+
 		if (password != password_1) {
-			$('#errorPassword_1').css('display', 'block');
+			$('#errorPassword_1').removeClass('hidden');
 			isValid = true;
 		} else {
-			$('#errorPassword_1').css('display', 'none');
+			$('#errorPassword_1').addClass('hidden');
+			isValid = false;
 		}
+
 		if (name) {
-			$('#errorName').css('display', 'none');
+			$('#errorName').addClass('hidden');
 			isValid = true;
 		} else {
-			$('#errorName').css('display', 'block');
+			$('#errorName').removeClass('hidden');
+			isValid = false;
 		}
 
 		if (phoneNumber.length >= 15 || phoneNumber == "") {
-			$('#errorPhone').css('display', 'block');
+			$('#errorPhone').removeClass('hidden');
+			isValid = false;
 		}
 		else {
-			$('#errorPhone').css('display', 'none');
+			$('#errorPhone').addClass('hidden');
 			isValid = true;
 		}
-
-		// if( img =="png" || img == "jpg" || img == "bmp" || img == "jpeg" || img == "gif"){
-		// 	$('#errorImg').css('display', 'none');
-		// }
-		// else {
-		// 	$('#errorImg').css('display', 'block');	
-		// }
 
 		return isValid;
 	}
@@ -112,11 +112,13 @@ $(document).ready(function () {
 	* ajax add staff
 	*/
 	$('BUTTON#addStaff').click(function (event) {
-		if (!validate()) {
+
+		var isValided = validate();
+		if (!isValided) {
 			return false;
 		}
 
-		var email = $('#inputEmail3').val();
+		var email = $('#inputEmail').val();
 		var password = $('#inputPassword').val();
 		var password_1 = $('#inputPassword_1').val();
 		var name = $('#inputName').val();
@@ -135,7 +137,6 @@ $(document).ready(function () {
 		formData.append('address', address);
 		formData.append('phone_number', phone);
 		formData.append('branch_id', branch_id);
-		//formData.append("file",$('#inputFile')[0].files[0]);
 
 		$.ajax({
 			url: '/api/add-staff',
@@ -155,11 +156,10 @@ $(document).ready(function () {
 
 	getBranchList(null);
 
-	$('SPAN.bell').css('display', 'none');
-
 	if ($('TABLE#staff_list').length == 0) {
 		return false;
 	}
+
 	/*
 	* ajax get list staff
 	*/
@@ -211,9 +211,9 @@ $(document).ready(function () {
 		}, {
 			"targets": -1,
 			"data": null,
-			"defaultContent": "<a href=" + asset + "staff/edit" + " class=\"btn btn-warning _action fa fa-pencil-square-o\" title=\"Chỉnh sửa\" id=\"editStaffid\"></a>"
+			"defaultContent": "<button type='button' href=" + asset + "staff/edit" + " class=\"btn btn-warning _action fa fa-pencil-square-o\" title=\"Chỉnh sửa\" id=\"edit_staff\"></button>"
 				+ "<a href=\"#\" class=\"btn btn-danger _action fa fa-trash\" title=\"Xoa\" type=\"button\" id=\"delete\" ></a>"
-				+ "<a href=\"#\" title=\"Đôi mật khẩu\" class=\"btn btn-info _action fa fa-key\" data-toggle=\"modal\" data-target=\"#myModal\" id=\"editPassword\"></a>"
+				+ "<a href=\"#\" title=\"Đôi mật khẩu\" class=\"btn btn-info _action fa fa-key\" data-toggle=\"modal\" data-target=\"#myModal\" id=\"change_password\"></a>"
 		}]
 	});
 	// var t = $('#example').DataTable()
@@ -258,7 +258,7 @@ $(document).ready(function () {
 				}
 			})
 	})
-	$('TABLE#staff_list').on('click', '#editPassword', function () {
+	$('TABLE#staff_list').on('click', '#change_password', function () {
 		var table = $('#example').DataTable();
 		var data = table.row($(this).parents('tr')).data();
 		data = data.id;
@@ -297,14 +297,14 @@ $(document).ready(function () {
 	/*
 	* ajax edit staff
 	*/
-	$('TABLE#staff_list').on('click', '#editStaffid', function () {
-		var table = $('#example').DataTable();
+	$('TABLE#staff_list').on('click', '#edit_staff', function () {
+		var table = $('TABLE#staff_list').DataTable();
 		var data = table.row($(this).parents('tr')).data();
-		data = data.id;
+		//data = data.id;
 		if (typeof (Storage) !== "undefined") {
-			localStorage.setItem("id", data);
+			//localStorage.setItem("id", data);
 		} else {
-			alert('Trình duyệt của bạn không hỗ trợ');
+			//alert('Trình duyệt của bạn không hỗ trợ');
 		}
 	});
 

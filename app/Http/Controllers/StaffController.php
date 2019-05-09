@@ -45,6 +45,7 @@ class StaffController extends Controller
             }
         }
     }
+    
     /**
      * Create a function addStaff
      *
