@@ -225,14 +225,14 @@ class syncClasses extends Command
 
         $tmp_time = $tmp['time_1'] != '' ? explode('-', $tmp['time_1']) : [];
         if (count($tmp_time) > 0) {
-            $time_1['start'] = trim($tmp_time[0]);
-            $time_1['finish'] = trim($tmp_time[1]);
+            $time_1['start'] = isset($tmp_time[0]) ? trim($tmp_time[0]) : '';
+            $time_1['finish'] = isset($tmp_time[1]) ? trim($tmp_time[1]) : '';
         }
 
         $tmp_time = $tmp['time_2'] != '' ? explode('-', $tmp['time_2']) : [];
         if (count($tmp_time) > 0) {
-            $time_2['start'] = trim($tmp_time[0]);
-            $time_2['finish'] = trim($tmp_time[1]);
+            $time_2['start'] = isset($tmp_time[0]) ? trim($tmp_time[0]) : '';
+            $time_2['finish'] = isset($tmp_time[1]) ? trim($tmp_time[1]) : '';
         }
 
         if ($weekday_1) {$schedule_rendered->$weekday_1 = $time_1;}
