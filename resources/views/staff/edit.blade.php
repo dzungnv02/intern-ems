@@ -5,8 +5,8 @@
  Sửa nhân viên
  @endsection
  @section('content')
- <form action="" method="post" id="abs">
- 	<div class="form-group row">
+ <form action="" method="post" id="frmStaff">
+	<div class="form-group row">
  		<label for="inputEmail" class="col-sm-2 col-form-label">Email *</label>
  		<div class="col-sm-8">
  			<input type="email" class="form-control" id="inputEmail" placeholder="Email">
