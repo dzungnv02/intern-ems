@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Support\Facades\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -129,4 +130,13 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::get('invoice/get-last-invoice/{student_id}/{class_id}', 'InvoiceController@calc_prepaid_tutor_fee');
 
     Route::get('/compensated/list','CompensatedClassController@index');
+});
+
+
+Route::prefix('webhook')->group(function () {
+    Route::post('student-add', function () {
+        $inputs = Request::all();
+        $id = $inputs['id'];
+        return response()->json(['REQUEST_ID' => $id,'RESULT' => 'OK']);
+    });
 });
