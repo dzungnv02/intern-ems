@@ -7,7 +7,7 @@
  Thêm mới nhân viên
  @endsection
  @section('content')
- <form action="" method="post" id="myForm" enctype="multipart/form-data">
+ <form action="" method="post" id="frmStaff">
  	<div class="form-group row">
  		<label for="inputEmail" class="col-sm-2 col-form-label">Email <i class="text-danger">*</i></label>
  		<div class="col-sm-8">

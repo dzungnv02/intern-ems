@@ -2,6 +2,7 @@ import { finished } from "stream";
 
 $(document).ready(function () {
 	
+
 	/**
 	*validate form add
 	*/
@@ -11,6 +12,8 @@ $(document).ready(function () {
 	}
 
 	function getBranchList(currentBranchId) {
+		if ($('FORM#frmStaff').length == 0) return;
+		
 		$.ajax('/api/branch/list',{
 			type: 'GET',
 			success: function (response) {
