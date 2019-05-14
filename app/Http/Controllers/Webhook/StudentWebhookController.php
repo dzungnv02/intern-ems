@@ -29,6 +29,8 @@ class StudentWebhookController  extends WebhookController
 
     public function delete_student(Request $request)
     {
+        $inputs = $request->all();
+        $id = $inputs['id'];
         Log::debug('DELETE STUDENT HOOK:');
         Log::debug(var_export($id, true));
         return response()->json(['REQUEST_ID' => $id,'RESULT' => 'OK']);
