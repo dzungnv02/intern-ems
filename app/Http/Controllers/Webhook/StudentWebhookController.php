@@ -21,13 +21,13 @@ class StudentWebhookController  extends WebhookController
     {
         $inputs = $request->all();
         $id = $inputs['id'];
-        
+
         Log::debug('EDIT STUDENT HOOK:');
         Log::debug(var_export($inputs, true));
         return response()->json(['REQUEST_ID' => $id,'RESULT' => 'OK']);
     }
 
-    public function delete_student($id)
+    public function delete_student(Request $request)
     {
         Log::debug('DELETE STUDENT HOOK:');
         Log::debug(var_export($id, true));
