@@ -18,15 +18,16 @@ class Student extends Event
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $input;
+
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($input)
     {
-        
+        $this->input = $input;
         Log::debug('Student Event fired!');
-        
     }
 }

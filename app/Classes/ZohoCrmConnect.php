@@ -39,9 +39,6 @@ class ZohoCrmConnect
 
         $is_expired = $session != null ? (time() >= $session->expired) : true;
 
-        Log::info('SIZE: ' . var_export($fsize, true));
-        Log::info('SESSION: ' . var_export($content, true));
-
         $options = [
             'http_errors' => true,
             'query' => [
@@ -70,15 +67,10 @@ class ZohoCrmConnect
                     if ($status_code == 200 && !property_exists($obj, 'error')) {
                         $retry_count = $retry;
                     }
-
-                    Log::info('Get access token attempt: ' . $retry_count . "\n" . 'Status code: ' . $status_code . "\n" . ' - OBJ: ' . var_export($obj, true));
                 }
 
                 $session->access_token = $obj->access_token;
                 $session->expired = time() + $obj->expires_in_sec;
-
-                Log::info('New session ' . $session->access_token);
-                Log::info('Expired at ' . date('Y-m-d H:i:s', $session->expired));
 
                 $f_handle = fopen($session_file_path, 'w');
                 fwrite($f_handle, json_encode($session));
@@ -94,7 +86,6 @@ class ZohoCrmConnect
             Log::error($e->getMessage());
             return false;
         }
-
     }
 
     public function getAllRecords($module, $fields = '', $page_limit = 0)

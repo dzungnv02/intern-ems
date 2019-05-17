@@ -13,11 +13,12 @@ class StudentWebhookController  extends WebhookController
     {
         $inputs = $request->all();
         $id = $inputs['id'];
+        $act = $inputs['act'];
 
         Log::debug('STUDENT HOOK:');
         Log::debug(var_export($inputs, true));
 
-        event(new StudentEvent());
+        event(new StudentEvent($inputs));
 
         return response()->json(['REQUEST_ID' => $id,'RESULT' => 'OK']); 
     }
