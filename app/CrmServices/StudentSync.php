@@ -160,6 +160,11 @@ class StudentSync {
             $ems_student_parent = StudentParent::find($student_parent[0]->id);
         }
 
+        if(is_null($ems_student_parent) )
+        {
+            $ems_student_parent = new StudentParent;
+        }
+
         $this->mapping_parent($ems_student_parent,$crm_student);
         $this->mapping_classes($crm_student);
     }
