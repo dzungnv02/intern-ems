@@ -245,7 +245,7 @@ class StudentSync {
            $class_list = Classes::getClassByCrmOwner($owner);
            foreach($class_list as $ems_class) {
                 $student_list = $this->zoho_crm->getRelatedList('Products', data_get($ems_class, 'crm_id'), 'Deal');
-                if (count($student_list) > 0) {
+                if ($student_list) {
                     foreach($student_list as $std) {
                         if (data_get($std, 'id') == $crm_student->id) {
                             StudentClass::assignClass(data_get($ems_class, 'id'), data_get($ems_student, 'id'));
