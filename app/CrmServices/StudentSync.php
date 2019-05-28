@@ -209,6 +209,9 @@ class StudentSync {
 
         $parent->save();
 
+        $ems_student->parent_id = $parent->id;
+        $ems_student->save();
+
         $ems_student_parent->parent_id = $parent->id;
         $ems_student_parent->student_id = $ems_student->id;
         $ems_student_parent->save();
