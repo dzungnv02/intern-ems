@@ -182,6 +182,7 @@ class StudentSync {
         }
 
         $parent = null;
+        $ems_student = Student::getStudentByCrmID($crm_student->id);
 
         if ($crm_contact->Account_Name != null){
             $parent = Parents::getParentByCrmId($crm_contact->Account_Name->id);
@@ -209,6 +210,7 @@ class StudentSync {
         $parent->save();
 
         $ems_student_parent->parent_id = $parent->id;
+        $ems_student_parent->student_id = $ems_student->id;
         $ems_student_parent->save();
     }
 
