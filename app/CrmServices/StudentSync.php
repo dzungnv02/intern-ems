@@ -11,8 +11,11 @@ use \App\Classes;
 use \App\Parents;
 use \App\StudentParent;
 use \App\Teacher;
+use \App\StudentClass;
+use Artisan;
 
 use Illuminate\Support\Facades\Log;
+use phpDocumentor\Reflection\Types\Parent_;
 
 class StudentSync {
 
@@ -147,6 +150,116 @@ class StudentSync {
             $assessment_list['staff_id'] = 1;
             Assessment::insertAssessment($assessment_list);
         }
+
+        $student_parent = StudentParent::getParentsOfStudent($ems_student->id);
+        if (count($student_parent) == 0) {
+            $ems_student_parent = new StudentParent;
+            $ems_student_parent->student_id = $ems_student->id;
+        }
+        else {
+            $ems_student_parent = StudentParent::find($student_parent[0]->id);
+        }
+
+        $this->mapping_parent($ems_student_parent,$crm_student);
+        $this->mapping_classes($crm_student);
+    }
+
+    protected function mapping_parent(StudentParent $ems_student_parent, $crm_student)
+    {
+        $contact_id = $crm_student->Contact_Name->id;
+        $criteria = $contact_id != '' ? '(id:equals:' . $contact_id . ')' : '';
+        $crm_contacts = $this->zoho_crm->search('Contacts', '', '', $criteria);
+
+        $crm_contact = count($crm_contacts) ? $crm_contacts[0] : null;
+
+        if ($crm_contact == null) {
+            return;
+        }
+
+        $parent = null;
+
+        if ($crm_contact->Account_Name != null){
+            $parent = Parents::getParentByCrmId($crm_contact->Account_Name->id);
+            if (!$parent) {
+                $parent = new Parents;
+            }
+        }
+        elseif ($crm_student->Contact_Name != null) {
+            $parent = Parents::getParentByCrmContactId($crm_student->Contact_Name->id);
+            if (!$parent) {
+                $parent = new Parents;
+            }
+        }
+        else {
+            $parent = new Parents;
+        }
+
+        $contacts_fields = config('zoho.MAPPING.ZOHO_MODULE_CONTACTS');
+        
+        foreach($contacts_fields as $crm_field => $ems_field) {
+            $value = $crm_field != 'Owner' ? $crm_contact->$crm_field : json_encode($crm_contact->$crm_field, JSON_UNESCAPED_UNICODE);
+            $parent->$ems_field = $value;
+        }
+
+        $parent->save();
+
+        $ems_student_parent->parent_id = $parent->id;
+        $ems_student_parent->save();
+    }
+
+    protected function mapping_classes($crm_student)
+    {
+        $student_stages = config('zoho.DEAL_STAGES');
+        if ($student_stages[$crm_student->Stage] == 0) {
+            return;
+        }
+
+        $owner = $crm_student->Owner->id;
+        $ems_student = Student::getStudentByCrmID($crm_student->id);
+
+        $current_class = data_get($crm_student, 'current_class');
+        
+        if ($current_class != null) {
+            $crm_class_id = data_get($current_class, 'id');
+            $ems_class = Classes::getClassByCrmId($crm_class_id);
+            if ($ems_class) {
+                StudentClass::assignClass(data_get($ems_class, 'id'), data_get($ems_student, 'id'));
+                return;
+            }
+            else {
+                $this->sync_crm_class($owner);
+                $this->mapping_classes($crm_student);
+            }
+        }
+        else if ($this->sync_crm_class($owner)) {
+           $class_list = Classes::getClassByCrmOwner($owner);
+           foreach($class_list as $ems_class) {
+                $student_list = $this->zoho_crm->getRelatedList('Products', data_get($ems_class, 'crm_id'), 'Deal');
+                if (count($student_list) > 0) {
+                    foreach($student_list as $std) {
+                        if (data_get($std, 'id') == $crm_student->id) {
+                            StudentClass::assignClass(data_get($ems_class, 'id'), data_get($ems_student, 'id'));
+                            return;
+                        }
+                    }
+                }
+           }
+        }
+    }
+
+    protected function sync_crm_class($owner)
+    {
+        Artisan::call('zoho:classes', [
+            '--getlist' => true,
+            '--owner' => $owner
+        ]);
+        $output = Artisan::output();
+
+        if ( strpos($output, 'end_sync_classes') !== false) {
+            return true;
+        }
+
+        return false;
     }
 
     protected function get_ebay_UTC_8601(DateTime $time)

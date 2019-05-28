@@ -55,7 +55,9 @@ class syncClasses extends Command
         $getlist = $this->option('getlist');
         $map_student = $this->option('map_student');
         if ($getlist) {
+            $this->info('start_sync_classes');
             $this->get_list($fillter_owner_id);
+            $this->info('end_sync_classes');
         }
         else if ($map_student){
             $this->map_student();

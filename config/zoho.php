@@ -14,8 +14,8 @@ return [
         'ZOHO_MODULE_EMS_STAFF' => 'EMS_STAFF',
         'ZOHO_MODULE_EMS_CLASS' => 'Products',
         'ZOHO_MODULE_STUDENTS' => 'Deals',
-        'ZOHO_MODULE_STUDENTS_CONTACTS' => 'Deals',
-        'ZOHO_MODULE_STUDENTS_TRACKING' => 'Deals',
+        'ZOHO_MODULE_CONTACTS' => 'Contacts',
+        //'ZOHO_MODULE_STUDENTS_TRACKING' => 'Deals',
         'ZOHO_MODULE_PARENTS' => 'Accounts',
         'ZOHO_MODULE_USERS' => 'users',
     ],
@@ -101,6 +101,18 @@ return [
             'register_branch' => 'crm_register_branch',
             'Owner' => 'crm_owner',
         ],
+        'ZOHO_MODULE_CONTACTS' => [
+            'id' => 'crm_contact',
+            'Full_Name' => 'fullname',
+            'Email' => 'email',
+            'Phone' => 'phone',
+            'address' => 'address',
+            'Skype_ID' => 'skype',
+            'Salutation' => 'parent_role',
+            'facebook' => 'facebook',
+            'Description' => 'note',
+            'Owner' => 'crm_owner',
+        ],
 
         'ZOHO_MODULE_EMS_CLASS' => [
             'id' => 'crm_id',
@@ -131,6 +143,22 @@ return [
         'Deals' => [
             'Products', 'Staff_list'
         ]
+    ],
+    'DEAL_STAGES' => [
+        'Book Ass.' => 0,
+        'Không tới Ass.' => 0,
+        'Thực hiện Ass.' => 0,
+        'Book Trial' => 0,
+        'Không tới Trial' => 0,
+        'Trial' => 0,
+        'Không đăng ký' => 0,
+        'Đặt cọc' => 1,
+        'Đăng ký' => 1,
+        'Đăng kí lại' => 1,
+        'Review sau 15d' => 1,
+        'Review sau 2m' => 1,
+        'Đăng kí tiếp' => 1,
+        'Withdrawal' => 1
     ]
 
 ];
