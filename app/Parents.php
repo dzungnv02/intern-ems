@@ -32,4 +32,14 @@ class Parents extends Model
                 ->where($field, $search_value)
                 ->get()->toArray();
     }
+
+    public static function getParentByCrmId($crm_id)
+    {
+        return Parents::where('crm_id', '=', $crm_id)->first();
+    }
+
+    public static function getParentByCrmContactId($crm_contact_id)
+    {
+        return Parents::where('crm_contact', '=', $crm_contact_id)->first();
+    }
 }

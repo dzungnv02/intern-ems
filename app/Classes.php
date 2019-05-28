@@ -309,4 +309,17 @@ class Classes extends Model
         return $status;
     }
 
+    public static function getClassByCrmId($crm_id)
+    {
+        return Classes::select('*')->where('crm_id', '=', $crm_id)->first();
+    }
+
+    public static function getClassByCrmOwner($crm_owner)
+    {
+        $result = DB::table('classes')->select('classes.*')
+            ->join('branch', 'branch.id', 'classes.branch_id')
+            ->where('branch.crm_owner', '=', $crm_owner)->get();
+        return $result;
+    }
+
 }
