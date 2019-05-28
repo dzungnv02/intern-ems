@@ -27,6 +27,8 @@ class StudentClass extends Model
                 ->get()->toArray();
         if (count($joined) > 0) return false;
 
+        DB::table('students')->update(['current_class' => $class_id])->where('id','=',$student_id);
+
         $data = [
             'student_id' => $student_id,
             'class_id' => $class_id,
