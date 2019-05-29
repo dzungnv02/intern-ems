@@ -168,7 +168,9 @@ class StudentSync
 
     protected function mapping_parent(StudentParent $ems_student_parent, $crm_student)
     {
-        $contact_id = $crm_student->Contact_Name->id;
+        $contact_id = data_get($crm_student->Contact_Name, 'id');
+        if (is_null($contact_id)) return;
+        
         $criteria = $contact_id != '' ? '(id:equals:' . $contact_id . ')' : '';
         $crm_contacts = $this->zoho_crm->search('Contacts', '', '', $criteria);
 
