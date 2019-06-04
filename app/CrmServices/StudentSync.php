@@ -222,9 +222,12 @@ class StudentSync
         $is_synced = false;
 
         $student_stages = config('zoho.DEAL_STAGES');
+        var_dump($crm_student->Stage);
+        
         if ($student_stages[$crm_student->Stage] == 0) {
             return;
         }
+        
 
         $owner = $crm_student->Owner->id;
 
