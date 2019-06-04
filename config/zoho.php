@@ -145,6 +145,7 @@ return [
         ]
     ],
     'DEAL_STAGES' => [
+        'Trạng thái' => 0,
         'Book Ass.' => 0,
         'Không tới Ass.' => 0,
         'Thực hiện Ass.' => 0,
