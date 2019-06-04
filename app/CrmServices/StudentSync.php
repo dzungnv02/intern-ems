@@ -36,7 +36,7 @@ class StudentSync
 
         $crm_student = $this->zoho_crm->getRecordById($this->crm_module, $record_id);
 
-        if (count($crm_student) == 0) {
+        if (!$crm_student) {
             Log::info('Not found student: ' . $record_id);
             return false;
         }
