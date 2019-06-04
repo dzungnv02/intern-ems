@@ -52,7 +52,7 @@ class StudentSync
 
         $crm_student = $this->zoho_crm->getRecordById($this->crm_module, $record_id);
 
-        if (count($crm_student) == 0) {
+        if (!$crm_student) {
             Log::info('Not found student: ' . $record_id);
             return false;
         }
@@ -159,7 +159,7 @@ class StudentSync
         }
 
         $this->mapping_parent($ems_student_parent, $crm_student);
-        
+
         if ($assign_class) {
             $this->mapping_classes($crm_student);
         }
