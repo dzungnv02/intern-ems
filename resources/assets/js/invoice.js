@@ -448,7 +448,7 @@ $(function () {
 
         $(student_id).on('change', (e) => {
             get_parent_list($(student_id).val(), () => {
-                get_class_list($(student_other_id).val(), $(class_id),() => {
+                get_class_list($(student_id).val(), $(class_id),() => {
                     toggle_tuition_frmTutorFee(false);
                 });
             });
