@@ -1,0 +1,70 @@
+<?php
+namespace App\CrmServices;
+
+use App\Classes\ZohoCrmConnect;
+use App\Teacher as EmsTeacher;
+use App\Branch;
+
+class TeacherSync 
+{
+    protected $zoho_crm;
+    protected $crm_module;
+    protected $mapping_fields;
+
+    public function __construct()
+    {
+        $this->zoho_crm = new ZohoCrmConnect();
+        $this->crm_module = config('zoho.MODULES.ZOHO_MODULE_EMS_TEACHER');
+        $this->mapping_fields = config('zoho.MAPPING.ZOHO_MODULE_EMS_TEACHER');
+    }
+
+    public function add_teacher($record_id)
+    {
+        $ems_teacher = EmsTeacher::getTeacherByCrmId($record_id);
+        if ($ems_teacher != null) {
+            return;
+        }
+
+        $ems_teacher = new EmsTeacher;
+        $ems_teacher->crm_id = $record_id;
+        $this->save_teacher($ems_teacher);
+    }
+
+    public function edit_teacher()
+    {
+        $ems_teacher = EmsTeacher::getTeacherByCrmId($record_id);
+        if ($ems_teacher == null) {
+            $this->add_teacher($ems_teacher);
+            return;
+        }
+
+        $this->save_teacher($ems_teacher);
+    }
+
+    public function save_teacher(EmsTeacher $ems_teacher)
+    {
+        $ems_fields = [];
+        $crm_fields = [];
+
+        foreach ($this->mapping_fields as $crm_field => $ems_field) {
+            array_push($ems_fields, $ems_field);
+            array_push($crm_fields, $crm_field);
+        }
+
+        $crm_teacher = $this->zoho_crm->getRecordById($this->crm_module, data_get($ems_teacher, 'crm_id'));
+        if ($crm_teacher == false) {
+            return;
+        };
+
+        $branch = Branch::getBranchByCrmOwner($crm_teacher->Owner->id);
+        $ems_teacher->branch_id = $branch->id;
+
+        for ($i = 0; $i < count($crm_fields); $i++) {
+            $ems_field = $ems_fields[$i];
+            $crm_field = $crm_fields[$i];
+            $value = $crm_field != 'Owner' ? $crm_teacher->$crm_field : json_encode($crm_teacher->$crm_field, JSON_UNESCAPED_UNICODE);
+            $ems_teacher->$ems_field = $value;
+        }
+        $ems_teacher->save();
+    }   
+}

@@ -34,39 +34,35 @@ class StudentSync
     {
         Log::info('Adding student: ' . $record_id);
 
-        $criteria = '(id:equals:' . $record_id . ')';
-        $crm_student = $this->zoho_crm->search($this->crm_module, '', '', $criteria);
+        $crm_student = $this->zoho_crm->getRecordById($this->crm_module, $record_id);
 
         if (count($crm_student) == 0) {
             Log::info('Not found student: ' . $record_id);
             return false;
         }
 
-        $student = $crm_student[0];
         $new_student = new Student;
 
-        $this->save_student($new_student, $student);
+        $this->save_student($new_student, $crm_student);
     }
 
     public function edit_student($record_id)
     {
         Log::info('Edit student');
 
-        $criteria = '(id:equals:' . $record_id . ')';
-        $crm_student = $this->zoho_crm->search($this->crm_module, '', '', $criteria);
+        $crm_student = $this->zoho_crm->getRecordById($this->crm_module, $record_id);
 
         if (count($crm_student) == 0) {
             Log::info('Not found student: ' . $record_id);
             return false;
         }
 
-        $student = $crm_student[0];
         $ems_student = Student::getStudentByCrmID($record_id);
         if ($ems_student == null) {
             $ems_student = new Student;
         }
 
-        $this->save_student($ems_student, $student);
+        $this->save_student($ems_student, $crm_student);
     }
 
     public function delete_student($record_id)
@@ -78,7 +74,7 @@ class StudentSync
         }
     }
 
-    protected function save_student(Student $ems_student, $crm_student)
+    public function save_student(Student $ems_student, $crm_student, $assign_class = true)
     {
         $ems_fields = [];
         $crm_fields = [];
@@ -163,7 +159,10 @@ class StudentSync
         }
 
         $this->mapping_parent($ems_student_parent, $crm_student);
-        $this->mapping_classes($crm_student);
+        
+        if ($assign_class) {
+            $this->mapping_classes($crm_student);
+        }
     }
 
     protected function mapping_parent(StudentParent $ems_student_parent, $crm_student)

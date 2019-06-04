@@ -112,4 +112,9 @@ class Teacher extends Model
             ]);
         return $teacher;
     }
+
+    public static function getTeacherByCrmId($crm_id)
+    {
+        return Teacher::select('*')->where('crm_id', '=', $crm_id)->first();
+    }
 }

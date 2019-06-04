@@ -114,7 +114,6 @@ class syncClasses extends Command
                         }
                         continue;
                     } else {
-                        $value = data_get($crm_class, $c_field);
                         $new_class->$e_field = data_get($crm_class, $c_field);
                     }
                 }
