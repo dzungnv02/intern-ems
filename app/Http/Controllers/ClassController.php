@@ -187,7 +187,7 @@ class ClassController extends Controller
                     $crm_data['data'][0]['Owner'] = ['id' => $branch->crm_owner_id, 'name' => $branch->crm_owner_name];
 
                     if ($crm_class != false) {
-                        $crm_schedule_id = isset($crm_class->L_ch_h_c_trong_tu_n) ? $crm_class->L_ch_h_c_trong_tu_n[0]->id : null;
+                        $crm_schedule_id = isset($crm_class->L_ch_h_c_trong_tu_n) && count($crm_class->L_ch_h_c_trong_tu_n) ? $crm_class->L_ch_h_c_trong_tu_n[0]->id : null;
                     }
 
                     if (is_array($inputs['schedule'])) {
