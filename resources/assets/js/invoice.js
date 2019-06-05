@@ -105,6 +105,7 @@ $(function () {
                             html: 'Chưa có lớp'
                         });
                         $(target).append(opt);
+                        toggle_tuition_frmTutorFee(false);
                     }
                     $($(target).find('OPTION')[0]).attr('selected', 'selected');
                     if (callback != undefined) {
@@ -449,7 +450,7 @@ $(function () {
         $(student_id).on('change', (e) => {
             get_parent_list($(student_id).val(), () => {
                 get_class_list($(student_id).val(), $(class_id),() => {
-                    toggle_tuition_frmTutorFee(false);
+                    //toggle_tuition_frmTutorFee(true);
                 });
             });
         });

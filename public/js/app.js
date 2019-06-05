@@ -57004,6 +57004,8 @@ $(document).ready(function () {
 	}
 
 	function getBranchList(currentBranchId) {
+		if ($('FORM#frmStaff').length == 0) return;
+
 		$.ajax('/api/branch/list', {
 			type: 'GET',
 			success: function success(response) {
@@ -58756,6 +58758,7 @@ $(function () {
                             html: 'Chưa có lớp'
                         });
                         $(target).append(opt);
+                        toggle_tuition_frmTutorFee(false);
                     }
                     $($(target).find('OPTION')[0]).attr('selected', 'selected');
                     if (callback != undefined) {
@@ -59086,8 +59089,8 @@ $(function () {
 
         $(student_id).on('change', function (e) {
             get_parent_list($(student_id).val(), function () {
-                get_class_list($(student_other_id).val(), $(class_id), function () {
-                    toggle_tuition_frmTutorFee(false);
+                get_class_list($(student_id).val(), $(class_id), function () {
+                    //toggle_tuition_frmTutorFee(true);
                 });
             });
         });
