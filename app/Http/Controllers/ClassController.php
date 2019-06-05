@@ -180,7 +180,7 @@ class ClassController extends Controller
                     $crm_data['data'][0]['id'] = $class->crm_id;
                     $crm_data['data'][0]['EMS_ID'] = trim($id);
                     $crm_data['data'][0]['EMS_SYNC_TIME'] = date('Y-m-d H:i:s');
-                    $crm_data['data'][0]['teacher'] = ['id' => $teacher->crm_id, 'name' => $teacher->name];
+                    $crm_data['data'][0]['teacher'] = $teacher ? ['id' => $teacher->crm_id, 'name' => $teacher->name] : null;
                     $crm_data['data'][0]['Product_Name'] = $data['name'];
                     $crm_data['data'][0]['course_name'] = $data['course_name'];
                     $crm_data['data'][0]['Product_Active'] = $data['status'] == 2 ? true : false;
