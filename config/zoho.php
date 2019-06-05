@@ -123,6 +123,7 @@ return [
             'L_ch_h_c_trong_tu_n' => 'schedule',
             'Description' => 'note',
             'start_date' => 'start_date',
+            'price_per_day' => 'price',
         ],
         'ZOHO_MODULE_EMS_BRANCH' => [
             'id' => 'crm_id',
