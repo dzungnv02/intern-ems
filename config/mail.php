@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'driver' => env('MAIL_DRIVER', 'smtp'),
+    'driver' => env('MAIL_DRIVER', 'mailgun'),
 
     /*
     |--------------------------------------------------------------------------
@@ -118,6 +118,11 @@ return [
         'paths' => [
             resource_path('views/vendor/mail'),
         ],
+    ],
+
+    'mailgun' => [
+        'domain' => env('MAILGUN_DOMAIN'),
+        'secret' => env('MAILGUN_SECRET'),
     ],
 
 ];
