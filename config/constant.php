@@ -58,6 +58,12 @@ return [
             1000000000000 => 'nghìn tỷ',
             1000000000000000 => 'ngàn triệu triệu',
             1000000000000000000 => 'tỷ tỷ'
+    ],
+
+    'payment_method' => [
+        0 => 'Tiền mặt',
+        1 => 'Chuyển khoản',
+        2 => 'Thẻ thanh toán'
     ]
     
 ];

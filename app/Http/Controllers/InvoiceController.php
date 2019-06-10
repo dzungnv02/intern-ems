@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\InvoicePrinted;
+use App\Branch;
 
 use PDF;
 
@@ -90,10 +91,13 @@ class InvoiceController extends Controller
 
     public function save_invoice(Request $request)
     {
+        $branch = Branch::findOrfail(json_decode($request->header('AUTH-USER'))->branch);
+
         $ary_fields = ['invoice_number',
             'type',
             'reason',
             'student_id',
+            'payment_method',
             'class_id',
             'start_date',
             'end_date',
@@ -111,15 +115,16 @@ class InvoiceController extends Controller
             'created_by'];
 
         $input = $request->all();
-        $ary_data = [];
 
+        $ary_data = [];
+        $input['amount'] = !$input['amount'] ? 0 : $input['amount'];
         foreach ($ary_fields as $field) {
             if (isset($input[$field])) {
                 $ary_data[$field] = $input[$field];
             }
         }
 
-        $ary_data['invoice_number'] = Invoice::invoice_number_generate();
+        $ary_data['invoice_number'] = Invoice::invoice_number_generate($branch->branch_code);
         $ary_data['created_by'] = Auth::user()->id;
 
         $invoice = new Invoice;
@@ -135,6 +140,7 @@ class InvoiceController extends Controller
 
     public function print_invoice($id, $act)
     {
+        $payment_methods = config('constant.payment_method');
         $invoice = Invoice::findOrfail($id);
 
         $invoice_data = $invoice->toArray();
@@ -162,6 +168,8 @@ class InvoiceController extends Controller
 
         $invoice_data['student_name'] = $student->name;
         $invoice_data['student_code'] = $student->student_code;
+        $invoice_data['payment_method'] =  $payment_methods[$invoice_data['payment_method']];
+
         $invoice_data['class_name'] = $class->name;
         $invoice_data['discount'] = (int) $invoice_data['discount'];
         $invoice_data['prepaid'] = $invoice_data['prepaid'] ? $invoice_data['prepaid'] : 0;
@@ -203,6 +211,8 @@ class InvoiceController extends Controller
 
     public function send_invoice($id) 
     {
+        $payment_methods = config('constant.payment_method');
+
         $invoice = Invoice::findOrfail($id);
         $student = Student::findOrfail($invoice->student_id);
         if ($student->parent_id == null) {
@@ -215,6 +225,8 @@ class InvoiceController extends Controller
         if ($to == null) {
             $to = 'dungnv02@gmail.com';
         }
+
+        $invoice->payment_method = $payment_methods[$invoice->payment_method];
 
         Mail::to($to)->send(new InvoicePrinted($invoice));
     }

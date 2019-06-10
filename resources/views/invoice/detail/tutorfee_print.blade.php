@@ -154,20 +154,10 @@
             <td>Viết bằng chữ</td>
             <th colspan="4"><span id="amount_text">{{$amount_text}}</span> đồng chẵn</th>
         </tr>
-        {{--  <tr>
-            <td></td>
-            <td>Số tiền còn phải thu</td>
-            <th colspan="4"></th>
-        </tr>  --}}
-        {{--  <tr>
-            <td>6. </td>
-            <td>Chứng từ kèm theo</td>
-            <th colspan="4">Không có</th>
-        </tr>  --}}
         <tr>
             <td>6. </td>
             <td>Phương thức thanh toán</td>
-            <th colspan="4">Tiền mặt</th>
+            <th colspan="4">{{$payment_method}}</th>
         </tr>
         <tr>
             <td>7. </td>

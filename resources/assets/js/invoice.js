@@ -21,13 +21,14 @@ $(function () {
     var tab_activate = (target) => {
         $(tab_col).removeClass('active');
         $(target).parent().addClass('active');
-        $(tab_contents).find("DIV[role='tabpanel']").removeClass('active');
+        $(tab_contents).find("DIV[role='tabpanel'   ]").removeClass('active');
         actived_tab = $(tab_contents).find("DIV[role='tabpanel']#" + $(target).data('tab')).addClass('active');
-
+        
         if ($(actived_tab).prop('id') == 'invoicelist-tab') {
             $('BUTTON#btnSaveInvoice').css('display', 'none');
             $('BUTTON#btnPrintInvoice').css('display', 'none');
             $('BUTTON#btnCreateInvoice').css('display', 'inline');
+            $(tab_contents).find("DIV[role='tabpanel']").find('FORM')[0].reset();
         } else {
             $('BUTTON#btnSaveInvoice').css('display', 'inline');
             $('BUTTON#btnPrintInvoice').css('display', 'inline');
@@ -189,7 +190,6 @@ $(function () {
             data: JSON.stringify(data),
             success: function (response) {
                 $(form_activated).find('input#iid').val(response.id);
-                console.log(response);
                 if (callback != undefined) {
                     callback(response.id);
                 }
@@ -405,6 +405,12 @@ $(function () {
 
         tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
 
+        $(tab_headers).find('A[data-tab="invoicelist-tab"]').on('click', (e) => {
+            $(tab_headers).find('LI').addClass('disabled');
+            $(e.target).parent().removeClass('disabled');
+            tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
+        });
+
         $(frmTutorFee).find('INPUT#reservation').daterangepicker({
                 opens: 'right',
                 locale: daterange_locale
@@ -478,6 +484,7 @@ $(function () {
                     "amount": numeral($(frmTutorFee).find('INPUT#amount').val()).value(),
                     "discount": $(frmTutorFee).find('INPUT#discount').val(),
                     "discount_desc": $(frmTutorFee).find('INPUT#discount_desc').val(),
+                    "payment_method": $(frmTutorFee).find('INPUT[name="payment_method"]:checked').val(),
                     "invoice_status": 0,
                     "currency": 'VND',
                 };
@@ -495,6 +502,7 @@ $(function () {
                     "payer": $(frmOtherFee).find('INPUT#payer').val(),
                     "reason": $(frmOtherFee).find('TEXTAREA#reason').val(),
                     "amount": numeral($(frmOtherFee).find('INPUT#amount').val()).value(),
+                    "payment_method": $(frmOtherFee).find('INPUT[name="payment_method"]:checked').val(),
                     "invoice_status": 0,
                     "currency": 'VND',
                 }
@@ -516,6 +524,7 @@ $(function () {
                     data = {
                         "type": 1,
                         "student_id": $(frmTutorFee).find('SELECT#student_id').val(),
+                        "payment_method": $(frmTutorFee).find('INPUT[name="payment_method"]:checked').val(),
                         "class_id": $(frmTutorFee).find('SELECT#class_id').val(),
                         "price": numeral($(frmTutorFee).find('INPUT#price').val()).value(),
                         "start_date": $(frmTutorFee).find('INPUT#start_date').val(),
