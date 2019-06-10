@@ -32,7 +32,7 @@ class StudentController extends Controller
         $record = $request->record;
         $keyword = $request->keyword;
         $page = $request->page;
-
+        
         $student_model = new Student($request->logged_user->crm_owner);
 
         if ($record == "") {

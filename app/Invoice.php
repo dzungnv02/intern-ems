@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use App\AccessControl\Scopes\CrmOwnerTrait;
 use App\Student;
 
+
 class Invoice extends Eloquent
 {
     use CrmOwnerTrait;
@@ -58,7 +59,11 @@ class Invoice extends Eloquent
             ->where('classes.id', '=', $class_id)
             ->first();
 
-        $schedule = json_decode($class->schedule, true);
+        $class_schedule = data_get($class, 'schedule');
+        if ($class_schedule == null) {
+            return 0;
+        }
+        $schedule = json_decode($class_schedule, true);
         $schedule_int = [];
         $wdays_int = config('constant.WEEKDAYS.int');
         foreach (array_keys($schedule) as $wday) {
@@ -105,13 +110,14 @@ class Invoice extends Eloquent
         return $list;
     }
 
-    public static function invoice_number_generate()
+    public static function invoice_number_generate($branch_code)
     {
         $prefix = date('Y/m');
         $old_numbers = DB::table('rev_n_exp')
             ->where('invoice_number', 'like', $prefix . '-%')
             ->pluck('invoice_number');
-        $postfix = 'NT';
+        //$postfix = 'NT';
+        $postfix = $branch_code;
 
         $max = $prefix . '-000-' . $postfix;
 

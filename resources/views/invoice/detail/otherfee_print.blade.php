@@ -136,7 +136,7 @@
         <tr>
             <td>6. </td>
             <td>Phương thức thanh toán</td>
-            <th colspan="4">Tiền mặt</th>
+            <th colspan="4">{{$payment_method}}</th>
         </tr>
         <tr>
             <td>7. </td>
