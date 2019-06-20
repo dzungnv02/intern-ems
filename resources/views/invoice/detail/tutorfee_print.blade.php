@@ -33,6 +33,17 @@
       body {
         width: 100%;
         height: 100%;
+        font-size:1.2em;
+        font-family:ICR-Verdana;!important
+      };
+    }
+
+    @media screen {
+      body {
+        width: 100%;
+        height: 100%;
+        font-size:1.2em;
+        font-family:ICR-Verdana;!important
       };
     }
 
@@ -59,13 +70,15 @@
   <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
 
+  {{-- 
   <!-- Google Font -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic"> 
+  --}}
 </head>
 <body>
 <div class="wrapper">
   <!-- Main content -->
-  <section class="invoice">
+  <section class="invoice" style="font-family:ICR-Verdana;">
     <!-- title row -->
     <div class="row">
       <div class="col-xs-12">
@@ -77,7 +90,15 @@
       <!-- /.col -->
     </div>
     <!-- info row -->
-    <p class="h4"><strong>I CAN READ SYSTEM IN VIETNAM</strong></p>
+    <div class="row">
+      <div class="col-xs-5">
+        <p class="h5"><strong style="font-family:ICR-Verdana;">I CAN READ SYSTEM IN VIETNAM</strong></p>
+      </div>
+      <div class="col-xs-5">
+        <p class="h4"><strong style="font-family:ICR-Verdana;">PHIẾU THU</strong></p>
+      </div>
+      <div class="col-xs-4"></div>
+    </div>
 
     <div class="row invoice-info">
       <div class="col-sm-2 invoice-col">

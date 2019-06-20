@@ -80,14 +80,16 @@ Route::get('branch', 'BranchController@index')->middleware('auth');
 Route::get('branch/add', 'BranchController@add')->middleware('auth');
 Route::get('branch/edit', 'BranchController@edit')->middleware('auth');
 
-Route::get('invoice', 'InvoiceController@index')->middleware('auth');
-Route::get('invoice/list', 'InvoiceController@getInvoiceList')->middleware(['auth','api.headers']);
-Route::get('invoice/student-list', 'InvoiceController@getStudentList')->middleware(['auth','api.headers']);
-Route::get('invoice/class-list', 'InvoiceController@getClassList')->middleware('auth');
-Route::post('invoice/tuition_fee_calculate', 'InvoiceController@tuition_calc')->middleware('auth');
-Route::post('invoice/save', 'InvoiceController@save_invoice')->middleware('auth');
-Route::get('invoice/print/{id}/{act}', 'InvoiceController@print_invoice')->middleware('auth');
-Route::get('invoice/pdf/{id}', 'InvoiceController@send_invoice')->middleware('auth');
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('invoice', 'InvoiceController@index');
+    Route::get('invoice/list', 'InvoiceController@getInvoiceList')->middleware('api.headers');
+    Route::get('invoice/student-list', 'InvoiceController@getStudentList')->middleware('api.headers');
+    Route::get('invoice/class-list', 'InvoiceController@getClassList')->middleware('api.headers');
+    Route::post('invoice/tuition_fee_calculate', 'InvoiceController@tuition_calc')->middleware('api.headers');
+    Route::post('invoice/save', 'InvoiceController@save_invoice')->middleware('api.headers');
+    Route::get('invoice/print/{id}/{act}', 'InvoiceController@print_invoice')->middleware(['api.headers','clearcache']);
+    Route::get('invoice/pdf/{id}', 'InvoiceController@send_invoice')->middleware(['api.headers','clearcache']);
+});
 
 
 Route::get('invoice/print', function(){

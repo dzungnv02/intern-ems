@@ -91,7 +91,7 @@ class InvoiceController extends Controller
 
     public function save_invoice(Request $request)
     {
-        $branch = Branch::findOrfail(json_decode($request->header('AUTH-USER'))->branch);
+        $branch = Branch::findOrfail($request->logged_user->branch);
 
         $ary_fields = ['invoice_number',
             'type',

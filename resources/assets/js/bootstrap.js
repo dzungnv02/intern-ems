@@ -21,6 +21,7 @@ try {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
             'AUTH-USER': JSON.stringify(user_info)
         },
+        cache: false,
         error: function (jqXHR, textStatus, errorThrown) {
             console.log(errorThrown);
             if (jqXHR.status === 403) {

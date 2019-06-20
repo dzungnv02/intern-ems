@@ -22,3 +22,10 @@ iframe#invoice-preview {
   color: #FF0000;
 }
 
+@font-face {
+  font-family: 'ICR-Verdana';
+  src: url(/fonts/verdanar.ttf?7652f550f74d065c79f44da613344338) format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
