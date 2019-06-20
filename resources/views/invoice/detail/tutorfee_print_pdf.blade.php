@@ -29,6 +29,13 @@
         padding: 0 1px 0 1px; !important
         line-height:50%; !important
       }
+
+      body {
+        width: 100%;
+        height: 100%;
+        font-size:1.2em;
+        font-family:ICR-Verdana;!important
+      };
     }
 
     /* A5 Landscape*/
@@ -111,7 +118,15 @@
         </tr>
     </table>
     <!-- info row -->
-    <p class="h4"><strong>I CAN READ SYSTEM IN VIETNAM</strong></p>
+    <div class="row">
+      <div class="col-xs-5">
+        <p class="h5"><strong style="font-family:ICR-Verdana;">I CAN READ SYSTEM IN VIETNAM</strong></p>
+      </div>
+      <div class="col-xs-5">
+        <p class="h4"><strong>PHIẾU THU</strong></p>
+      </div>
+      <div class="col-xs-4"></div>
+    </div>
 
     <div class="row invoice-info">
         <table style="width:100%">

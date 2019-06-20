@@ -31929,6 +31929,7 @@ try {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
             'AUTH-USER': JSON.stringify(user_info)
         },
+        cache: false,
         error: function error(jqXHR, textStatus, errorThrown) {
             console.log(errorThrown);
             if (jqXHR.status === 403) {
@@ -58657,6 +58658,12 @@ $(function () {
     var frmTutorFee = $('FORM#frmTutorFee');
     var frmOtherFee = $('FORM#frmOtherFee');
 
+    var select2_tutor_studentid = null;
+    var select2_tutor_classid = null;
+
+    var select2_other_studentid = null;
+    var select2_other_classid = null;
+
     var tab_headers = $('UL.nav#invoice_tabs');
     var tab_contents = $('DIV.tab-content');
     var tab_col = $(tab_headers).find('LI');
@@ -58666,7 +58673,6 @@ $(function () {
 
     var student_id = $('FORM#frmTutorFee SELECT.select2[id="student_id"]');
     var class_id = $('FORM#frmTutorFee SELECT.select2[id="class_id"]').select2();
-    var prepaid = $('FORM#frmTutorFee INPUT#prepaid');
 
     var student_other_id = $('FORM#frmOtherFee SELECT.select2[id="student_id"]').select2();
     var class_other_id = $('FORM#frmOtherFee SELECT.select2[id="class_id"]').select2();
@@ -58681,6 +58687,10 @@ $(function () {
             $('BUTTON#btnSaveInvoice').css('display', 'none');
             $('BUTTON#btnPrintInvoice').css('display', 'none');
             $('BUTTON#btnCreateInvoice').css('display', 'inline');
+            $(frmTutorFee)[0].reset();
+            $(frmOtherFee)[0].reset();
+            $(tab_headers).find('LI').addClass('disabled');
+            $(tab_headers).find('A[data-tab="invoicelist-tab"]').parent().removeClass('disabled');
         } else {
             $('BUTTON#btnSaveInvoice').css('display', 'inline');
             $('BUTTON#btnPrintInvoice').css('display', 'inline');
@@ -58777,6 +58787,7 @@ $(function () {
             for (var i = 0; i < response.data.length; i++) {
                 if (response.data[i].id === students[student_id].parent_id) {
                     $(frmTutorFee).find('INPUT#payer').val(response.data[i].fullname);
+                    $(frmTutorFee).find('INPUT#payer').trigger("change");
                 }
             }
             if (callback != undefined) callback();
@@ -58803,8 +58814,11 @@ $(function () {
                 success: function success(response) {
                     if (response.code == 0) {
                         var res_data = response.data;
-                        if (data.duration == '') $(frmTutorFee).find('INPUT#duration').val(res_data.duration);
-                        if (data.end_date == '') $(frmTutorFee).find('INPUT#end_date').val(res_data.end_date);
+                        if (data.duration == '') {
+                            $(frmTutorFee).find('INPUT#duration').val(res_data.duration);
+                        } else if (data.end_date == '') {
+                            $(frmTutorFee).find('INPUT#end_date').val(res_data.end_date);
+                        }
                         $(amount).val(numeral(res_data.amount).format('0,0'));
                         $(amount).change();
                     } else {
@@ -58824,8 +58838,7 @@ $(function () {
         $(frmTutorFee).find('INPUT#amount').prop('disabled', !toggle);
     };
 
-    var save_tutor_invoice = function save_tutor_invoice(callback, form_activated, data) {
-
+    var save_invoice = function save_invoice(callback, form_activated, data) {
         $(form_activated).find('.help-block').hide();
         $(form_activated).find('.has-error').removeClass('has-error');
 
@@ -58841,10 +58854,12 @@ $(function () {
             data: JSON.stringify(data),
             success: function success(response) {
                 $(form_activated).find('input#iid').val(response.id);
-                console.log(response);
                 if (callback != undefined) {
                     callback(response.id);
                 }
+            },
+            error: function error(xhr, status, err) {
+                alert(err);
             }
         });
     };
@@ -58879,6 +58894,9 @@ $(function () {
     };
 
     var tutorfee_validate = function tutorfee_validate(data) {
+        $(frmTutorFee).find('.has-error').removeClass('has-error');
+        $(frmTutorFee).find('.help-block').hide();
+
         var is_valided = true;
         var container = null;
         if (data.payer == '') {
@@ -58915,7 +58933,9 @@ $(function () {
     };
 
     var otherfee_validate = function otherfee_validate(data) {
-        console.log('Validate other', data);
+        $(frmOtherFee).find('.has-error').removeClass('has-error');
+        $(frmOtherFee).find('.help-block').hide();
+
         var is_valided = true;
         var container = null;
         if (data.payer == '') {
@@ -58933,7 +58953,6 @@ $(function () {
         }
 
         if (data.amount == '' || data.amount == null) {
-            console.log($(frmOtherFee).find('INPUT#amount'));
             container = $(frmOtherFee).find('INPUT#amount').parent().parent();
             $(container).addClass('has-error');
             $(container).find('.help-block').html('Hãy nhập Tổng số tiền').show();
@@ -59033,19 +59052,15 @@ $(function () {
         }
     };
 
-    var init = function init() {
+    var invoice_list_event_binding = function invoice_list_event_binding() {
+        $('BUTTON#btnCreateInvoice').on('click', function () {
+            frmTutorFee[0].reset();
+            $(tab_headers).find('LI').removeClass('disabled');
+            tab_activate($(tab_headers).find('A[data-tab="tutorfee-tab"]')[0]);
+        });
+    };
 
-        $(student_id).select2();
-        $(class_id).select2();
-
-        $(student_other_id).select2();
-        $(class_other_id).select2();
-
-        $('.help-block').hide();
-        $('.has-error').removeClass('has-error');
-        toggle_tuition_frmTutorFee(false);
-
-        tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
+    var invoice_tutor_form_event_binding = function invoice_tutor_form_event_binding() {
 
         $(frmTutorFee).find('INPUT#reservation').daterangepicker({
             opens: 'right',
@@ -59071,6 +59086,19 @@ $(function () {
             }
         });
 
+        select2_tutor_studentid.on('change', function (e) {
+            get_parent_list($(e.target).val(), function () {
+                get_class_list($(e.target).val(), $(class_id));
+            });
+        });
+
+        $(frmTutorFee).on('keyup change paste', 'input, select, textarea', function (e) {
+            $(e.target).closest('.has-error').find('.help-block').hide();
+            $(e.target).closest('.has-error').removeClass('has-error');
+        });
+    };
+
+    var invoice_other_form_event_binding = function invoice_other_form_event_binding() {
         $(frmOtherFee).find('input#amount').on('blur', function (e) {
             var value = $(e.target).val().trim();
             if (value != '') {
@@ -59081,141 +59109,94 @@ $(function () {
             }
         });
 
-        //$(prepaid).on('');
-
-        $(class_id).on('change', function (e) {
-            console.log(e.target);
+        $(frmOtherFee).on('keyup change paste', 'input, select, textarea', function (e) {
+            $(e.target).closest('.has-error').find('.help-block').hide();
+            $(e.target).closest('.has-error').removeClass('has-error');
         });
+    };
 
-        $(student_id).on('change', function (e) {
-            get_parent_list($(student_id).val(), function () {
-                get_class_list($(student_id).val(), $(class_id), function () {
-                    //toggle_tuition_frmTutorFee(true);
-                });
-            });
-        });
-
-        $(student_other_id).on('change', function (e) {
-            get_class_list($(student_other_id).val(), $(class_other_id), function () {
-                console.log('Other fee');
-            });
-        });
-
-        $('BUTTON#btnSaveInvoice').on('click', function (e) {
-            var actived_tab_id = $(actived_tab).prop('id');
-            var data = {};
-            if (actived_tab_id.indexOf('tutorfee') == 0) {
-                data = {
-                    "type": 1,
-                    "student_id": $(frmTutorFee).find('SELECT#student_id').val(),
-                    "class_id": $(frmTutorFee).find('SELECT#class_id').val(),
-                    "price": numeral($(frmTutorFee).find('INPUT#price').val()).value(),
-                    "start_date": $(frmTutorFee).find('INPUT#start_date').val(),
-                    "end_date": $(frmTutorFee).find('INPUT#end_date').val(),
-                    "duration": $(frmTutorFee).find('INPUT#duration').val(),
-                    "payer": $(frmTutorFee).find('INPUT#payer').val(),
-                    "prepaid": numeral($(frmTutorFee).find('INPUT#prepaid').val()).value(),
-                    "amount": numeral($(frmTutorFee).find('INPUT#amount').val()).value(),
-                    "discount": $(frmTutorFee).find('INPUT#discount').val(),
-                    "discount_desc": $(frmTutorFee).find('INPUT#discount_desc').val(),
-                    "invoice_status": 0,
-                    "currency": 'VND'
-                };
-
-                save_tutor_invoice(function () {
-                    tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
-                    invoice_list_table.ajax.reload();
-                }, frmTutorFee, data);
-            } else if (actived_tab_id.indexOf('otherfee') == 0) {
-                data = {
-                    "type": 2,
-                    "student_id": $(frmOtherFee).find('SELECT#student_id').val(),
-                    "class_id": $(frmOtherFee).find('SELECT#class_id').val(),
-                    "payer": $(frmOtherFee).find('INPUT#payer').val(),
-                    "reason": $(frmOtherFee).find('TEXTAREA#reason').val(),
-                    "amount": numeral($(frmOtherFee).find('INPUT#amount').val()).value(),
-                    "invoice_status": 0,
-                    "currency": 'VND'
-                };
-
-                save_tutor_invoice(function () {
-                    tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
-                    invoice_list_table.ajax.reload();
-                }, frmOtherFee, data);
-            }
-
-            $(frmTutorFee)[0].reset();
-            $(frmOtherFee)[0].reset();
-        });
-
-        $('BUTTON#btnPrintInvoice').on('click', function (e) {
-            var actived_tab_id = $(actived_tab).prop('id');
-            if (actived_tab_id.indexOf('tutorfee') == 0) {
-                if ($(frmTutorFee).find('input#iid').val() == '') {
-                    data = {
-                        "type": 1,
-                        "student_id": $(frmTutorFee).find('SELECT#student_id').val(),
-                        "class_id": $(frmTutorFee).find('SELECT#class_id').val(),
-                        "price": numeral($(frmTutorFee).find('INPUT#price').val()).value(),
-                        "start_date": $(frmTutorFee).find('INPUT#start_date').val(),
-                        "end_date": $(frmTutorFee).find('INPUT#end_date').val(),
-                        "duration": $(frmTutorFee).find('INPUT#duration').val(),
-                        "payer": $(frmTutorFee).find('INPUT#payer').val(),
-                        "prepaid": numeral($(frmTutorFee).find('INPUT#prepaid').val()).value(),
-                        "amount": numeral($(frmTutorFee).find('INPUT#amount').val()).value(),
-                        "discount": $(frmTutorFee).find('INPUT#discount').val(),
-                        "discount_desc": $(frmTutorFee).find('INPUT#discount_desc').val(),
-                        "invoice_status": 1,
-                        "currency": 'VND'
-                    };
-
-                    save_tutor_invoice(function (invoce_id) {
-                        print_invoice(invoce_id);
-                        tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
-                        invoice_list_table.ajax.reload();
-                    }, frmTutorFee, data);
-                } else {
-                    print_invoice($(frmTutorFee).find('input#iid').val());
-                    tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
-                }
-            } else if (actived_tab_id.indexOf('otherfee') == 0) {
-                if ($(frmOtherFee).find('input#iid').val() == '') {
-                    data = {
-                        "type": 2,
-                        "student_id": $(frmOtherFee).find('SELECT#student_id').val(),
-                        "class_id": $(frmOtherFee).find('SELECT#class_id').val(),
-                        "payer": $(frmOtherFee).find('INPUT#payer').val(),
-                        "reason": $(frmOtherFee).find('TEXTAREA#reason').val(),
-                        "amount": numeral($(frmOtherFee).find('INPUT#amount').val()).value(),
-                        "invoice_status": 1,
-                        "currency": 'VND'
-                    };
-
-                    save_tutor_invoice(function (invoce_id) {
-                        print_invoice(invoce_id);
-                        tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
-                        invoice_list_table.ajax.reload();
-                    }, frmOtherFee, data);
-                } else {
-                    print_invoice($(frmOtherFee).find('input#iid').val());
-                    tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
-                }
-            }
-
-            $(frmTutorFee)[0].reset();
-            $(frmOtherFee)[0].reset();
-        });
-
-        $('BUTTON#btnCreateInvoice').on('click', function () {
-            $(tab_headers).find('LI').removeClass('disabled');
-            tab_activate($(tab_headers).find('A[data-tab="tutorfee-tab"]')[0]);
-        });
-
+    var init = function init() {
         invoice_list_init();
+        invoice_list_event_binding();
+
+        $('.help-block').hide();
+        $('.has-error').removeClass('has-error');
+        toggle_tuition_frmTutorFee(false);
+
+        tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
+
+        select2_tutor_studentid = $(student_id).select2();
+        select2_tutor_classid = $(class_id).select2();
+
+        select2_other_studentid = $(student_other_id).select2();
+        select2_other_classid = $(class_other_id).select2();
+
+        toggle_tuition_frmTutorFee(false);
 
         get_student_list(function (std_id, class_target) {
             get_class_list(std_id, class_target);
         }, $('SELECT.select2[id="student_id"]'), $('SELECT.select2[id="class_id"]'));
+
+        invoice_tutor_form_event_binding();
+        invoice_other_form_event_binding();
+
+        $('BUTTON#btnSaveInvoice, BUTTON#btnPrintInvoice').on('click', function (e) {
+            var save_callback = null;
+            var data = null;
+            var actived_tab_id = $(actived_tab).prop('id');
+            var invoice_type = actived_tab_id == 'tutorfee-tab' ? 'tutorfee' : actived_tab_id == 'otherfee-tab' ? 'otherfee' : '';
+            var form = actived_tab_id == 'tutorfee-tab' ? frmTutorFee : actived_tab_id == 'otherfee-tab' ? frmOtherFee : null;
+            if (invoice_type == 'tutorfee') {
+                data = {
+                    "type": 1,
+                    "student_id": $(form).find('SELECT#student_id').val(),
+                    "class_id": $(form).find('SELECT#class_id').val(),
+                    "price": numeral($(form).find('INPUT#price').val()).value(),
+                    "start_date": $(form).find('INPUT#start_date').val(),
+                    "end_date": $(form).find('INPUT#end_date').val(),
+                    "duration": $(form).find('INPUT#duration').val(),
+                    "payer": $(form).find('INPUT#payer').val(),
+                    "prepaid": numeral($(form).find('INPUT#prepaid').val()).value(),
+                    "amount": numeral($(form).find('INPUT#amount').val()).value(),
+                    "discount": $(form).find('INPUT#discount').val(),
+                    "discount_desc": $(form).find('INPUT#discount_desc').val(),
+                    "payment_method": $(form).find('INPUT[name="payment_method"]:checked').val(),
+                    "invoice_status": 0,
+                    "currency": 'VND'
+                };
+            } else if (invoice_type == 'otherfee') {
+                data = {
+                    "type": 2,
+                    "student_id": $(form).find('SELECT#student_id').val(),
+                    "class_id": $(form).find('SELECT#class_id').val(),
+                    "payer": $(form).find('INPUT#payer').val(),
+                    "reason": $(form).find('TEXTAREA#reason').val(),
+                    "amount": numeral($(form).find('INPUT#amount').val()).value(),
+                    "payment_method": $(form).find('INPUT[name="payment_method"]:checked').val(),
+                    "invoice_status": 0,
+                    "currency": 'VND'
+                };
+            }
+
+            if (!eval(invoice_type + '_validate(data)')) {
+                return false;
+            } else {
+                if ($(e.target).prop('id') == 'btnSaveInvoice') {
+                    save_callback = function save_callback() {
+                        tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
+                        invoice_list_table.ajax.reload();
+                    };
+                } else if ($(e.target).prop('id') == 'btnPrintInvoice') {
+                    save_callback = function save_callback(invoce_id) {
+                        print_invoice(invoce_id);
+                        tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
+                        invoice_list_table.ajax.reload();
+                    };
+                }
+
+                save_invoice(save_callback, form, data);
+            }
+        });
     };
 
     init();
