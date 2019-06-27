@@ -84,7 +84,7 @@
       <div class="col-xs-12">
         <h2 class="page-header">
           <img style="width:100px" src="{{asset('images/logo.png')}}">
-          <small class="pull-right">Ngày in: {{date('d/m/Y H:i')}}</small>
+          <small class="pull-right">Ngày in: {{$last_printed_time}}</small>
         </h2>
       </div>
       <!-- /.col -->

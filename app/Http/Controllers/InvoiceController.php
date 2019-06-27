@@ -164,6 +164,8 @@ class InvoiceController extends Controller
             $css .= file_get_contents( $file) . "\n";
         }
 
+        $last_printed_time = date('Y-m-d H:i:s');
+
         $invoice_data['css'] = $css;
 
         $invoice_data['student_name'] = $student->name;
@@ -178,12 +180,22 @@ class InvoiceController extends Controller
 
         $invoice_data['amount'] = number_format ( $invoice_data['amount'] , 0 , '' , ',' );
         $invoice_data['prepaid'] = number_format ( $invoice_data['prepaid'] , 0 , '' , ',' );
+
+        if ($invoice_data['last_printed_time'] == null && $invoice_data['invoice_status'] > 0) {
+            $invoice_data['last_printed_time'] = $invoice_data['updated_at'];
+        }
+        else if($invoice_data['last_printed_time'] == null && $invoice_data['invoice_status'] == 0){
+            $invoice_data['last_printed_time'] = 'Chưa in' ;
+        }
+
+        if ($act == 'print') {
+            $invoice_data['last_printed_time'] = $last_printed_time;
+        }
         
         $invoice_data['start_date'] = date('d/m/Y', strtotime($invoice_data['start_date']));
         $invoice_data['end_date'] = date('d/m/Y', strtotime($invoice_data['end_date']));
         $invoice_data['created_at'] = date('d/m/Y H:i', strtotime($invoice_data['created_at']));
         $invoice_data['act'] = $act;
-        //$invoice_data['logo'] = 'data:image/png;base64, ' . base64_encode(file_get_contents($resource_path.'images/logo.png'));
 
         $view = ((int)$invoice_data['type'] == 1) ? 'invoice/detail/tutorfee_print' : 'invoice/detail/otherfee_print';
         $view_pdf = ((int)$invoice_data['type'] == 1) ? 'invoice/detail/tutorfee_print_pdf' : 'invoice/detail/otherfee_print';
@@ -192,7 +204,6 @@ class InvoiceController extends Controller
         $content_pdf = view( $view_pdf, $invoice_data);
 
         if ($act == 'print') {
-
             if ($invoice->printed_count >= 1) {
                 return response()->json(['code' => 0, 'message'=> 'Hoá đơn số '. $invoice->invoice_number . ' đã được in '.$invoice->printed_count.' lần!'], 500);
             }
@@ -203,6 +214,7 @@ class InvoiceController extends Controller
                 $invoice->invoice_status = 2;
             }
             $invoice->printed_count++;
+            $invoice->last_printed_time = $last_printed_time;
         }
 
         $invoice->invoice_content = $content_pdf;
@@ -258,6 +270,7 @@ class InvoiceController extends Controller
         $input = $request->all();
         $invoice_id = $input['id'];
         $invoice = Invoice::findOrfail($invoice_id);
+        $invoice->accountant_approved_date = date('Y-m-d H:i:s');
         $invoice->invoice_status = 3;
         $invoice->save();
         return response()->json(['code' => 0, 'data' => ['message' => 'OK']], 200);
