@@ -192,11 +192,17 @@ class InvoiceController extends Controller
         $content_pdf = view( $view_pdf, $invoice_data);
 
         if ($act == 'print') {
+
+            if ($invoice->printed_count >= 1) {
+                return response()->json(['code' => 0, 'message'=> 'Hoá đơn số '. $invoice->invoice_number . ' đã được in '.$invoice->printed_count.' lần!'], 500);
+            }
+
             if ($invoice->invoice_status == 0) {
                 $invoice->invoice_status = 1;
             } else if ($invoice->invoice_status == 1) {
                 $invoice->invoice_status = 2;
             }
+            $invoice->printed_count++;
         }
 
         $invoice->invoice_content = $content_pdf;
@@ -235,6 +241,26 @@ class InvoiceController extends Controller
     {
         $data = Invoice::get_last_tutor_duration($student_id, $class_id);
         return response()->json(['code' => 0, 'data' => $data], 200);
+    }
+
+    public function mark_delete_invoice (Request $request)
+    {
+        $input = $request->all();
+        $invoice_id = $input['id'];
+        $invoice = Invoice::findOrfail($invoice_id);
+        $invoice->invoice_status = 4;
+        $invoice->save();
+        return response()->json(['code' => 0, 'data' => ['message' => 'OK']], 200);
+    }
+
+    public function approve_invoice (Request $request)
+    {
+        $input = $request->all();
+        $invoice_id = $input['id'];
+        $invoice = Invoice::findOrfail($invoice_id);
+        $invoice->invoice_status = 3;
+        $invoice->save();
+        return response()->json(['code' => 0, 'data' => ['message' => 'OK']], 200);
     }
 
     protected function number_to_words($number)

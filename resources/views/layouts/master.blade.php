@@ -247,7 +247,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 
 <!-- Select2 -->
-{{--  <script src="{{ asset('admin/select2/dist/js/select2.full.min.js') }}"></script>  --}}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.full.min.js"></script>
 
 <!-- AdminLTE App -->

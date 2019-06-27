@@ -29,3 +29,40 @@ iframe#invoice-preview {
   font-style: normal;
 }
 
+TABLE#invoice-list {
+  width: 100%;
+}
+
+TABLE#invoice-list tbody tr td:first-child {
+  width: 12%;
+}
+
+TABLE#invoice-list tbody tr td:nth-child(2) {
+  width: 10%;
+}
+
+TABLE#invoice-list tbody tr td:nth-child(3) {
+  width: 5%;
+}
+
+TABLE#invoice-list tbody tr td:nth-child(4) {
+  width: 15%;
+}
+
+TABLE#invoice-list tbody tr td:nth-child(5) {
+  width: 6%;
+}
+
+TABLE#invoice-list tbody tr td:nth-child(6) {
+  width: 15%;
+}
+
+TABLE#invoice-list tbody tr td:nth-child(7) {
+  width: 8%;
+}
+
+TABLE#invoice-list tbody tr td:nth-child(8) {
+  text-align: left;
+  width: 12%;
+}
+

@@ -7,6 +7,8 @@ try {
     require('jquery-validation');
     require('daterangepicker');
     require('datatables.net');
+    require('datatables.net-buttons')(window.$);
+    require('bootstrap-datepicker');
 
     var user_info = {
         id: $('meta[name="user-id"]').attr('content'),

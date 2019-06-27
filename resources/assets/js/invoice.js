@@ -212,18 +212,25 @@ $(function () {
         });
     }
 
-    var print_invoice = (invoice_id) => {
+    var print_invoice = (invoice_id, callback) => {
         $.ajax({
             url: '/invoice/print/' + invoice_id + '/print',
             type: 'GET',
             dataType: 'html',
-            success: function (response) {
+            success: (response) => {
                 var w = window.open();
                 w.document.write(response);
                 setTimeout(() => {
                     w.print();
                     w.close();
                 }, 1000);
+                if (callback != undefined) {
+                    callback();
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                var response = JSON.parse(jqXHR.responseText)
+                alert(response.message);
             }
         });
     };
@@ -320,15 +327,21 @@ $(function () {
         if ($.fn.dataTable.isDataTable('TABLE#invoice-list')) {
             invoice_list_table = $('TABLE#invoice-list').DataTable();
         } else {
-            var buttons = '<button title="In phiếu thu" class="btn btn-primary print-invoice"><i class="fa fa-print" aria-hidden="true"></i></button>\
-                            <button title="Xem" class="btn btn-info view-invoice"><i class="fa fa-eye" aria-hidden="true"></i></button>';
+
+            $.fn.dataTable.ext.buttons.reload = {
+                text: 'Làm mới dữ liệu',
+                action: function ( e, dt, node, config ) {
+                    dt.ajax.reload();
+                }
+            };
+
             invoice_list_table = $('TABLE#invoice-list').DataTable({
                 language: datatable_language,
                 "columnDefs": [{
                     targets: [7],
                     "data": null,
                     "visible": true,
-                    "defaultContent": buttons
+                    "defaultContent": ''
                 }],
                 ajax: {
                     url: 'invoice/list',
@@ -337,7 +350,8 @@ $(function () {
                 "order": [
                     [1, 'asc']
                 ],
-                columns: [{
+                columns: [
+                    {
                         data: 'invoice_number',
                         name: 'invoice_number'
                     },
@@ -374,13 +388,19 @@ $(function () {
                             var status = '';
                             switch (data) {
                                 case 0:
-                                    status = 'Lưu tạm thời';
+                                    status = '<span class="label label-info">Lưu (chưa in)</span>';
                                 break;
                                 case 1:
-                                    status = 'Đã in';
+                                    status = '<span class="label label-warning">Đã in lần 1</span>';
                                 break;
                                 case 2:
-                                    status = 'Đã in lại';
+                                    status = '<span class="label label-warning">Đã in lần 2</span>';
+                                break;
+                                case 3:
+                                    status = '<span class="label label-success">Đã duyệt</span>';
+                                break;
+                                case 4:
+                                    status = '<span class="label label-danger">Đã huỷ</span>';
                                 break;
                                 default:
                                 break;
@@ -390,23 +410,113 @@ $(function () {
                         }
                     },
                     {
-                        data: null
+                        data: null,
+                        name: 'buttons',
+                        render: (data, type, row, meta) => {
+                            var user_info = {
+                                id: $('meta[name="user-id"]').attr('content'),
+                                name: btoa($('meta[name="user-name"]').attr('content')),
+                                email: $('meta[name="user-email"]').attr('content'),
+                                branch: $('meta[name="user-branch_id"]').attr('content'),
+                                role: $('meta[name="user-role"]').attr('content')
+                            }
+
+                            var b_print =  $('<button title="In phiếu thu" class="btn btn-primary print-invoice" style="margin-right: 2px;"><i class="fa fa-print" aria-hidden="true"></i></button>');
+                            var b_view = $('<button title="Xem" class="btn btn-info view-invoice" style="margin-right: 2px;"><i class="fa fa-eye" aria-hidden="true"></i></button>');
+                            var b_trash = $('<button title="Huỷ" class="btn btn-danger del-invoice"><i class="fa fa-trash" aria-hidden="true"></i></button>');
+                            var b_accountant_locked = $('<button title="Duyệt" class="btn btn-success approve-invoice" style="margin-right: 2px;"><i class="fa fa-check-square-o" aria-hidden="true"></i></button>');
+
+                            var content = $('<span></span>');
+                            content.append(b_view, b_print, b_accountant_locked, b_trash);
+
+                            if (row.invoice_status >= 2) {
+                                $(b_print).prop('disabled', true);
+                            }
+
+                            if (row.invoice_status > 2) {
+                                $(b_trash).prop('disabled', true);
+                            } 
+
+                            if (user_info.role != 4) {
+                                $(b_accountant_locked).css('display', 'none');
+                                $('TABLE#invoice-list tbody tr td:nth-child(8)').css('width', '8%');
+                            }
+                            else if (row.invoice_status > 2) {
+                                $(b_accountant_locked).prop('disabled', true);
+                            }
+
+                            return content.html();
+                        }
                     }
-                ]
+                ],
+                initComplete: () => {
+                    var filter_bar = filter_bar_render();
+
+                    $('DIV#invoice-list_wrapper').prepend(
+                        filter_bar,
+                        $('<div></div>', {class:'row',style:'height:20px'})
+                    );
+                }
+            });
+
+            invoice_list_table.on('draw.dt', () => {
+                var user_role = $('meta[name="user-role"]').attr('content');
+                if (user_role != 4) {
+                    $('TABLE#invoice-list tbody tr td:nth-child(8)').css('width', '8%');
+                }
             });
 
             invoice_list_table.on('click', 'button.print-invoice', function () {
                 var data = invoice_list_table.row($(this).parents('tr')).data();
-                print_invoice(data.id);
-                setTimeout(() => {
-                    invoice_list_table.ajax.reload()
-                }, 500);
+                print_invoice(data.id, () => {
+                    setTimeout(() => {
+                        invoice_list_table.ajax.reload()
+                    }, 500);
+                });
             });
 
             invoice_list_table.on('click', 'button.view-invoice', function () {
                 var data = invoice_list_table.row($(this).parents('tr')).data();
                 view_invoice(data.id);
             });
+
+            invoice_list_table.on('click', 'button.del-invoice', function () {
+                var data = invoice_list_table.row($(this).parents('tr')).data();
+                if (confirm('Bạn có chắc muốn huỷ hoá đơn sô ' + data.invoice_number + ' không?')) {
+                    $.ajax('/invoice/delete', {
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({"id":data.id}),
+                        success: function (response) {
+                            alert('Đã huỷ!');
+                            invoice_list_table.ajax.reload();
+                        },
+                        error: (xhr, status, err) => {
+                            alert(err);
+                        }
+                    });
+                }
+            });
+
+            invoice_list_table.on('click', 'button.approve-invoice', function () {
+                var data = invoice_list_table.row($(this).parents('tr')).data();
+                if (confirm('Bạn có chắc muốn duyệt hoá đơn sô ' + data.invoice_number + ' không?')) {
+                    $.ajax('/invoice/approve', {
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({"id":data.id}),
+                        success: function (response) {
+                            alert('Đã duyệt!');
+                            invoice_list_table.ajax.reload();
+                        },
+                        error: (xhr, status, err) => {
+                            alert(err);
+                        }
+                    });
+                    
+                }
+            });
+            
         }
     };
 
@@ -474,6 +584,64 @@ $(function () {
             $(e.target).closest('.has-error').find('.help-block').hide();
             $(e.target).closest('.has-error').removeClass('has-error');
         });
+    }
+
+    var filter_bar_render = () => {
+        var wrapper = $('<div></div>', {id:'invoice_filter_bar', class:'row'});
+
+        var wrapper_title = $('<div></div>', {text:''});
+
+        var status_filter = $('<select></select>', {id:'invoice-list-status-filter', class:'form-control'});
+        var date_filter = $('<input>', {id:'invoice-list-date-filter', class:'form-control', type:'text',style:'width:100px'});
+        var type_filter = $('<select></select>', {id:'invoice-list-type-filter', class:'form-control'});
+
+        $(status_filter).append( $('<option></option>', {'value':-1, html: '[ Tất cả trạng thái ]'}));
+        var status = ['Lưu (chưa in)','Đã in lần 1','Đã in lần 2','Đã duyệt', 'Đã huỷ'];
+        for(var i = 0; i < status.length; i++) {
+            $(status_filter).append(  
+                $('<option></option>', {'value':status[i], html: status[i]})
+            );
+        }
+
+        $(status_filter).on('change', (e) => {
+            var search_value = $(e.target).val() == -1 ? '' : $(e.target).val();
+            invoice_list_table.column(6).search(search_value).draw();
+        })
+
+        $(type_filter).append( $('<option></option>', {'value':-1, html: '[ Tất cả ]'}));
+        var type = ['Học phí','Thu khác'];
+        for(var i = 0; i < type.length; i++) {
+            $(type_filter).append(  
+                $('<option></option>', {'value':type[i], html: type[i]})
+            );
+        }
+
+        $(type_filter).on('change', (e) => {
+            var search_value = $(e.target).val() == -1 ? '' : $(e.target).val();
+            invoice_list_table.column(2).search(search_value).draw();
+        });
+
+        wrapper.append(
+            $('<div></div>', {class:'col-sm-3'}).append(wrapper_title),
+            $('<div></div>', {class:'col-sm-3'}).append($('<label>Loại hoá đơn: </label>').append(type_filter)),
+            $('<div></div>', {class:'col-sm-3'}).append($('<label>Trạng thái hoá đơn: </label>').append(status_filter)),
+            $('<div></div>', {class:'col-sm-3'}).append($('<label>Thời gian lập: </label>').append(date_filter))
+        );
+
+        $(date_filter).datepicker({
+            autoclose: true,
+            format: 'yyyy-mm-dd'
+        });
+
+        $(date_filter).on('change',(e) => {
+            var search_value = $.fn.dataTable.util.escapeRegex(
+                $(e.target).val()
+            );
+            console.log(search_value);
+            invoice_list_table.column(1).search( search_value ? '^'+search_value : '', true, false ).draw();
+        });
+
+        return wrapper;
     }
 
     var init = () => {

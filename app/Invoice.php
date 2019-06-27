@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Facades\DB;
 use App\AccessControl\Scopes\CrmOwnerTrait;
 use App\Student;
+use App\Holiday;
 
 
 class Invoice extends Eloquent
@@ -70,17 +71,19 @@ class Invoice extends Eloquent
             $schedule_int[] = $wdays_int[$wday];
         }
 
+        $holidays = Holiday::getHolidayInRange($start_date, $end_date);
+
         $days_of_range = date_diff(date_create($start_date), date_create($end_date))->format('%a');
         $int_start_date = strtotime($start_date);
 
         for ($i = 1; $i <= (int) $days_of_range + 1; $i++) {
             $day = strtotime('+' . ($i - 1) . ' days', $int_start_date);
             $wday = date('w', $day);
-            if (in_array($wday, $schedule_int)) {
+            $full_day = date('Y-m-d', $day);            
+            if (in_array($wday, $schedule_int) && !in_array($full_day, $holidays)) {
                 $duration++;
             }
         }
-
         return $duration;
     }
 
@@ -92,10 +95,19 @@ class Invoice extends Eloquent
             ->first();
         $schedule = explode(',', substr($class->schedule, 0, -1));
         $int_start_date = strtotime($start_date);
+        $temp_end_date = date('Y-m-d', strtotime('+'. (int)($duration * 3) . ' days',$int_start_date));
+
+        $holidays = Holiday::getHolidayInRange($start_date, $temp_end_date);
 
         for ($i = 1; $i <= (int) $duration + 1; $i++) {
             $day = strtotime('+' . ($i - 1) . ' days', $int_start_date);
             $wday = date('w', $day);
+            $full_day = date('Y-m-d', $day); 
+
+            if(in_array($full_day, $holidays)) {
+                $duration ++;
+            }
+
             if (in_array($wday, $schedule)) {
                 $end_date = date('Y-m-d', $day);
             }
@@ -116,8 +128,8 @@ class Invoice extends Eloquent
         $old_numbers = DB::table('rev_n_exp')
             ->where('invoice_number', 'like', $prefix . '-%')
             ->pluck('invoice_number');
-        //$postfix = 'NT';
-        $postfix = $branch_code;
+
+            $postfix = $branch_code;
 
         $max = $prefix . '-000-' . $postfix;
 
