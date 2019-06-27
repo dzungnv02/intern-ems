@@ -89,6 +89,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('invoice/save', 'InvoiceController@save_invoice')->middleware('api.headers');
     Route::get('invoice/print/{id}/{act}', 'InvoiceController@print_invoice')->middleware(['api.headers','clearcache']);
     Route::get('invoice/pdf/{id}', 'InvoiceController@send_invoice')->middleware(['api.headers','clearcache']);
+    Route::post('invoice/delete', 'InvoiceController@mark_delete_invoice')->middleware('api.headers');
+    Route::post('invoice/approve', 'InvoiceController@approve_invoice')->middleware('api.headers');
+
 });
 
 
