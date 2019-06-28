@@ -425,6 +425,7 @@ $(function () {
         });
 
         $(modal_add_schedule).on('show.bs.modal', (e) => {
+            $(modal_add_schedule).find('FORM#frmTeacherSchedule')[0].reset();
             schedule_type_select();
             get_class_list();
             get_student_list();
@@ -435,6 +436,14 @@ $(function () {
         $(modal_add_schedule).find('DIV.modal-footer BUTTON#btnSave').on('click', (e) => {
             add_teacher_schedule();
         }) 
+
+        $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#start_time').datetimepicker({
+            format: 'Y-m-d H:i'
+        });
+
+        $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#end_time').datetimepicker({
+            format: 'Y-m-d H:i'
+        });
     }
 
 });
