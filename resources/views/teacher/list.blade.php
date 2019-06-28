@@ -241,11 +241,13 @@
 							<div class="row">
 								<div class="form-group col-sm-6">
 									<label for="start_time" class="col-form-label">Từ<i style="color:red">*</i></label>
-									<input type="datetime-local" class="form-control" id="start_time" name="start_time" placeholder="Bắt đầu">
+									{{--  <input type="datetime-local" class="form-control" id="start_time" name="start_time" placeholder="Bắt đầu">  --}}
+									<input type="text" class="form-control" id="start_time" name="start_time" placeholder="Bắt đầu">
 								</div>
 								<div class="form-group col-sm-6">
 									<label for="end_time" class="col-form-label">Đến<i style="color:red">*</i></label>
-									<input type="datetime-local" class="form-control" id="end_time" name="end_time" placeholder="Kết thúc">
+									{{--  <input type="datetime-local" class="form-control" id="end_time" name="end_time" placeholder="Kết thúc">  --}}
+									<input type="text" class="form-control" id="end_time" name="end_time" placeholder="Kết thúc">
 								</div>
 							</div>
 							<hr>
