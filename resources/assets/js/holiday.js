@@ -81,7 +81,6 @@ $(function () {
 					    $(this).find('form')[0].reset();
 					});
 	            	tableHoliday.ajax.reload();
-	     			toastr.success('Thêm thành công!');
 	            }
 	        });
     	}
@@ -104,7 +103,6 @@ $(function () {
 		            data: {id:id},
 		            success: function(response){
 		            	tableHoliday.ajax.reload();
-		                toastr.success('Xóa thành công!');
 		            }
 		        })
 	      	}

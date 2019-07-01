@@ -249,15 +249,8 @@ $(document).ready(function () {
 						data: formData,
 						success: function (response) {
 							location.reload();
-							toastr.warning(response.message);
-						},
-						error: function (response) {
-							toastr.warning(response.message);
 						}
 					});
-				}
-				else {
-					toastr.warning('Bạn đã hủy!');
 				}
 			})
 	})

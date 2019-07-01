@@ -32,6 +32,13 @@ try {
             }else {
                 console.log(jqXHR);
             }
+            toastr.error('Có lỗi xẩy ra!');
+        }
+    });
+
+    $( document ).ajaxSuccess(function( event, xhr, settings ) {
+        if (settings.method == 'POST') {
+            toastr.success('Thành công');
         }
     });
 
