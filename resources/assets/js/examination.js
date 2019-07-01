@@ -137,7 +137,7 @@ $(document).on('click','.button-add',function(e){
 	  if($('#form-add-exam').valid()){
 			$.ajax({
 			url :"api/create-exam",
-			type: "POST",
+			method: "POST",
 			data : {name: name,start_day: start_day,duration: duration,note: note,class_id: class_id},
 			dataType:"json",
 			success:function(response){ 
@@ -170,7 +170,7 @@ $(document).on('click','.button-del-exam',function(){
 			console.log(id);	
 				$.ajax({
 						dataType : 'json',
-						type : 'post',
+						method:"POST",
 						url : 'api/delete-exam',
 						data : {id:id},
 						success: function(response){
@@ -204,7 +204,7 @@ $(document).on('click','.button-edit-exam',function(e){
 	});
 			$.ajax({
 				dataType : 'json',
-				type : 'post',
+				method:"POST",
 				url : 'api/edit-exam',
 				data : {id:id},
 				resetForm: true,
@@ -307,7 +307,7 @@ $(document).on('click','.button-edit-exam',function(e){
 			if($('#form-edit-exam').valid()){
 				$.ajax({
 					url :"api/update-exam",
-					type: "POST",
+					method: "POST",
 					data : {id:id,name: name,start_day: start_day,duration: duration,note: note,class_id: class_id},
 					dataType:"json",
 					success:function(response){ 
@@ -383,7 +383,7 @@ $('#setPoint').on('click', function() {
 	if(pointnull == 0){
 		$.ajax({
 			url :"api/add-pointexam",
-			type: "post",
+			method: "POST",
 			data : {student_id:student_id,point: point,exams_id: exams_id},
 			dataType:"json",
 			success:function(response){ 
@@ -475,7 +475,7 @@ $(document).on('click','.button-update-point',function(){
 
 	$.ajax({
 		url :"api/update-point",
-		type: "POST",
+		method: "POST",
 		data : {examination_id: examination_id,student_id: student_id,point: point},
 		dataType:"json",
 		success:function(response){ 

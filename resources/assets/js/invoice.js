@@ -154,7 +154,7 @@ $(function () {
 
         if (data.class_id != '' && (data.start_date != '' && (data.end_date != '' || data.duration != '')) && data.price) {
             $.ajax('/invoice/tuition_fee_calculate', {
-                type: 'POST',
+                method:"POST",
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: function (response) {
@@ -197,7 +197,7 @@ $(function () {
         }
 
         $.ajax('/invoice/save', {
-            type: 'POST',
+            method:"POST",
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function (response) {
@@ -484,7 +484,7 @@ $(function () {
                 var data = invoice_list_table.row($(this).parents('tr')).data();
                 if (confirm('Bạn có chắc muốn huỷ hoá đơn sô ' + data.invoice_number + ' không?')) {
                     $.ajax('/invoice/delete', {
-                        type: 'POST',
+                        method:"POST",
                         contentType: 'application/json',
                         data: JSON.stringify({"id":data.id}),
                         success: function (response) {
@@ -502,7 +502,7 @@ $(function () {
                 var data = invoice_list_table.row($(this).parents('tr')).data();
                 if (confirm('Bạn có chắc muốn duyệt hoá đơn sô ' + data.invoice_number + ' không?')) {
                     $.ajax('/invoice/approve', {
-                        type: 'POST',
+                        method:"POST",
                         contentType: 'application/json',
                         data: JSON.stringify({"id":data.id}),
                         success: function (response) {

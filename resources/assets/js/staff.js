@@ -143,7 +143,7 @@ $(document).ready(function () {
 
 		$.ajax({
 			url: '/api/add-staff',
-			type: 'POST',
+			method:"POST",
 			contentType: false,
 			processData: false,
 			data: formData,
@@ -243,7 +243,7 @@ $(document).ready(function () {
 				if (willDelete) {
 					$.ajax({
 						url: '/api/delete-staff',
-						type: 'POST',
+						method:"POST",
 						contentType: false,
 						processData: false,
 						data: formData,
@@ -280,7 +280,7 @@ $(document).ready(function () {
 				formData.append('newPassword', new_password);
 				$.ajax({
 					url: '/api/edit-password-staff',
-					type: 'POST',
+					method:"POST",
 					contentType: false,
 					processData: false,
 					data: formData,
@@ -339,7 +339,7 @@ $('#editStaff_1').click(function (event) {
 		formData.append("file", $('#inputFile')[0].files[0]);
 		$.ajax({
 			url: '/api/edit-staff',
-			type: 'POST',
+			method:"POST",
 			contentType: false,
 			processData: false,
 			data: formData,

@@ -72,7 +72,7 @@ $(function () {
     	var holiday = $('#holiday').val();
     	if(formAddHoliday.valid()){
     		$.ajax({
-	            type: 'POST',
+	            method:"POST",
 	            url: 'api/add-holiday',
 	            data: {holiday: holiday},
 	            success: function(response){
@@ -99,7 +99,7 @@ $(function () {
 	    .then((willDelete) => {
 	      	if (willDelete) {
       			$.ajax({
-		            type: 'post',
+		            method:"POST",
 		            url: 'api/delete-holiday',
 		            data: {id:id},
 		            success: function(response){

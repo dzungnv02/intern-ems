@@ -159,7 +159,7 @@ $(function () {
         var url = mode == 'new' ? '/api/add-teacher' : '/api/edit-teacher';
 
         $.ajax(url, {
-            type: 'POST',
+            method:"POST",
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function (response) {
@@ -308,7 +308,6 @@ $(function () {
                             $($(class_id).find('OPTION')[0]).attr('selected', 'selected');
                     }
                 }
-                
             }
         });
     }

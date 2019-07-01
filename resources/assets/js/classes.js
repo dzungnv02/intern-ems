@@ -758,7 +758,7 @@ $(function () {
             }
             $.ajax({
                 url: "api/add-student-to-class",
-                type: "POST",
+                method: "POST",
                 data: data,
                 success: function (response) {
                     if (response.code == 0) {
