@@ -261,7 +261,7 @@ $(function () {
 
     var show_add_schedule_modal = () => {
         if ($(modal_teacher_schedule).is(':visible')) {
-            var teacher_id = $(modal_teacher_schedule).find('FORM#frmTeacher INPUT#teacher_id').val();
+            var teacher_id = $(modal_teacher_schedule).find('FORM#frmTeacher INPUT#teacher_id').val(); 
             $(modal_teacher_schedule).removeClass("fade").modal("hide");
             $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val(teacher_id);
             $(modal_add_schedule).modal("show").addClass("fade");
@@ -350,7 +350,6 @@ $(function () {
         var form = $(modal_add_schedule).find('FORM#frmTeacherSchedule');
         var inputs = $(form).find('input,select,textarea');
         $(inputs).each((index, el) => {
-            console.log('el',el);
             data[el.id] = $(el).val();
         });
 
@@ -360,9 +359,7 @@ $(function () {
             data: JSON.stringify(data),
             contentType: 'application/json',
             success: (response) => {
-                console.log(response);
                 var teacher_id = $(form).find('INPUT#teacher_id').val();
-                
                 get_teacher_schedule(teacher_id, () => {
                     if ($(modal_add_schedule).is(':visible')) {
                         $(modal_add_schedule).removeClass("fade").modal("hide");
@@ -425,7 +422,9 @@ $(function () {
         });
 
         $(modal_add_schedule).on('show.bs.modal', (e) => {
+            var teacher_id = $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val();
             $(modal_add_schedule).find('FORM#frmTeacherSchedule')[0].reset();
+            $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val(teacher_id);
             schedule_type_select();
             get_class_list();
             get_student_list();
