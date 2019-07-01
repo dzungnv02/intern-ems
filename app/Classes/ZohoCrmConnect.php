@@ -258,6 +258,7 @@ class ZohoCrmConnect
 
                 if (count($data['data']) > 100) {
                     $error = 'data too large';
+                    Log::error('$error: '. $error);
                     throw new Exception($error);
                     return false;
                 }
@@ -273,11 +274,12 @@ class ZohoCrmConnect
                 $method = 'POST';
                 $response = $this->zoho_crm_client->request($method, $uri, $options);
 
-                if ($response->getStatusCode() == 201) {
+                if ($response->getStatusCode() == 201 || $response->getStatusCode() == 200) {
                     $data = json_decode($response->getBody());
-                    $record = $data->data[0];
+                    $record = $data->data[0]->code;
                     return $record;
                 } else {
+                    Log::error($response->getStatusCode() . ' - '. $response->getBody());
                     return false;
                 }
             } else {

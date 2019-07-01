@@ -184,6 +184,8 @@ class TeacherController extends Controller
             ]];
 
             foreach ($crm_mapping as $key => $field) {
+                if ($field == 'crm_owner') continue;
+                
                 if ($key == 'EMS_ID') {
                     $crm_data['data'][0][$key] = '' . $data['id'];
                 } else if ($key == 'EMS_SYNC_TIME') {
