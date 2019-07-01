@@ -175,11 +175,9 @@ $(function () {
                             if(response.code==1)
                             {
                                 tableCourse.ajax.reload();
-                                toastr.success(response.message);
                                 $('#form-create-course')[0].reset();
                                 $('#modal-create-course').modal('hide');
-                            }else
-                                toastr.error(response.message);
+                            }
                             
                         }
                     });
@@ -234,10 +232,7 @@ $(function () {
                         {
                             $("#modal-edit-course").modal("hide");
                             tableCourse.ajax.reload();
-                            toastr.success(response.message);
-                        }else{
-                            toastr.error(response.message);
-                        }   
+                        } 
                     }
                 });
             }
@@ -260,10 +255,8 @@ $(function () {
                         data:{id:course_id},
                         success:function(response){
                             if(response.code==1){
-                                toastr.success(response.message);
                                 tableCourse.ajax.reload();
-                            }else
-                                toastr.error(response.message);
+                            }
                         }
                     });
               }else {

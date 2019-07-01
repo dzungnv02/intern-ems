@@ -605,7 +605,6 @@ $(function () {
                     success: (response) => {
                         table_classes.ajax.reload();
                         $('DIV#modal-class').modal("hide");
-                        toastr.success(response.message);
                     }
                 });
             }
@@ -764,11 +763,9 @@ $(function () {
                     if (response.code == 0) {
                         get_student_not_assign(class_id);
                         get_student_of_class(class_id);
-                        toastr.error(response.message);
                     } else {
                         get_student_not_assign(class_id);
                         get_student_of_class(class_id);
-                        toastr.success(response.message);
                     }
                 }
             });
@@ -780,42 +777,6 @@ $(function () {
             placeholder: "Chọn học sinh",
             minimumInputLength: 3
         });
-
-        /* var modalConfirm = (callback, message) => {
-            if (message != undefined) {
-                $("#confirm-delete DIV.modal-header H5.modal-title").html(message);
-            }
-            $("#confirm-delete").modal('show');
-
-            $("#modal-btn-yes").unbind('click').bind("click", function () {
-                callback(true);
-                $("#confirm-delete").modal('hide');
-            });
-
-            $("#modal-btn-no").unbind('click').bind("click", function () {
-                callback(false);
-                $("#confirm-delete").modal('hide');
-            });
-
-            var delete_class = (class_id) => {
-                $.ajax({
-                    url: "api/delete-class",
-                    method: "GET",
-                    data: {
-                        id: class_id
-                    },
-                    success: function (response) {
-                        if (response.code == 1) {
-                            table_classes.ajax.reload();
-                            toastr.success(response.message);
-
-                        } else
-                            toastr.error(response.message);
-                    }
-                });
-            }
-        }; */
-
 
         var contaner = $('DIV#attendance-modal');
 

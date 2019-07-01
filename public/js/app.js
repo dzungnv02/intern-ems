@@ -47243,6 +47243,13 @@ try {
             } else {
                 console.log(jqXHR);
             }
+            toastr.error('Có lỗi xẩy ra!');
+        }
+    });
+
+    $(document).ajaxSuccess(function (event, xhr, settings) {
+        if (settings.method == 'POST') {
+            toastr.success('Thành công');
         }
     });
 
@@ -59290,7 +59297,8 @@ $(function () {
             data: { id: id },
             dataSrc: 'data'
         },
-        columns: [{ data: null }, { data: getDayAndDate,
+        columns: [{ data: null }, {
+            data: getDayAndDate,
             render: function render(data, type, row) {
                 var day;
                 switch (row.week_days) {
@@ -59370,13 +59378,8 @@ $(function () {
             url: "api/update-timetable",
             data: { id: id, date: date, time: time, class_id: class_id },
             success: function success(response) {
-                if (response.code == 0) {
-                    toastr.error(response.message);
-                } else {
-                    tableTimetable.ajax.reload();
-                    $('#edit-timetable').modal('hide');
-                    toastr.success('Cập nhật thành công');
-                }
+                tableTimetable.ajax.reload();
+                $('#edit-timetable').modal('hide');
             }
         });
     });
@@ -59466,16 +59469,11 @@ $(function () {
             url: "api/update-note",
             data: { id: id, note: note },
             success: function success(response) {
-                if (response.code == 0) {
-                    toastr.error(response.message);
-                } else {
-                    $('#enter-note').modal('hide');
-                    $('#enter-note').on('hidden.bs.modal', function () {
-                        $(this).find('form')[0].reset();
-                    });
-                    tableRollCall.ajax.reload();
-                    toastr.success('Thêm ghi chú thành công');
-                }
+                $('#enter-note').modal('hide');
+                $('#enter-note').on('hidden.bs.modal', function () {
+                    $(this).find('form')[0].reset();
+                });
+                tableRollCall.ajax.reload();
             }
         });
     });
@@ -59561,7 +59559,6 @@ $(function () {
 						$(this).find('form')[0].reset();
 					});
 					tableHoliday.ajax.reload();
-					toastr.success('Thêm thành công!');
 				}
 			});
 		}
@@ -59583,7 +59580,6 @@ $(function () {
 					data: { id: id },
 					success: function success(response) {
 						tableHoliday.ajax.reload();
-						toastr.success('Xóa thành công!');
 					}
 				});
 			}
@@ -60171,7 +60167,6 @@ $(function () {
                     success: function success(response) {
                         table_classes.ajax.reload();
                         $('DIV#modal-class').modal("hide");
-                        toastr.success(response.message);
                     }
                 });
             }
@@ -60326,11 +60321,9 @@ $(function () {
                     if (response.code == 0) {
                         get_student_not_assign(class_id);
                         get_student_of_class(class_id);
-                        toastr.error(response.message);
                     } else {
                         get_student_not_assign(class_id);
                         get_student_of_class(class_id);
-                        toastr.success(response.message);
                     }
                 }
             });
@@ -60342,37 +60335,6 @@ $(function () {
             placeholder: "Chọn học sinh",
             minimumInputLength: 3
         });
-
-        /* var modalConfirm = (callback, message) => {
-            if (message != undefined) {
-                $("#confirm-delete DIV.modal-header H5.modal-title").html(message);
-            }
-            $("#confirm-delete").modal('show');
-             $("#modal-btn-yes").unbind('click').bind("click", function () {
-                callback(true);
-                $("#confirm-delete").modal('hide');
-            });
-             $("#modal-btn-no").unbind('click').bind("click", function () {
-                callback(false);
-                $("#confirm-delete").modal('hide');
-            });
-             var delete_class = (class_id) => {
-                $.ajax({
-                    url: "api/delete-class",
-                    method: "GET",
-                    data: {
-                        id: class_id
-                    },
-                    success: function (response) {
-                        if (response.code == 1) {
-                            table_classes.ajax.reload();
-                            toastr.success(response.message);
-                         } else
-                            toastr.error(response.message);
-                    }
-                });
-            }
-        }; */
 
         var contaner = $('DIV#attendance-modal');
 
@@ -60578,7 +60540,8 @@ $(function () {
 			data: { classid: classid },
 			dataSrc: 'data'
 		},
-		"columns": [{ "data": null }, { "data": "name" }, { "data": "name_class" }, { "data": "start_day" }, { "data": "duration" }, { "data": "note" }, { "data": function data(_data, type, full) {
+		"columns": [{ "data": null }, { "data": "name" }, { "data": "name_class" }, { "data": "start_day" }, { "data": "duration" }, { "data": "note" }, {
+			"data": function data(_data, type, full) {
 				return ' <button type="button" examid="' + _data.id + '"  class="button-set-point btn btn-success">\
 					<i class="fa fa-tasks"  aria-hidden="true" title="Thêm điểm kỳ thi"></i></button>\
 					<button type="button" examid="' + _data.id + '"  class="button-get-point btn btn-info">\
@@ -60692,11 +60655,6 @@ $('#add-exam').click(function (event) {
 				$("#model-add").modal("hide");
 				//$('#form-add-exam').dialog("close")
 				$('#list-exam').DataTable().ajax.reload();
-				if (response.code == 1) {
-					toastr.success('Thêm kỳ thành công');
-				} else {
-					toastr.error('Lỗi không thể thêm!');
-				}
 				$("#form-add-exam")[0].reset();
 			}
 		});
@@ -60724,14 +60682,9 @@ $(document).on('click', '.button-del-exam', function () {
 				success: function success(response) {
 					if (response.code == 1) {
 						$('#list-exam').DataTable().ajax.reload();
-						toastr.success('Xóa thành công!');
-					} else {
-						toastr.error(response.message);
 					}
 				}
 			});
-		} else {
-			toastr.warning('Bạn đã hủy!');
 		}
 	});
 });
@@ -60852,10 +60805,7 @@ $('#update-exam').click(function (event) {
 				$("#edit-exam").modal("hide");
 				$('#list-exam').DataTable().ajax.reload();
 				if (response.code == 1) {
-					toastr.success('Sửa thành công!');
 					$('#form-edit-exam').trigger("reset");
-				} else {
-					toastr.error('Lỗi không thể sửa bản ghi!');
 				}
 				document.getElementById("form-edit-exam").reset();
 			}
@@ -60883,10 +60833,12 @@ $(document).on('click', '.button-set-point', function () {
 			data: { examid: examid },
 			dataSrc: 'data'
 		},
-		"columns": [{ "data": "id" }, { "data": "student_code" }, { "data": "name" }, { "data": function data(_data2, type, full) {
+		"columns": [{ "data": "id" }, { "data": "student_code" }, { "data": "name" }, {
+			"data": function data(_data2, type, full) {
 				return "<input min='1' max='10' value='' id='ip-set-point' class='set-point' type='number'>\
 					<input type='hidden' name='' value='" + _data2.exams_id + "' id='get_examid'>";
-			} }]
+			}
+		}]
 	});
 	aTable.on('order.dt search.dt', function () {
 		aTable.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
@@ -60922,15 +60874,10 @@ $('#setPoint').on('click', function () {
 				$("#model-add-setPoint").modal("hide");
 				//		 $('#model-add-setPoint').DataTable().ajax.reload();
 				if (response.code == 1) {
-					toastr.success('Thêm điểm thành công');
 					$('#ip-set-point').prop('readonly', true);
-				} else {
-					toastr.error('Lỗi không thể Thêm!');
 				}
 			}
 		});
-	} else {
-		toastr.error('Lỗi chưa nhập đủ điểm cho học sinh!');
 	}
 });
 
@@ -60948,13 +60895,17 @@ $(document).on('click', '.button-get-point', function () {
 			data: { examid: examid },
 			dataSrc: 'data'
 		},
-		"columns": [{ "data": "student_code" }, { "data": "student_name" }, { "data": function data(_data3, type, full) {
+		"columns": [{ "data": "student_code" }, { "data": "student_name" }, {
+			"data": function data(_data3, type, full) {
 				return "<input min='1' max='10' value='" + _data3.point + "' id='" + _data3.student_id + "' class='set-point-update'  type='number'>\
 					<input type='hidden' name='' value='" + examid + "' id='get_examid'>";
-			} }, { "data": function data(_data4, type, full) {
+			}
+		}, {
+			"data": function data(_data4, type, full) {
 				return '<button type="button" student_id="' + _data4.student_id + '"  class="button-update-point btn btn-info">\
 					<i class="fa fa-check-square" aria-hidden="true"></i></button>';
-			} }]
+			}
+		}]
 	});
 });
 //update điểm
@@ -60997,11 +60948,6 @@ $(document).on('click', '.button-update-point', function () {
 			dataType: "json",
 			success: function success(response) {
 				$('#get-point').DataTable().ajax.reload();
-				if (response.code == 1) {
-					toastr.success('Sửa thành công!');
-				} else {
-					toastr.error('Lỗi không thể sửa bản ghi!');
-				}
 			}
 		});
 	}
@@ -61248,14 +61194,8 @@ $(document).ready(function () {
 					data: formData,
 					success: function success(response) {
 						location.reload();
-						toastr.warning(response.message);
-					},
-					error: function error(response) {
-						toastr.warning(response.message);
 					}
 				});
-			} else {
-				toastr.warning('Bạn đã hủy!');
 			}
 		});
 	});
