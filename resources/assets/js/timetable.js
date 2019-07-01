@@ -114,7 +114,7 @@ $(function(){
     	var date = $('#change-date').val();
     	var class_id = $('#getClass_id').val();
     	$.ajax({
-            type: 'post',
+            method:"POST",
             url: "api/update-timetable",
             data: {id:id,date:date,time:time,class_id:class_id},
             success: function(response){

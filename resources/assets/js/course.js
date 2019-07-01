@@ -226,7 +226,7 @@ $(function () {
         if($('#form-edit-course').valid()){
                 $.ajax({
                     dataType : 'json',
-                    type : 'post',
+                    method:"POST",
                     url : 'api/edit-course',
                     data : data,
                     success: function(response){

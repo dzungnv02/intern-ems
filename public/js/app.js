@@ -59366,7 +59366,7 @@ $(function () {
         var date = $('#change-date').val();
         var class_id = $('#getClass_id').val();
         $.ajax({
-            type: 'post',
+            method: "POST",
             url: "api/update-timetable",
             data: { id: id, date: date, time: time, class_id: class_id },
             success: function success(response) {
@@ -59442,7 +59442,7 @@ $(function () {
         var student_id = $(this).attr('studentID');
         var status = $('input[name=' + student_id + ']:checked').val();
         $.ajax({
-            type: "POST",
+            method: "POST",
             url: "api/roll-call-student",
             data: { status: status, student_id: student_id, timetable_id: timetable_id },
             success: function success(response) {
@@ -59462,7 +59462,7 @@ $(function () {
         var note = $('#note1').val();
         var id = $('#rollID').val();
         $.ajax({
-            type: "POST",
+            method: "POST",
             url: "api/update-note",
             data: { id: id, note: note },
             success: function success(response) {
@@ -59552,7 +59552,7 @@ $(function () {
 		var holiday = $('#holiday').val();
 		if (formAddHoliday.valid()) {
 			$.ajax({
-				type: 'POST',
+				method: "POST",
 				url: 'api/add-holiday',
 				data: { holiday: holiday },
 				success: function success(response) {
@@ -59578,7 +59578,7 @@ $(function () {
 		}).then(function (willDelete) {
 			if (willDelete) {
 				$.ajax({
-					type: 'post',
+					method: "POST",
 					url: 'api/delete-holiday',
 					data: { id: id },
 					success: function success(response) {
@@ -60320,7 +60320,7 @@ $(function () {
             };
             $.ajax({
                 url: "api/add-student-to-class",
-                type: "POST",
+                method: "POST",
                 data: data,
                 success: function success(response) {
                     if (response.code == 0) {
@@ -60685,7 +60685,7 @@ $('#add-exam').click(function (event) {
 	if ($('#form-add-exam').valid()) {
 		$.ajax({
 			url: "api/create-exam",
-			type: "POST",
+			method: "POST",
 			data: { name: name, start_day: start_day, duration: duration, note: note, class_id: class_id },
 			dataType: "json",
 			success: function success(response) {
@@ -60718,7 +60718,7 @@ $(document).on('click', '.button-del-exam', function () {
 			console.log(id);
 			$.ajax({
 				dataType: 'json',
-				type: 'post',
+				method: "POST",
 				url: 'api/delete-exam',
 				data: { id: id },
 				success: function success(response) {
@@ -60748,7 +60748,7 @@ $(document).on('click', '.button-edit-exam', function (e) {
 	});
 	$.ajax({
 		dataType: 'json',
-		type: 'post',
+		method: "POST",
 		url: 'api/edit-exam',
 		data: { id: id },
 		resetForm: true,
@@ -60845,7 +60845,7 @@ $('#update-exam').click(function (event) {
 	if ($('#form-edit-exam').valid()) {
 		$.ajax({
 			url: "api/update-exam",
-			type: "POST",
+			method: "POST",
 			data: { id: id, name: name, start_day: start_day, duration: duration, note: note, class_id: class_id },
 			dataType: "json",
 			success: function success(response) {
@@ -60914,7 +60914,7 @@ $('#setPoint').on('click', function () {
 	if (pointnull == 0) {
 		$.ajax({
 			url: "api/add-pointexam",
-			type: "post",
+			method: "POST",
 			data: { student_id: student_id, point: point, exams_id: exams_id },
 			dataType: "json",
 			success: function success(response) {
@@ -60992,7 +60992,7 @@ $(document).on('click', '.button-update-point', function () {
 
 		$.ajax({
 			url: "api/update-point",
-			type: "POST",
+			method: "POST",
 			data: { examination_id: examination_id, student_id: student_id, point: point },
 			dataType: "json",
 			success: function success(response) {
@@ -61155,7 +61155,7 @@ $(document).ready(function () {
 
 		$.ajax({
 			url: '/api/add-staff',
-			type: 'POST',
+			method: "POST",
 			contentType: false,
 			processData: false,
 			data: formData,
@@ -61242,7 +61242,7 @@ $(document).ready(function () {
 			if (willDelete) {
 				$.ajax({
 					url: '/api/delete-staff',
-					type: 'POST',
+					method: "POST",
 					contentType: false,
 					processData: false,
 					data: formData,
@@ -61278,7 +61278,7 @@ $(document).ready(function () {
 				formData.append('newPassword', new_password);
 				$.ajax({
 					url: '/api/edit-password-staff',
-					type: 'POST',
+					method: "POST",
 					contentType: false,
 					processData: false,
 					data: formData,
@@ -61333,7 +61333,7 @@ $('#editStaff_1').click(function (event) {
 		formData.append("file", $('#inputFile')[0].files[0]);
 		$.ajax({
 			url: '/api/edit-staff',
-			type: 'POST',
+			method: "POST",
 			contentType: false,
 			processData: false,
 			data: formData,
@@ -62402,7 +62402,7 @@ $(function () {
         var url = mode == 'new' ? '/api/add-teacher' : '/api/edit-teacher';
 
         $.ajax(url, {
-            type: 'POST',
+            method: "POST",
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function success(response) {
@@ -62584,7 +62584,6 @@ $(function () {
         var form = $(modal_add_schedule).find('FORM#frmTeacherSchedule');
         var inputs = $(form).find('input,select,textarea');
         $(inputs).each(function (index, el) {
-            console.log('el', el);
             data[el.id] = $(el).val();
         });
 
@@ -62594,9 +62593,7 @@ $(function () {
             data: JSON.stringify(data),
             contentType: 'application/json',
             success: function success(response) {
-                console.log(response);
                 var teacher_id = $(form).find('INPUT#teacher_id').val();
-
                 get_teacher_schedule(teacher_id, function () {
                     if ($(modal_add_schedule).is(':visible')) {
                         $(modal_add_schedule).removeClass("fade").modal("hide");
@@ -62658,7 +62655,9 @@ $(function () {
         });
 
         $(modal_add_schedule).on('show.bs.modal', function (e) {
+            var teacher_id = $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val();
             $(modal_add_schedule).find('FORM#frmTeacherSchedule')[0].reset();
+            $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val(teacher_id);
             schedule_type_select();
             get_class_list();
             get_student_list();
@@ -62840,7 +62839,7 @@ $(function () {
 
         if (data.class_id != '' && data.start_date != '' && (data.end_date != '' || data.duration != '') && data.price) {
             $.ajax('/invoice/tuition_fee_calculate', {
-                type: 'POST',
+                method: "POST",
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: function success(response) {
@@ -62881,7 +62880,7 @@ $(function () {
         }
 
         $.ajax('/invoice/save', {
-            type: 'POST',
+            method: "POST",
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function success(response) {
@@ -63153,7 +63152,7 @@ $(function () {
                 var data = invoice_list_table.row($(this).parents('tr')).data();
                 if (confirm('Bạn có chắc muốn huỷ hoá đơn sô ' + data.invoice_number + ' không?')) {
                     $.ajax('/invoice/delete', {
-                        type: 'POST',
+                        method: "POST",
                         contentType: 'application/json',
                         data: JSON.stringify({ "id": data.id }),
                         success: function success(response) {
@@ -63171,7 +63170,7 @@ $(function () {
                 var data = invoice_list_table.row($(this).parents('tr')).data();
                 if (confirm('Bạn có chắc muốn duyệt hoá đơn sô ' + data.invoice_number + ' không?')) {
                     $.ajax('/invoice/approve', {
-                        type: 'POST',
+                        method: "POST",
                         contentType: 'application/json',
                         data: JSON.stringify({ "id": data.id }),
                         success: function success(response) {

@@ -72,7 +72,7 @@ $(function(){
         var student_id = $(this).attr('studentID');
         var status = $('input[name='+student_id+']:checked').val();
         $.ajax({
-            type: "POST",
+            method: "POST",
             url: "api/roll-call-student",
             data: {status:status,student_id:student_id,timetable_id:timetable_id},
             success: function(response){
@@ -92,7 +92,7 @@ $(function(){
         var note = $('#note1').val();
         var id = $('#rollID').val();
         $.ajax({
-            type: "POST",
+            method: "POST",
             url: "api/update-note",
             data: {id:id,note:note},
             success: function(response){
