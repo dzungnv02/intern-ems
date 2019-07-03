@@ -9,6 +9,7 @@ try {
     require('datatables.net');
     require('datatables.net-buttons')(window.$);
     require('bootstrap-datepicker');
+    require('bootstrap-timepicker');
 
     var user_info = {
         id: $('meta[name="user-id"]').attr('content'),
