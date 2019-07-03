@@ -340,8 +340,8 @@ $(function () {
                         class_schedule[wd].start = class_schedule[wd].start.length < 5 ? '0' + class_schedule[wd].start : class_schedule[wd].start;
                         class_schedule[wd].finish = class_schedule[wd].finish.length < 5 ? '0' + class_schedule[wd].finish : class_schedule[wd].finish;
                         $(form).find('INPUT#schedule_' + wd).prop('checked', true);
-                        $(form).find('INPUT#time_start_' + wd).val(class_schedule[wd].start);
-                        $(form).find('INPUT#time_end_' + wd).val(class_schedule[wd].finish);
+                        $(form).find('INPUT#time_start_' + wd).val(moment('1900-01-01 ' + class_schedule[wd].start).format("LT"));
+                        $(form).find('INPUT#time_end_' + wd).val(moment('1900-01-01 ' +class_schedule[wd].finish).format("LT"));
                     }
 
                 }
@@ -597,7 +597,7 @@ $(function () {
                 };
 
                 if (id != '') data.id = id;
-
+               
                 $.ajax({
                     url: endpoint,
                     method: "POST",
@@ -739,8 +739,8 @@ $(function () {
                     var start_time = $(container).find('INPUT#' + weekday_time_start_prefix + wd).val();
                     var end_time = $(container).find('INPUT#' + weekday_time_end_prefix + wd).val();
                     schedule[wd] = {
-                        'start': start_time,
-                        'finish': end_time
+                        'start': moment(start_time, "h:mm A").format("HH:mm"),
+                        'finish': moment(end_time, "h:mm A").format("HH:mm")
                     };
                 } else {
                     schedule[wd] = {};
@@ -953,6 +953,20 @@ $(function () {
                     $("DIV#modal-class SELECT#teacher_id").append("<option value=" + this.id + ">" + this.name + "</option>")
                 });
             }
+        });
+
+        $(form).find('INPUT[type="text"][id^="time_start_"],INPUT[type="text"][id^="time_end_"]').timepicker({
+            showInputs: false,
+            template: 'dropdown',
+        }).on('show.timepicker', (e) => {
+            if ($(e.target).val() != '') {
+                $(e.target).timepicker('setTime', $(e.target).val());
+            }
+            else {
+                $(e.target).val(e.time.value); 
+            }
+        }).on('changeTime.timepicker', function(e) {
+            $(e.target).parent().find('label').remove();
         });
     }
 });

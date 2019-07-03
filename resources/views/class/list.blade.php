@@ -4,6 +4,12 @@
 <li class="active">Danh sách lớp</li>
 @endsection
 @section('content')
+<style>
+  #classtime td input {
+    height: 26px;
+    width: 95px;
+  }
+</style>
   <div class="content-class row">
       <div class="col-xs-12">
             <div class="box-header">
@@ -143,34 +149,34 @@
                                 <label class="form-check-label" style="font-weight:normal" for="schedule_sun" id="schedule" >Chủ nhật</label>
                             </td>
                           </tr>
-                          <tr>
+                          <tr id="classtime">
                             <td class="text-center">
-                              <div class="form-group"><input type="time" id="time_start_mon" name="time_start_mon"></div>
-                              <div class="form-group"><input type="time" id="time_end_mon" name="time_end_mon"></div>
+                              <div class="form-group"><input type="text" class="form-control timepicker" id="time_start_mon" name="time_start_mon"></div>
+                              <div class="form-group"><input type="text" class="form-control timepicker" id="time_end_mon" name="time_end_mon"></div>
                             </td>
                             <td class="text-center">
-                                <div class="form-group"><input type="time" id="time_start_tue" name="time_start_tue"></div>
-                                <div class="form-group"><input type="time" id="time_end_tue" name="time_end_tue"></div>
+                                <div class="form-group"><input type="text" class="form-control timepicker" id="time_start_tue" name="time_start_tue"></div>
+                                <div class="form-group"><input type="text" class="form-control timepicker" id="time_end_tue" name="time_end_tue"></div>
                             </td>
                             <td class="text-center">
-                                <div class="form-group"><input type="time" id="time_start_wed" name="time_start_wed"></div>
-                                <div class="form-group"><input type="time" id="time_end_wed" name="time_end_wed"></div>
+                                <div class="form-group"><input type="text" class="form-control timepicker" id="time_start_wed" name="time_start_wed"></div>
+                                <div class="form-group"><input type="text" class="form-control timepicker" id="time_end_wed" name="time_end_wed"></div>
                             </td>
                             <td class="text-center">
-                                <div class="form-group"><input type="time" id="time_start_thu" name="time_start_thu"></div>
-                                <div class="form-group"><input type="time" id="time_end_thu" name="time_end_thu"></div>
+                                <div class="form-group"><input type="text" class="form-control timepicker" id="time_start_thu" name="time_start_thu"></div>
+                                <div class="form-group"><input type="text" class="form-control timepicker" id="time_end_thu" name="time_end_thu"></div>
                             </td>
                             <td class="text-center">
-                                <div class="form-group"><input type="time" id="time_start_fri" name="time_start_fri"></div>
-                                <div class="form-group"><input type="time" id="time_end_fri" name="time_end_fri"></div>
+                                <div class="form-group"><input type="text" class="form-control timepicker" id="time_start_fri" name="time_start_fri"></div>
+                                <div class="form-group"><input type="text" class="form-control timepicker" id="time_end_fri" name="time_end_fri"></div>
                             </td>
                             <td class="text-center">
-                                <div class="form-group"><input type="time" id="time_start_sat" name="time_start_sat"></div>
-                                <div class="form-group"><input type="time" id="time_end_sat" name="time_end_sat"></div>
+                                <div class="form-group"><input type="text" class="form-control timepicker" id="time_start_sat" name="time_start_sat"></div>
+                                <div class="form-group"><input type="text" class="form-control timepicker" id="time_end_sat" name="time_end_sat"></div>
                             </td>
                             <td class="text-center">
-                                <div class="form-group"><input type="time" id="time_start_sun" name="time_start_sun"></div>
-                                <div class="form-group"><input type="time" id="time_end_sun" name="time_end_sun"></div>
+                                <div class="form-group"><input type="text" class="form-control timepicker" id="time_start_sun" name="time_start_sun"></div>
+                                <div class="form-group"><input type="text" class="form-control timepicker" id="time_end_sun" name="time_end_sun"></div>
                             </td>
                           </tr>
                       </table>
