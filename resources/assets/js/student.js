@@ -22,7 +22,7 @@ $(function () {
 							"targets": 0
 						},
 						{
-							targets: [6],
+							targets: [7],
 							"data": null,
 							"visible": true,
 							"defaultContent": buttons
@@ -47,14 +47,6 @@ $(function () {
 							name: 'name'
 						},
 						{
-							data: 'class_name',
-							name: 'class_name'
-						},
-						{
-							data: 'parent_name',
-							name: 'parent_name'
-						},
-						{
 							data: 'birthday',
 							name: 'birthday',
 							render: (data, type, row, meta) => {
@@ -70,6 +62,18 @@ $(function () {
 								
 								return data;
 							}
+						},
+						{
+							data: 'class_name',
+							name: 'class_name'
+						},
+						{
+							data: 'parent_name',
+							name: 'parent_name'
+						},
+						{
+							data: 'stage',
+							name: 'stage'
 						},
 						{
 							'data': null

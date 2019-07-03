@@ -15882,7 +15882,7 @@ exports.Readable = exports;
 exports.Writable = __webpack_require__(11);
 exports.Duplex = __webpack_require__(1);
 exports.Transform = __webpack_require__(142);
-exports.PassThrough = __webpack_require__(184);
+exports.PassThrough = __webpack_require__(185);
 
 
 /***/ }),
@@ -15962,7 +15962,7 @@ util.inherits = __webpack_require__(3);
 
 /*<replacement>*/
 var internalUtil = {
-  deprecate: __webpack_require__(183)
+  deprecate: __webpack_require__(184)
 };
 /*</replacement>*/
 
@@ -16577,7 +16577,7 @@ Writable.prototype._destroy = function (err, cb) {
   this.end();
   cb(err);
 };
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(181).setImmediate, __webpack_require__(4)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6), __webpack_require__(182).setImmediate, __webpack_require__(4)))
 
 /***/ }),
 /* 12 */
@@ -43803,7 +43803,7 @@ util.inherits = __webpack_require__(3);
 /*</replacement>*/
 
 /*<replacement>*/
-var debugUtil = __webpack_require__(178);
+var debugUtil = __webpack_require__(179);
 var debug = void 0;
 if (debugUtil && debugUtil.debuglog) {
   debug = debugUtil.debuglog('stream');
@@ -43812,7 +43812,7 @@ if (debugUtil && debugUtil.debuglog) {
 }
 /*</replacement>*/
 
-var BufferList = __webpack_require__(179);
+var BufferList = __webpack_require__(180);
 var destroyImpl = __webpack_require__(140);
 var StringDecoder;
 
@@ -44786,8 +44786,8 @@ module.exports = __webpack_require__(9).EventEmitter;
 
 
 
-var base64 = __webpack_require__(176)
-var ieee754 = __webpack_require__(177)
+var base64 = __webpack_require__(177)
+var ieee754 = __webpack_require__(178)
 var isArray = __webpack_require__(137)
 
 exports.Buffer = Buffer
@@ -47175,7 +47175,7 @@ function done(stream, er, data) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(144);
-module.exports = __webpack_require__(193);
+module.exports = __webpack_require__(194);
 
 
 /***/ }),
@@ -47220,7 +47220,7 @@ try {
     __webpack_require__(135);
     __webpack_require__(164)(window.$);
     __webpack_require__(165);
-    __webpack_require__(200);
+    __webpack_require__(166);
 
     var user_info = {
         id: $('meta[name="user-id"]').attr('content'),
@@ -47254,18 +47254,18 @@ try {
         }
     });
 
-    __webpack_require__(166);
     __webpack_require__(167);
-    __webpack_require__(169);
+    __webpack_require__(168);
     __webpack_require__(170);
     __webpack_require__(171);
     __webpack_require__(172);
     __webpack_require__(173);
     __webpack_require__(174);
-    __webpack_require__(189);
+    __webpack_require__(175);
     __webpack_require__(190);
     __webpack_require__(191);
     __webpack_require__(192);
+    __webpack_require__(193);
 } catch (e) {
     console.log(e);
 }
@@ -58237,5393 +58237,6 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 /* 166 */
 /***/ (function(module, exports) {
 
-$(function () {
-	if ($('TABLE#list-student').length > 0) {
-		var table_student = null;
-		var save_student_button = $('DIV#student-form-modal DIV.modal-footer BUTTON#btnSave');
-		var add_student_button = $('BUTTON.add-student');
-		var add_parent_button = $("DIV#student-form-modal DIV.modal-body BUTTON.add-parent");
-		var parent_info_panel = $("DIV#student-form-modal DIV.modal-body DIV.row#parent-info");
-		var student_form = $("DIV#student-form-modal DIV.modal-body FORM#frmStudent");
-
-		var init = function init() {
-			if ($.fn.dataTable.isDataTable('TABLE#list-student')) {
-				table_student = $('TABLE#list-student').DataTable();
-			} else {
-				var buttons = '<button title="thêm học sinh vào lớp" class="btn btn-primary assign-to-class hidden"><i class="fa fa-plus" aria-hidden="true"></i></button>\
-							<button title="Hồ sơ chi tiết học sinh" class="edit-student btn btn-warning"><i class="fa fa-pencil" aria-hidden="true"></i></button>\
-							<button title="xóa học sinh" class="del-student btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>';
-				table_student = $('#list-student').DataTable({
-					language: datatable_language,
-					"columnDefs": [{
-						"searchable": false,
-						"orderable": false,
-						"targets": 0
-					}, {
-						targets: [6],
-						"data": null,
-						"visible": true,
-						"defaultContent": buttons
-					}],
-					"order": [[1, 'asc']],
-					ajax: {
-						url: 'api/get-list-student',
-						dataSrc: 'data'
-					},
-					columns: [{
-						data: null
-					}, {
-						data: 'student_code',
-						name: 'student_code'
-					}, {
-						data: 'name',
-						name: 'name'
-					}, {
-						data: 'class_name',
-						name: 'class_name'
-					}, {
-						data: 'parent_name',
-						name: 'parent_name'
-					}, {
-						data: 'birthday',
-						name: 'birthday',
-						render: function render(data, type, row, meta) {
-							if (data != null) {
-								data = moment(data).format("DD-MM-YYYY");
-							} else if (row.birthyear != null) {
-								data = row.birthyear;
-							} else {
-								data = '';
-							}
-
-							return data;
-						}
-					}, {
-						'data': null
-					}]
-				});
-
-				table_student.on('order.dt search.dt', function () {
-					table_student.column(0, {
-						search: 'applied',
-						order: 'applied'
-					}).nodes().each(function (cell, i) {
-						cell.innerHTML = i + 1;
-					});
-				}).draw();
-
-				table_student.on('click', 'button.assign-to-class', function () {
-					var data = table_student.row($(this).parents('tr')).data();
-					console.log('assign-to-class', data);
-				});
-
-				table_student.on('click', 'button.edit-student', function () {
-					var data = table_student.row($(this).parents('tr')).data();
-					window.location.href = '/student/detail?student_id=' + data.id;
-				});
-
-				table_student.on('click', 'button.del-student', function () {
-					var data = table_student.row($(this).parents('tr')).data();
-					show_delete_student_confirm_modal(data);
-					console.log('del-student', data);
-				});
-			}
-
-			$(save_student_button).bind('click', function (e) {
-				$(e.target).button('loading');
-				$(e.target).prop('disabled', true);
-				//save_student();
-			});
-
-			$(add_student_button).bind('click', function (e) {
-				var student_id = null;
-				show_student_form();
-			});
-
-			$(add_parent_button).bind('click', function (e) {
-				$(parent_info_panel).show();
-			});
-
-			$('DIV#student-form-modal').on('show.bs.modal', function (e) {
-				console.log(e);
-			});
-		};
-
-		var show_assign_class_modal = function show_assign_class_modal(student_id) {};
-		var get_class_list_to_assign = function get_class_list_to_assign(student_id) {};
-		var assign_to_class = function assign_to_class(student_id, class_id) {};
-
-		var show_student_form = function show_student_form(student_id) {
-			var modal_title = 'Thêm mới học sinh';
-			$("DIV#student-form-modal").find('FORM#frmStudent INPUT#id').val();
-			$("DIV#student-form-modal").find('FORM#frmStudent INPUT#crm_id').val();
-
-			if (student_id != null) {
-				modal_title = 'Sửa thông tin học sinh';
-				$("DIV#student-form-modal").find('FORM#frmStudent INPUT#id').val(student_id);
-				get_student(student_id, function (student, parent) {
-					reset_student_form(student, parent);
-					$("DIV#student-form-modal").modal('show');
-				});
-			} else {
-				reset_student_form(null, null);
-				$("DIV#student-form-modal").modal('show');
-			}
-
-			$("DIV#student-form-modal").find('.modal-title').html(modal_title);
-		};
-
-		var reset_student_form = function reset_student_form(student, parent) {
-			var form_inputs = $(student_form).find('INPUT');
-			if (student == null) {
-				$(form_inputs).val('');
-				$(student_form).find('SELECT#gender').val('0').change();
-				return;
-			}
-
-			$(form_inputs).each(function (index, el) {
-				var field = el.id.indexOf('parent-') == 0 ? el.id.substr(7, el.id.length) : el.id;
-				if (student != null) {
-					if (student[field] != undefined && el.id.indexOf('parent-') == -1) {
-						$(el).val(student[field]);
-					} else if (student[field] == undefined) {
-						$(el).val('');
-					}
-				}
-
-				if (parent != null) {
-					if (parent[field] != undefined && el.id.indexOf('parent-') == 0) {
-						$(el).val(parent[field]);
-					} else if (parent[field] == undefined) {
-						$(el).val('');
-					}
-				}
-			});
-
-			$(student_form).find('SELECT#gender').val(student.gender).change();
-		};
-
-		var get_student = function get_student(student_id, callback) {
-			$.ajax({
-				url: 'api/get-student',
-				data: {
-					'id': student_id
-				},
-				method: 'GET',
-				success: function success(response) {
-					var student = response.data.student;
-					var parent = response.data.parent;
-					callback(student, parent);
-				}
-			});
-		};
-
-		var validate = function validate(data) {
-			return true;
-			// var result = false;
-			// if (data.student.name == '') {
-
-			// }
-		};
-
-		var save_student = function save_student() {
-
-			var data = {
-				"student": {
-					"id": "",
-					"name": "",
-					"crm_id": "",
-					"email": "",
-					"mobile": "",
-					"birthday": "",
-					"birthyear": "",
-					"address": "",
-					"gender": ""
-				},
-				"parent": {
-					"id": "",
-					"fullname": "",
-					"email": "",
-					"phone": "",
-					"role": "",
-					"facebook": ""
-				}
-			};
-
-			var form_parent_inputs = $(student_form).find('INPUT[id^="parent-"]');
-			var form_student_inputs = $(student_form).find('INPUT:not([id^="parent-"])');
-			form_student_inputs.push($(student_form).find('SELECT#gender')[0]);
-
-			$(form_parent_inputs).each(function (index, el) {
-				var field = el.id.substr(7, el.id.length);
-				if (field == "search") return;
-				data.parent[field] = $(el).val();
-			});
-
-			$(form_student_inputs).each(function (index, el) {
-				data.student[el.id] = $(el).val();
-			});
-
-			$.ajax({
-				url: 'api/save-student',
-				data: JSON.stringify(data),
-				contentType: 'application/json',
-				method: 'POST',
-				success: function success(response) {
-					console.log(response);
-					table_student.ajax.reload();
-					$("DIV#student-form-modal").modal('hide');
-				}
-			}).done(function () {
-				$(save_student_button).prop('disabled', false);
-				$(save_student_button).button('reset');
-			});
-		};
-
-		var show_delete_student_confirm_modal = function show_delete_student_confirm_modal(data) {
-			modalConfirm(function (confirm) {
-				if (confirm) {
-					delete_student(data.id);
-				}
-			}, 'Bạn có muốn xoá học sinh <strong>' + data.name + '</strong> không?');
-		};
-
-		var delete_student = function delete_student(student_id) {
-			console.log(student_id);
-		};
-
-		var modalConfirm = function modalConfirm(callback, message) {
-			if (message != undefined) {
-				$("#confirm-delete DIV.modal-header H5.modal-title").html(message);
-			}
-			$("#confirm-delete").modal('show');
-
-			$("#modal-btn-yes").unbind('click').bind("click", function () {
-				callback(true);
-				$("#confirm-delete").modal('hide');
-			});
-
-			$("#modal-btn-no").unbind('click').bind("click", function () {
-				callback(false);
-				$("#confirm-delete").modal('hide');
-			});
-		};
-
-		init();
-	}
-});
-
-/***/ }),
-/* 167 */
-/***/ (function(module, exports, __webpack_require__) {
-
-$(function () {
-    var tab_headers = $('UL.nav#student_detail');
-    var tab_contents = $('DIV.tab-content');
-    var student_id = null;
-
-    var student_data = {
-        profile: null,
-        parents: null,
-        activities: null,
-        exams: null,
-        teacher_reports: null,
-        payment: null,
-        attendance: null
-    };
-
-    var assessment_status = {
-        '-1': 'Chưa hẹn lịch',
-        '0': 'Chưa có kết quả',
-        '1': 'Đã có kết quả'
-    };
-
-    var trial_status = {
-        '0': 'Chưa có lịch học thử',
-        '1': 'Đã hẹn học thử',
-        '2': 'Đã học thử'
-    };
-
-    var activity_types = {
-        '1': 'Làm assessment',
-        '2': 'Học thử',
-        '3': 'Nhập học chính thức',
-        '4': 'Đã gửi nội dung học 2 tuần tới',
-        '5': 'Chuyển lớp',
-        '6': 'Kiểm tra',
-        '7': 'Kết thúc'
-    };
-
-    if (tab_headers.length == 0) return false;
-
-    var tab_col = $(tab_headers).find('LI');
-
-    var tab_activate = function tab_activate(target) {
-        $(tab_col).removeClass('active');
-        $(target).parent().addClass('active');
-        $(tab_contents).find("DIV[role='tabpanel']").removeClass('active');
-        $(tab_contents).find("DIV[role='tabpanel']#" + $(target).data('tab')).addClass('active');
-    };
-
-    $(tab_headers).find('A').bind('click', function (e) {
-        tab_activate(e.target);
-        e.preventDefault();
-        e.stopPropagation();
-    });
-
-    $('BUTTON#btnSaveAll').on('click', function (e) {
-        save();
-    });
-
-    $('BUTTON#btn_change_parent').on('click', function (e) {
-        tab_activate($(tab_col).find('a[data-tab="parents"]'));
-    });
-
-    $('A#btnSaveActivity').on('click', function (e) {
-        save_activities();
-    });
-
-    var get_url_param = function get_url_param($param_name) {
-        var hash;
-        var q = document.URL.split('?')[1];
-        if (q != undefined) {
-            q = q.split('&');
-            for (var i = 0; i < q.length; i++) {
-                hash = q[i].split('=');
-                if (hash[0] == $param_name) return hash[1];
-            }
-            return null;
-        }
-        return null;
-    };
-
-    var get_student_profile = function get_student_profile(callback) {
-        get('/api/student/get-profile', {
-            id: student_id
-        }, function (data) {
-            student_data.profile = data;
-            fill_profile(data);
-            if (callback != undefined) callback();
-        });
-    };
-
-    var get_parent_list = function get_parent_list(callback) {
-        get('/api/parent/list', {
-            student_id: student_id
-        }, function (data) {
-            student_data.parents = data;
-            fill_parent_list(data);
-            if (callback != undefined) callback();
-        });
-    };
-
-    var get_exam_results = function get_exam_results() {};
-
-    var get_teacher_reports = function get_teacher_reports() {};
-
-    var get_payment_history = function get_payment_history() {};
-
-    var get_activities = function get_activities() {
-        get('/api/student/get-activity', {
-            student_id: student_id
-        }, function (data) {
-            student_data.activities = data;
-            fill_activities(data);
-        });
-    };
-
-    var get_attendance_history = function get_attendance_history() {
-        get('/api/student/attendance', { student_id: student_id }, function (data) {
-            student_data.attendance = data;
-            fill_attendance(data);
-        });
-    };
-
-    var fill_profile = function fill_profile(data) {
-        var form = $('FORM#frmStudent');
-        if (data.student !== null) {
-            $(form).find('INPUT#student-name').val(data.student.name);
-            $(form).find('INPUT#student-e_name').val(data.student.e_name);
-            $(form).find('INPUT#student-gender').val(data.student.gender);
-            $(form).find('INPUT#student-birthyear').val(data.student.birthyear);
-            $(form).find('INPUT#student-birthday').val(data.student.birthday);
-        }
-
-        if (data.parent !== null) {
-            $(form).find('INPUT#parent_id').val(data.parent.id);
-            $(form).find('INPUT#parent-fullname').val(data.parent.fullname);
-            $(form).find('INPUT#parent-parent_role').val(data.parent.parent_role);
-            $(form).find('INPUT#parent-phone').val(data.parent.phone);
-            $(form).find('INPUT#parent-email').val(data.parent.email);
-            $(form).find('INPUT#parent-facebook').val(data.parent.facebook);
-        }
-
-        if (data.staff !== null) {
-            $(form).find('INPUT#dependent_staff_name').val(data.staff.name);
-            $(form).find('INPUT#staff_id').val(data.staff.id);
-        }
-
-        if (data.register_branch !== null) {
-            $(form).find('INPUT#branch-register_branch_name').val(data.register_branch.branch_name);
-            $(form).find('INPUT#register_branch_id').val(data.register_branch.id);
-        }
-
-        if (data.dependent_branch !== null) {
-            $(form).find('INPUT#branch-dependent_branch_name').val(data.dependent_branch.branch_name);
-            $(form).find('INPUT#dependent_branch_id').val(data.dependent_branch.id);
-        }
-
-        if (data.assessment !== null) {
-            $(form).find('INPUT#assessment_status').val(assessment_status[data.assessment.status]);
-            $(form).find('INPUT#assessment_date').val(moment(data.assessment.assessment_date).format("YYYY-MM-DDTkk:mm"));
-            $(form).find('INPUT#assessment_teacher').val(data.assessment.teacher_name);
-            $(form).find('INPUT#assessment_teacher_id').val(data.assessment.teacher_id);
-            $(form).find('INPUT#assessment_result').val(data.assessment.assessment_result);
-
-            $(form).find('INPUT#trial_status').val(trial_status[data.assessment.trial_status]);
-            $(form).find('INPUT#trial_start_date').val(moment(data.assessment.trial_start_date).format("YYYY-MM-DDTkk:mm"));
-            $(form).find('INPUT#trial_class').val(data.assessment.class_name);
-            $(form).find('INPUT#assessment_trial_class_id').val(data.assessment.trial_class_id);
-        } else {
-            $(form).find('INPUT#assessment_status').val(assessment_status['-1']);
-            $(form).find('INPUT#trial_status').val(trial_status['0']);
-        }
-    };
-
-    var fill_activities = function fill_activities(data) {
-        var table = $('DIV.box#box_history > DIV.box-body > TABLE');
-        $(table).find('tbody').empty();
-        if (data.length > 0) {
-            for (var i = 0; i < data.length; i++) {
-                var obj = data[i];
-                var tr = $('<TR></TR>');
-                var index_cell = $('<TH></TH>', {
-                    text: i + 1
-                });
-                var activity_cell = $('<TD></TD>', {
-                    text: activity_types[obj.act_type]
-                });
-                var note_cell = $('<TD></TD>', {
-                    text: obj.note
-                });
-                var start_date_cell = $('<TD></TD>', {
-                    text: obj.start_time
-                });
-                var act_cell = $('<TD></TD>');
-                // var act_edit = $('<a></a>', {html:'<i class="fa fa-pencil"></i>', class:'btn btn-sm btn-info', role:'button'});
-                var act_del = $('<a></a>', {
-                    html: '<i class="fa fa-remove"></i>',
-                    class: 'btn btn-sm btn-danger',
-                    role: 'button'
-                });
-                $(tr).append(index_cell, activity_cell, note_cell, start_date_cell, act_cell);
-                $(table).find('tbody').append(tr);
-            }
-        } else {
-            var tr = $('<TR></TR>');
-            var cell = $('<TD></TD>', {
-                colspan: 5,
-                text: 'Không có hoạt động nào',
-                style: 'text-align:center'
-            });
-            $(table).find('tbody').append(tr.append(cell));
-        }
-    };
-
-    var fill_parent_list = function fill_parent_list(data) {
-        var table = $('DIV.box#box_parent_list > DIV.box-body > TABLE');
-        $(table).find('tbody').empty();
-        if (data.length > 0) {
-            for (var i = 0; i < data.length; i++) {
-                var obj = data[i];
-                var set_primary_button = $('<a></a>', {
-                    class: 'text-white',
-                    text: 'Chọn',
-                    title: 'Chọn làm liên hệ chính',
-                    style: 'color:white;cursor: pointer',
-                    'data-parent': JSON.stringify(obj)
-                });
-                var btn_container = $('<span></span>', {
-                    class: 'badge bg-dark',
-                    style: 'margin-left:30px'
-                }).append(set_primary_button);
-
-                var primary_contact = obj.id == student_data.profile.parent.id ? $('<span style="margin-left:30px" title="" class="badge bg-light-blue"><i class="fa fa-check"></span></i>') : btn_container;
-
-                var tr = $('<TR></TR>');
-                var index_cell = $('<TH></TH>', {
-                    text: i + 1
-                });
-                var role_cell = $('<TD></TD>', {
-                    text: obj.parent_role
-                });
-                var name_cell = $('<TD></TD>', {
-                    text: obj.fullname
-                });
-                var phone_cell = $('<TD></TD>', {
-                    text: obj.phone
-                });
-                var email_cell = $('<TD></TD>', {
-                    html: obj.email != null ? '<a href="mailto:' + obj.email + '">' + obj.email + '</a>' : ''
-                });
-                var address_cell = $('<TD></TD>', {
-                    text: obj.address
-                });
-                var primary_contact_cell = $('<TD></TD>', {
-                    html: primary_contact
-                });
-                var act_edit = $('<a></a>', {
-                    text: 'Thay đổi'
-                });
-                var act_del = $('<a></a>', {
-                    text: 'Xoá'
-                });
-                var act_cell = $('<TD></TD>').append(act_edit, '&nbsp;|&nbsp;', act_del);
-
-                $(tr).append(index_cell, role_cell, name_cell, phone_cell, email_cell, address_cell, primary_contact_cell, act_cell);
-                $(table).find('tbody').append(tr);
-
-                $(set_primary_button).on('click', function (e) {
-                    set_primary_parent($(e.target).data('parent'));
-                });
-            }
-        } else {
-            var tr = $('<TR></TR>');
-            var cell = $('<TD></TD>', {
-                colspan: 8,
-                text: 'Không có danh sách phụ huynh',
-                style: 'text-align:center'
-            });
-            $(table).find('tbody').append(tr.append(cell));
-        }
-    };
-
-    var fill_exam_results = function fill_exam_results(data) {};
-
-    var fill_teacher_reports = function fill_teacher_reports(data) {};
-
-    var fill_payment_history = function fill_payment_history(data) {};
-
-    var fill_attendance = function fill_attendance(data) {
-        var container = $('DIV#box_attendance');
-        var table = $(container).find('TABLE > TBODY');
-        $(table).empty();
-
-        if (data.length > 0) {
-            for (var i = 0; i < data.length; i++) {
-                var cls = data[i];
-
-                var class_cell = $('<td></td>', {
-                    'colspan': '6',
-                    'class': 'text-left',
-                    'html': '<h4>Lớp <b>' + cls.name + '</b></h4>'
-                });
-
-                var class_row = $('<tr></tr>').append(class_cell);
-
-                $(table).append(class_row);
-
-                if (cls.attendance.length > 0) {
-                    for (var x = 0; x < cls.attendance.length; x++) {
-                        var attend = cls.attendance[x];
-                        var attend_row = $('<tr></tr>');
-                        var td_num = $('<td></td>', {
-                            'text': x + 1
-                        });
-
-                        var td_date = $('<td></td>', {
-                            'text': attend.date
-                        });
-
-                        var td_present = $('<td></td>', {
-                            'html': attend.present !== '' ? '<i class="fa fa-check text-success" style="font-size: 1.5em"></i>' : ''
-                        });
-
-                        var td_absent = $('<td></td>', {
-                            'html': attend.absent !== '' ? '<i class="fa fa-check text-danger" style="font-size: 1.5em"></i>' : ''
-                        });
-
-                        var td_late = $('<td></td>', {
-                            'html': attend.late !== '' ? '<i class="fa fa-check text-warning" style="font-size: 1.5em"></i>' : ''
-                        });
-
-                        var td_note = $('<td></td>', {
-                            'text': attend.note
-                        });
-
-                        $(attend_row).append(td_num, td_date, td_present, td_absent, td_late, td_note);
-                        $(table).append(attend_row);
-                    }
-                } else {
-                    var class_cell = $('<td></td>', {
-                        'colspan': '6',
-                        'class': 'text-center',
-                        'text': 'Không có dữ liệu'
-                    });
-
-                    var class_row = $('<tr></tr>').append(class_cell);
-                    $(table).append(class_row);
-                }
-            }
-        } else {
-            var class_cell = $('<td></td>', {
-                'colspan': '6',
-                'class': 'text-center',
-                'text': 'Không có dữ liệu'
-            });
-
-            var class_row = $('<tr></tr>').append(class_cell);
-            $(table).append(class_row);
-        }
-    };
-
-    var get = function get(end_point, data, callback) {
-        $.ajax({
-            url: end_point + '/?' + $.param(data, true),
-            method: 'GET',
-            dataType: 'json',
-            //contentType: 'application/json',
-            success: function success(response) {
-                if (response.code == 1) {
-                    callback(response.data);
-                } else {
-                    console.log(response.message);
-                }
-            }
-        });
-    };
-
-    var post = function post(end_point, data, callback) {
-        $.ajax({
-            url: end_point,
-            method: 'POST',
-            dataType: 'json',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function success(response) {
-                if (response.code == 1) {
-                    callback(response.data);
-                } else {
-                    console.log(response.message);
-                }
-            }
-        });
-    };
-
-    var save_profile = function save_profile() {
-        var form = $('FORM#frmStudent');
-        var assessment_date = $(form).find('INPUT#assessment_date').val().trim();
-        assessment_date = assessment_date == '' ? null : moment(assessment_date).format("YYYY-MM-DD HH:mm:ss");
-        console.log(assessment_date);
-        var data = {
-            'student_id': student_id,
-            'student': {
-                'name': $(form).find('INPUT#student-name').val().trim(),
-                'e_name': $(form).find('INPUT#student-e_name').val().trim(),
-                'gender': $(form).find('SELECT#student-gender').val().trim(),
-                'birthyear': $(form).find('INPUT#student-birthyear').val().trim(),
-                'birthday': $(form).find('INPUT#student-birthday').val().trim(),
-                'parent_id': $(form).find('INPUT#parent_id').val().trim(),
-                'register_branch_id': $(form).find('INPUT#register_branch_id').val().trim(),
-                'dependent_branch_id': $(form).find('INPUT#dependent_branch_id').val().trim(),
-                'staff_id': $(form).find('INPUT#staff_id').val().trim(),
-                'register_note': $(form).find('textarea#register_note').val().trim()
-            },
-            'assessment': {
-                'assessment_date': assessment_date,
-                'assessment_result': $(form).find('INPUT#assessment_result').val().trim(),
-                'teacher_id': $(form).find('INPUT#assessment_teacher_id').val().trim(),
-                'trial_class_id': $(form).find('INPUT#assessment_teacher_id').val().trim()
-            }
-        };
-
-        post('/api/student/save', data, function (response) {
-            console.log(response);
-        });
-    };
-
-    var save_activities = function save_activities() {
-        var form = $('DIV#box_history');
-        var time = $(form).find('INPUT#start_time').val().trim();
-        var data = {
-            'student_id': student_id,
-            'act_type': $(form).find('SELECT#act_type').val(),
-            'start_time': time == '' ? null : moment(time).format("YYYY-MM-DD HH:mm:ss"),
-            'note': $(form).find('INPUT#note').val().trim()
-        };
-
-        post('/api/student/save-activity', data, function (response) {
-            get_activities();
-        });
-
-        $(form).find('SELECT#act_type').val('');
-        $(form).find('INPUT#start_time').val('');
-        $(form).find('INPUT#note').val('');
-    };
-
-    var save = function save() {
-        save_profile();
-    };
-
-    var set_primary_parent = function set_primary_parent(parent) {
-        student_data.profile.parent = parent;
-        fill_profile(student_data.profile);
-        fill_parent_list(student_data.parents);
-        tab_activate($(tab_col).find('a[data-tab="profile"]'));
-    };
-
-    var init = function init() {
-        student_id = get_url_param('student_id');
-        if (student_id == null) {
-            console.log('NO DATA');
-            return false;
-        }
-
-        $('FORM#frmStudent').find('INPUT#student_id').val(student_id);
-
-        var form = $('FORM#frmStudent');
-        for (var i = 1; i <= 6; i++) {
-            var opt = $('<option></option>', { text: activity_types[i], value: i });
-            $(form).find('SELECT#act_type').append(opt);
-        }
-
-        get_student_profile(function () {
-            get_activities();
-            get_parent_list();
-            get_exam_results();
-            get_teacher_reports();
-            get_payment_history();
-            get_attendance_history();
-        });
-    };
-
-    __webpack_require__(168);
-    init();
-});
-
-/***/ }),
-/* 168 */
-/***/ (function(module, exports) {
-
-$(function () {
-    var modal_branch = $('DIV#branch-select-modal');
-    var modal_teacher = $('DIV#teacher-select-modal');
-    var modal_classes = $('DIV#classes-select-modal');
-    var modal_staff = $('DIV#staff-select-modal');
-
-    var table_branch = null;
-    var table_teacher = null;
-    var table_classes = null;
-    var table_staff = null;
-
-    var branch_list_render = function branch_list_render() {
-        if ($.fn.dataTable.isDataTable('DIV#branch-select-modal TABLE#branch-list-student')) {
-            table_student = $(modal_branch).find('TABLE#branch-list-student').DataTable();
-            table_branch.ajax.reload();
-        } else {
-            table_branch = $(modal_branch).find('TABLE#branch-list-student').DataTable({
-                language: datatable_language,
-                "ordering": false,
-                "lengthChange": false,
-                ajax: {
-                    url: '/api/branch/list'
-                },
-                columns: [{
-                    data: null
-                }, {
-                    data: 'branch_name'
-                }, {
-                    data: 'address'
-                }, {
-                    data: null
-                }],
-                "columnDefs": [{
-                    "targets": [0],
-                    "data": null,
-                    "defaultContent": ''
-                }, {
-                    targets: 3,
-                    "data": null,
-                    "visible": true,
-                    "defaultContent": '<span class="badge bg-dark" style="margin-left:30px"><a title="Chọn trung tâm" class="text-white branch-selection" style="color:white;cursor: pointer">Chọn</a></span>'
-                }]
-            });
-
-            table_branch.on('order.dt search.dt', function () {
-                table_branch.column(0, {
-                    search: 'applied',
-                    order: 'applied'
-                }).nodes().each(function (cell, i) {
-                    cell.innerHTML = i + 1;
-                });
-            }).draw();
-
-            table_branch.on('click', 'a.branch-selection', function () {
-                var data = table_branch.row($(this).parents('tr')).data();
-                var form = $('FORM#frmStudent');
-                var target_prefix = $(modal_branch).find('INPUT#target-form-control[type="hidden"]').val();
-                $(form).find('INPUT#' + target_prefix + '_id').val(data.id);
-                $(form).find('INPUT#branch-' + target_prefix + '_name').val(data.branch_name);
-                $(modal_branch).modal('hide');
-            });
-        }
-    };
-
-    var classes_list_render = function classes_list_render() {
-        if ($.fn.dataTable.isDataTable('DIV#classes-select-modal TABLE#classes-list-student')) {
-            table_classes = $(modal_classes).find('TABLE#classes-list-student').DataTable();
-        } else {
-            table_classes = $(modal_classes).find('TABLE#classes-list-student').DataTable({
-                language: datatable_language,
-                "ordering": false,
-                "lengthChange": false,
-                ajax: {
-                    url: '/api/get-list-class'
-                },
-                columns: [{
-                    data: null
-                }, {
-                    data: 'name'
-                }, {
-                    data: 'branch_name'
-                }, {
-                    data: null
-                }],
-                "columnDefs": [{
-                    "targets": [0],
-                    "data": null,
-                    "defaultContent": ''
-                }, {
-                    targets: 3,
-                    "data": null,
-                    "visible": true,
-                    "defaultContent": '<span class="badge bg-dark" style="margin-left:30px"><a title="Chọn lớp" class="text-white classes-selection" style="color:white;cursor: pointer">Chọn</a></span>'
-                }]
-            });
-
-            table_classes.on('order.dt search.dt', function () {
-                table_classes.column(0, {
-                    search: 'applied',
-                    order: 'applied'
-                }).nodes().each(function (cell, i) {
-                    cell.innerHTML = i + 1;
-                });
-            }).draw();
-
-            table_classes.on('click', 'a.classes-selection', function () {
-                var data = table_classes.row($(this).parents('tr')).data();
-                var form = $('FORM#frmStudent');
-                $(form).find('INPUT#assessment_trial_class_id').val(data.id);
-                $(form).find('INPUT#trial_class').val(data.name);
-                $(modal_classes).modal('hide');
-            });
-        }
-    };
-
-    var teacher_list_render = function teacher_list_render() {
-        if ($.fn.dataTable.isDataTable('DIV#teacher-select-modal TABLE#teacher-list-student')) {
-            table_teacher = $(modal_teacher).find('TABLE#teacher-list-student').DataTable();
-        } else {
-            table_teacher = $(modal_teacher).find('TABLE#teacher-list-student').DataTable({
-                language: datatable_language,
-                "ordering": false,
-                "lengthChange": false,
-                ajax: {
-                    url: '/api/list-teachers'
-                },
-                columns: [{
-                    data: null
-                }, {
-                    data: 'name'
-                }, {
-                    data: 'email'
-                }, {
-                    data: null
-                }],
-                "columnDefs": [{
-                    "targets": [0],
-                    "data": null,
-                    "defaultContent": ''
-                }, {
-                    targets: 3,
-                    "data": null,
-                    "visible": true,
-                    "defaultContent": '<span class="badge bg-dark" style="margin-left:30px"><a title="Chọn lớp" class="text-white teacher-selection" style="color:white;cursor: pointer">Chọn</a></span>'
-                }]
-            });
-
-            table_teacher.on('order.dt search.dt', function () {
-                table_teacher.column(0, {
-                    search: 'applied',
-                    order: 'applied'
-                }).nodes().each(function (cell, i) {
-                    cell.innerHTML = i + 1;
-                });
-            }).draw();
-
-            table_teacher.on('click', 'a.teacher-selection', function () {
-                var data = table_teacher.row($(this).parents('tr')).data();
-                var form = $('FORM#frmStudent');
-                $(form).find('INPUT#assessment_teacher_id').val(data.id);
-                $(form).find('INPUT#assessment_teacher').val(data.name);
-                $(modal_teacher).modal('hide');
-            });
-        }
-    };
-
-    var staff_list_render = function staff_list_render() {
-        if ($.fn.dataTable.isDataTable('DIV#staff-select-modal TABLE#staff-list-student')) {
-            table_staff = $(modal_staff).find('TABLE#staff-list-student').DataTable();
-        } else {
-            table_staff = $(modal_staff).find('TABLE#staff-list-student').DataTable({
-                language: datatable_language,
-                "ordering": false,
-                "lengthChange": false,
-                ajax: {
-                    url: '/api/get-list-staff'
-                },
-                columns: [{
-                    data: null
-                }, {
-                    data: 'name'
-                }, {
-                    data: 'email'
-                }, {
-                    data: 'branch_name'
-                }, {
-                    data: null
-                }],
-                "columnDefs": [{
-                    "targets": [0],
-                    "data": null,
-                    "defaultContent": ''
-                }, {
-                    targets: 4,
-                    "data": null,
-                    "visible": true,
-                    "defaultContent": '<span class="badge bg-dark" style="margin-left:30px"><a title="Chọn lớp" class="text-white staff-selection" style="color:white;cursor: pointer">Chọn</a></span>'
-                }]
-            });
-
-            table_staff.on('order.dt search.dt', function () {
-                table_staff.column(0, {
-                    search: 'applied',
-                    order: 'applied'
-                }).nodes().each(function (cell, i) {
-                    cell.innerHTML = i + 1;
-                });
-            }).draw();
-
-            table_staff.on('click', 'a.staff-selection', function () {
-                var data = table_staff.row($(this).parents('tr')).data();
-                var form = $('FORM#frmStudent');
-                $(form).find('INPUT#staff_id').val(data.id);
-                console.log(data);
-                $(form).find('INPUT#dependent_staff_name').val(data.name);
-                $(modal_staff).modal('hide');
-            });
-        }
-    };
-
-    var events_binding = function events_binding() {
-        $('A#btn_register_branch').on('click', function (e) {
-            $(modal_branch).find('INPUT#target-form-control[type="hidden"]').val('register_branch');
-            modal_branch.modal('show');
-        });
-
-        $('A#btn_dependent_branch').on('click', function (e) {
-            $(modal_branch).find('INPUT#target-form-control[type="hidden"]').val('dependent_branch');
-            modal_branch.modal('show');
-        });
-
-        $('A#btn_staff').on('click', function (e) {
-            modal_staff.modal('show');
-        });
-
-        $('A#btn_trial_class').on('click', function (e) {
-            modal_classes.modal('show');
-        });
-
-        $('A#btn_teacher').on('click', function (e) {
-            modal_teacher.modal('show');
-        });
-
-        modal_branch.on('show.bs.modal', function (e) {
-            branch_list_render();
-        });
-
-        modal_classes.on('show.bs.modal', function (e) {
-            classes_list_render();
-        });
-
-        modal_teacher.on('show.bs.modal', function (e) {
-            teacher_list_render();
-        });
-
-        modal_staff.on('show.bs.modal', function (e) {
-            staff_list_render();
-        });
-    };
-
-    events_binding();
-});
-
-/***/ }),
-/* 169 */
-/***/ (function(module, exports) {
-
-$(function () {
-
-    if ($('#timeTableClass').length == 0) return false;
-
-    var url_string = window.location.href;
-    var url = new URL(url_string);
-    var id = url.searchParams.get("classid");
-    function getTimeEnd(data, type, row) {
-        var d = moment(data.time, 'HH:mm:ss').add(data.duration, 'hour').format('HH:mm:ss');
-        return d;
-    }
-    function getDayAndDate(data, type, dataToSet) {
-        return data.date + "<br>" + data.week_days;
-    }
-    var tableTimetable = $('#timeTableClass').DataTable({
-        "columnDefs": [{
-            "searchable": false,
-            "orderable": false,
-            "targets": 0
-        }],
-        "order": [[1, 'asc']],
-        ajax: {
-            url: 'api/get-list-timetable',
-            data: { id: id },
-            dataSrc: 'data'
-        },
-        columns: [{ data: null }, {
-            data: getDayAndDate,
-            render: function render(data, type, row) {
-                var day;
-                switch (row.week_days) {
-                    case 0:
-                        day = "Chủ nhật";
-                        break;
-                    case 1:
-                        day = "Thứ hai";
-                        break;
-                    case 2:
-                        day = "Thứ ba";
-                        break;
-                    case 3:
-                        day = "Thứ tư";
-                        break;
-                    case 4:
-                        day = "Thứ năm";
-                        break;
-                    case 5:
-                        day = "Thứ sáu";
-                        break;
-                    case 6:
-                        day = "Thứ bảy";
-                }
-                return row.date + "<br>" + day;
-            }
-        }, { data: 'time', name: 'time' }, { data: getTimeEnd }, {
-            'data': null,
-            'render': function render(data, type, row) {
-                return '<button timetableID=\"' + row.id + '\" title=\"Sửa thời khóa biểu\"' + 'class=\"btn btn-warning editTimetable\"><i class=\"fa fa-pencil\" ' + 'aria-hidden=\"true\"></i>' + '</button> <button classID=\"' + row.class_id + '\" timetableID=\"' + row.id + '\" ' + 'class="rollCallPage btn btn-success" ' + 'title="Điểm danh"><i class="fa fa-sticky-note" ' + 'aria-hidden="true"></i></button>';
-            }
-        }]
-    });
-
-    tableTimetable.on('order.dt search.dt', function () {
-        tableTimetable.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
-            cell.innerHTML = i + 1;
-        });
-    }).draw();
-
-    jQuery.datetimepicker.setLocale('vi');
-    $('#change-date').datetimepicker({
-        format: 'Y-m-d',
-        timepicker: false,
-        minDate: '-1970-01-1'
-    });
-    $('#change-time').datetimepicker({
-        format: 'H:i',
-        datepicker: false,
-        allowTimes: ['07:30', '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00']
-    });
-
-    $(document).on('click', '.editTimetable', function () {
-        var id = $(this).attr('timetableID');
-        $.ajax({
-            type: 'get',
-            url: "api/edit-timetable",
-            data: { id: id },
-            success: function success(response) {
-                $('#edit-timetable').modal('show');
-                $('#change-date').val(response['data'][0].date);
-                $('#change-time').val(response['data'][0].time);
-                $('#getClass_id').val(response['data'][0].class_id);
-                $('#update-timetable1').attr('data-id', response['data'][0].id);
-            }
-        });
-    });
-
-    $('#update-timetable1').click(function (e) {
-        e.preventDefault();
-        var id = $(this).attr('data-id');
-        var time = $('#change-time').val();
-        var date = $('#change-date').val();
-        var class_id = $('#getClass_id').val();
-        $.ajax({
-            method: "POST",
-            url: "api/update-timetable",
-            data: { id: id, date: date, time: time, class_id: class_id },
-            success: function success(response) {
-                tableTimetable.ajax.reload();
-                $('#edit-timetable').modal('hide');
-            }
-        });
-    });
-
-    $(document).on('click', '.rollCallPage', function () {
-        var idOfTimetable = $(this).attr('timetableID');
-        localStorage.setItem("idOfTimetable", idOfTimetable);
-        window.location.href = asset + "rollcall";
-    });
-});
-
-/***/ }),
-/* 170 */
-/***/ (function(module, exports) {
-
-$(function () {
-    if ($('#table-rollcall').length == 0) return false;
-
-    var timetable_id = localStorage.getItem("idOfTimetable");
-    var tableRollCall = $('#table-rollcall').DataTable({
-        "columnDefs": [{
-            "searchable": false,
-            "orderable": false,
-            "targets": 0
-        }],
-        "order": [[1, 'asc']],
-        ajax: {
-            url: 'api/get-list-roll-call-student',
-            data: { timetable_id: timetable_id },
-            dataSrc: 'data'
-        },
-        columns: [{ data: null }, { data: 'student_code', name: 'student_code' }, { data: 'name', name: 'name' }, {
-            'render': function render(data, type, row) {
-                var tmp = row.status == 0 ? 'checked' : "";
-                var tmp1 = row.status == 1 ? 'checked' : "";
-                var tmp2 = row.status == 2 ? 'checked' : "";
-                var tmp3 = row.status == 3 ? 'checked' : "";
-                return '<label class="container1">Đ' + '<input class="rol" studentID=\"' + row.id + '\" ' + tmp + ' value="0" type="radio" name=\"' + row.id + '\">' + '<span class="checkmark"></span>' + '</label>' + '<label class="container1">P' + '<input class="rol" studentID=\"' + row.id + '\" ' + tmp1 + ' value="1" type="radio" name=\"' + row.id + '\">' + '<span class="checkmark"></span>' + '</label>' + '<label class="container1">M' + '<input class="rol" studentID=\"' + row.id + '\" ' + tmp2 + ' value="2" type="radio" name=\"' + row.id + '\">' + '<span class="checkmark"></span>' + '</label>' + '<label class="container1">V' + '<input class="rol" studentID=\"' + row.id + '\" ' + tmp3 + ' value="3" type="radio" name=\"' + row.id + '\">' + '<span class="checkmark"></span>' + '</label>';
-            }
-        }, {
-            'render': function render(data, type, row) {
-                if (row.note == null) {
-                    return '';
-                } else {
-                    return row.note;
-                }
-            }
-        }, {
-            'render': function render(data, type, row) {
-                return '<button rolID="' + row.rol_id + '" class="show-note btn btn-success" ' + 'title="Nhập ghi chú">' + '<i class="fa fa-newspaper-o" aria-hidden="true"></i></button>';
-            }
-        }]
-    });
-
-    tableRollCall.on('order.dt search.dt', function () {
-        tableRollCall.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
-            cell.innerHTML = i + 1;
-        });
-    }).draw();
-
-    $(document).on('change', '.rol', function (e) {
-        e.preventDefault();
-        var student_id = $(this).attr('studentID');
-        var status = $('input[name=' + student_id + ']:checked').val();
-        $.ajax({
-            method: "POST",
-            url: "api/roll-call-student",
-            data: { status: status, student_id: student_id, timetable_id: timetable_id },
-            success: function success(response) {
-                tableRollCall.ajax.reload();
-            }
-        });
-    });
-
-    $(document).on('click', '.show-note', function () {
-        $('#enter-note').modal('show');
-        var id = $(this).attr('rolID');
-        $('#rollID').val(id);
-    });
-
-    $('#update-note').click(function (e) {
-        e.preventDefault();
-        var note = $('#note1').val();
-        var id = $('#rollID').val();
-        $.ajax({
-            method: "POST",
-            url: "api/update-note",
-            data: { id: id, note: note },
-            success: function success(response) {
-                $('#enter-note').modal('hide');
-                $('#enter-note').on('hidden.bs.modal', function () {
-                    $(this).find('form')[0].reset();
-                });
-                tableRollCall.ajax.reload();
-            }
-        });
-    });
-});
-
-/***/ }),
-/* 171 */
-/***/ (function(module, exports) {
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-$(function () {
-	if ($('#list-holiday').length == 0) return false;
-	var tableHoliday = $('#list-holiday').DataTable({
-		"columnDefs": [{
-			"searchable": false,
-			"orderable": false,
-			"targets": 0
-		}],
-		"order": [[1, 'asc']],
-		ajax: {
-			url: 'api/get-list-holiday',
-			dataSrc: 'data'
-		},
-		columns: [{ data: null }, { data: 'holiday', name: 'holiday' }, {
-			'data': null,
-			'render': function render(data, type, row) {
-				return '<button holidayID=\"' + row.id + '\" title=\"xóa ngày nghỉ\" ' + 'class=\"deleteHoliday btn btn-danger\"><i class=\"fa fa-trash\" ' + 'aria-hidden=\"true\"></i></button>';
-			}
-		}]
-	});
-
-	tableHoliday.on('order.dt search.dt', function () {
-		tableHoliday.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
-			cell.innerHTML = i + 1;
-		});
-	}).draw();
-
-	$('.add-holiday').click(function () {
-		$('#add-holiday').modal('show');
-	});
-
-	var formAddHoliday = $('#form-add-holiday');
-	formAddHoliday.validate(_defineProperty({
-		rules: {
-			"holiday": {
-				required: true,
-				date: true
-			}
-		},
-		messages: {
-			"holiday": {
-				required: "Bắt buộc nhập ngày",
-				date: "Hãy nhập đúng định dạng ngày"
-			}
-		},
-		highlight: function highlight(element, errorClass) {
-			$(element).closest(".form-group").addClass("has-error");
-		},
-		unhighlight: function unhighlight(element, errorClass) {
-			$(element).closest(".form-group").removeClass("has-error");
-		},
-		errorPlacement: function errorPlacement(error, element) {
-			error.appendTo(element.parent().next());
-		}
-	}, 'errorPlacement', function errorPlacement(error, element) {
-		if (element.attr("type") == "checkbox") {
-			element.closest(".form-group").children(0).prepend(error);
-		} else error.insertAfter(element);
-	}));
-
-	$('#store-holiday').click(function (e) {
-		e.preventDefault();
-		var holiday = $('#holiday').val();
-		if (formAddHoliday.valid()) {
-			$.ajax({
-				method: "POST",
-				url: 'api/add-holiday',
-				data: { holiday: holiday },
-				success: function success(response) {
-					$('#add-holiday').modal('hide');
-					$('#add-holiday').on('hidden.bs.modal', function () {
-						$(this).find('form')[0].reset();
-					});
-					tableHoliday.ajax.reload();
-				}
-			});
-		}
-	});
-
-	$(document).on('click', '.deleteHoliday', function () {
-		var id = $(this).attr('holidayID');
-		swal({
-			title: "Bạn có chắc muốn xóa?",
-			text: "Bạn sẽ không thể khôi phục lại bản ghi này!",
-			icon: "warning",
-			buttons: true,
-			dangerMode: true
-		}).then(function (willDelete) {
-			if (willDelete) {
-				$.ajax({
-					method: "POST",
-					url: 'api/delete-holiday',
-					data: { id: id },
-					success: function success(response) {
-						tableHoliday.ajax.reload();
-					}
-				});
-			}
-		});
-	});
-
-	jQuery.datetimepicker.setLocale('vi');
-	$('#holiday').datetimepicker({
-		format: 'Y-m-d',
-		timepicker: false,
-		minDate: '-1970-01-1'
-	});
-});
-
-/***/ }),
-/* 172 */
-/***/ (function(module, exports) {
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-$(document).on({
-    ajaxStart: function ajaxStart() {
-        $('div.modal#modal-class').find('div.modal-footer > button#create-class').button('loading');
-        $('div.modal#modal-class').find('div.modal-footer > button#create-class').prop('disabled', true);
-        $('DIV#modal-class FORM#form-class').closest('.form-group').prop('disabled', true);
-    },
-    ajaxStop: function ajaxStop() {
-        $('div.modal#modal-class').find('div.modal-footer > button#create-class').prop('disabled', false);
-        $('div.modal#modal-class').find('div.modal-footer > button#create-class').button('reset');
-        $('DIV#modal-class FORM#form-class').closest('.form-group').prop('disabled', false);
-    }
-});
-
-//require('./attendance.js');
-
-$(function () {
-    if ($('TABLE#list_class').length > 0) {
-
-        var form = $('DIV#modal-class FORM#form-class');
-        var attendance_modal = $('DIV#attendance-modal');
-
-        var table_act_buttons = '<button type="button" title="Danh sách lớp" class="list-student-class btn btn-sm btn-info"><i class="fa fa-address-book-o" aria-hidden="true"></i></button>\
-                            <button type="button"  title="Thời Khóa Biểu" class="show-timetable btn btn-sm bg-purple"><i class="fa fa-calendar-times-o" aria-hidden="true"></i></button>\
-                            <button type="button" title="Sửa thông tin lớp" class="edit-class btn btn-sm btn-primary"><i title="Sửa thông tin lớp" class="fa fa-pencil-square-o" aria-hidden="true"></i></button>\
-                            <button type="button" title="Điểm danh" class="attendance-class btn btn-sm btn-warning"><i class="fa fa-check" aria-hidden="true"></i></button>';
-        // <button type="button" title="Xoá lớp" class="delete-class btn btn-sm btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
-
-        var vietnamese_weekday = {
-            'mon': 'T2',
-            'tue': 'T3',
-            'wed': 'T4',
-            'thu': 'T5',
-            'fri': 'T6',
-            'sat': 'T7',
-            'sun': 'CN'
-        };
-
-        var vietnamese_weekday_full = {
-            'mon': 'Thứ 2',
-            'tue': 'Thứ 3',
-            'wed': 'Thứ 4',
-            'thu': 'Thứ 5',
-            'fri': 'Thứ 6',
-            'sat': 'Thứ 7',
-            'sun': 'Chủ nhật'
-        };
-
-        var date_range_time_table = $('DIV#modal-time-table DIV.modal-body INPUT#reservation').daterangepicker({
-            "locale": {
-                "format": "YYYY-MM-DD",
-                "separator": " - ",
-                "applyLabel": "Chọn",
-                "cancelLabel": "Đóng",
-                "fromLabel": "From",
-                "toLabel": "To",
-                "customRangeLabel": "Custom",
-                "daysOfWeek": ["CN", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7"],
-                "monthNames": ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"],
-                "firstDay": 1
-            },
-            autoUpdateInput: false
-        });
-
-        date_range_time_table.on('apply.daterangepicker', function (e, picker) {
-            $(e.target).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
-            $('DIV#modal-time-table DIV.modal-body INPUT#start_date').val(picker.startDate.format('YYYY-MM-DD'));
-            $('DIV#modal-time-table DIV.modal-body INPUT#end_date').val(picker.endDate.format('YYYY-MM-DD'));
-            $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').prop('disabled', false);
-        });
-
-        $('DIV#modal-time-table DIV.modal-body INPUT#reservation').on('change', function (e) {
-            if ($(e.target).val() == '') {
-                $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').prop('disabled', true);
-            }
-        });
-
-        $('SELECT.select2[id="teacher_id"]').select2({
-            placeholder: "Chọn giáo viên"
-        });
-
-        var create_class_validate_rules = {
-            class_name: {
-                required: true
-            },
-            /* max_seat: {
-                required: true,
-                number: true,
-                min: 1
-            }, */
-            start_date: {
-                required: true,
-                date: true
-            }
-        };
-
-        var create_class_validate_messages = {
-            class_name: {
-                required: "Tên lớp không được trống!"
-            },
-            /* max_seat: {
-                required: "Số học sinh tối đa không được trống!",
-                number: "Hãy nhập giá trị là số lớn hơn 0!",
-                min: "Hãy nhập giá trị là số lớn hơn 0!"
-            }, */
-            start_date: {
-                required: 'Ngày bắt đầu không được trống!',
-                date: 'Hãy nhập giá trị là một ngày!'
-            }
-        };
-
-        $(form).find('INPUT[id^="time_start_"]').each(function () {
-            var name_postfix = this.name.substr(this.name.length - 3, 3);
-            create_class_validate_rules[this.name] = {
-                required: 'input#schedule_' + name_postfix + '[type="checkbox"]:checked'
-            };
-            create_class_validate_messages[this.name] = {
-                required: 'Nhập giờ bắt đầu!'
-            };
-        });
-
-        $(form).find('INPUT[id^="time_end_"]').each(function () {
-            var name_postfix = this.name.substr(this.name.length - 3, 3);
-            create_class_validate_rules[this.name] = {
-                required: 'input#schedule_' + name_postfix + '[type="checkbox"]:checked'
-            };
-            create_class_validate_messages[this.name] = {
-                required: 'Nhập giờ kết thúc!'
-            };
-        });
-
-        $(form).find('INPUT[id^="schedule_"]').on('click', function (e) {
-            var name_postfix = $(e.target).prop('id').substr($(e.target).prop('id').length - 3, 3);
-            if ($(e.target)[0].checked == false) {
-                $(form).find('INPUT[id^="time_start_' + name_postfix + '"]').val('');
-                $(form).find('INPUT[id^="time_end_' + name_postfix + '"]').val('');
-            }
-        });
-
-        var create_class_validator = form.validate(_defineProperty({
-            debug: true,
-            success: "valid",
-            rules: create_class_validate_rules,
-            messages: create_class_validate_messages,
-            highlight: function highlight(element, errorClass) {
-                $(element).closest(".form-group").addClass("has-error");
-            },
-            unhighlight: function unhighlight(element, errorClass) {
-                $(element).closest(".form-group").removeClass("has-error");
-            },
-            errorPlacement: function errorPlacement(error, element) {
-                error.appendTo(element.parent().next());
-            }
-        }, 'errorPlacement', function errorPlacement(error, element) {
-            if (element.attr("type") == "checkbox") {
-                element.closest(".form-group").children(0).prepend(error);
-            } else error.insertAfter(element);
-        }));
-
-        var table_classes = $('TABLE#list_class').DataTable({
-            language: datatable_language,
-            "order": [[1, 'asc']],
-            ajax: {
-                url: 'api/get-list-class',
-                dataSrc: 'data'
-            },
-            columns: [{
-                data: null
-            }, {
-                data: "name",
-                name: "name"
-            }, {
-                data: "teacher_name",
-                name: "teacher_name"
-            }, {
-                data: "seat_count",
-                name: "seat_count"
-            }, {
-                data: "start_date",
-                name: "start_date",
-                render: function render(data, type, row) {
-                    return data != null ? moment(data).format("DD/MM/YYYY") : '';
-                }
-            }, {
-                data: "schedule",
-                name: "schedule",
-                render: function render(data, type, row) {
-                    return show_schedule(data);
-                }
-            }, {
-                data: "status",
-                name: "status",
-                render: function render(data, type, row) {
-                    var obj_status = {
-                        0: 'Chưa khai giảng',
-                        1: 'Chưa khai giảng',
-                        2: 'Đang học',
-                        3: 'Kết thúc'
-                    };
-                    return obj_status[data];
-                }
-            }],
-            'autoWidth': false,
-            "columnDefs": [{
-                "searchable": false,
-                "orderable": false,
-                "targets": [7],
-                "data": null,
-                "defaultContent": table_act_buttons
-            }]
-
-        });
-
-        table_classes.on('order.dt search.dt', function () {
-            table_classes.column(0, {
-                search: 'applied',
-                order: 'applied'
-            }).nodes().each(function (cell, i) {
-                cell.innerHTML = i + 1;
-            });
-        }).draw();
-
-        table_classes.on('click', 'button.list-student-class', function () {
-            var data = table_classes.row($(this).parents('tr')).data();
-            $('DIV#modal-list-student-class DIV.modal-body INPUT#class_id').val(data.id);
-            $('DIV#modal-list-student-class DIV.modal-dialog .modal-title').html('Danh sách học sinh của lớp <strong>' + data.name + '</strong>');
-            $('DIV#modal-list-student-class').modal('show');
-        });
-
-        table_classes.on('click', 'button.show-timetable', function () {
-            var data = table_classes.row($(this).parents('tr')).data();
-            $('DIV#modal-time-table DIV.modal-body INPUT#class_id').val(data.id);
-            $('DIV#modal-time-table').modal('show');
-        });
-
-        table_classes.on('click', 'button.attendance-class', function () {
-            var data = table_classes.row($(this).parents('tr')).data();
-            $(attendance_modal).find('H3.modal-title').html('Điểm danh cho lớp ' + data.name);
-            $(attendance_modal).find('input#current-class-id').val(data.id);
-            $(attendance_modal).find('input#current-class-name').val(data.name);
-            open_attendance(data.id);
-        });
-
-        table_classes.on('click', 'button.edit-class', function () {
-            var data = table_classes.row($(this).parents('tr')).data();
-            edit_class(data.id);
-        });
-
-        $('DIV#modal-class UL.status_select A').on('click', function (e) {
-            var text = $(e.target).text();
-            var val = $(e.target).data('value');
-            $('DIV#modal-class BUTTON.status_selected').text(text);
-            $('DIV#modal-class INPUT#status[type="hidden"]').val(val);
-        });
-
-        $("DIV.content-class BUTTON#button-create-class").click(function () {
-            reset_class_form('create');
-            $('DIV#modal-class').modal('show');
-        });
-
-        var show_schedule = function show_schedule(json_schedule) {
-            var schedule = json_schedule ? JSON.parse(json_schedule) : null;
-            var result = [];
-
-            if (schedule != null) {
-                for (var wd in schedule) {
-                    schedule[wd].start = schedule[wd].start.length < 5 ? '0' + schedule[wd].start : schedule[wd].start;
-                    schedule[wd].finish = schedule[wd].finish.length < 5 ? '0' + schedule[wd].finish : schedule[wd].finish;
-                    result.push('<div>' + vietnamese_weekday[wd] + ': ' + schedule[wd].start + ' - ' + schedule[wd].finish + '</div>');
-                }
-
-                return result.join('');
-            }
-            return '';
-        };
-
-        var reset_class_form = function reset_class_form(mode, data) {
-            var modal_title = '';
-            $(form)[0].reset();
-            create_class_validator.resetForm();
-            form.find(".error").removeClass("error");
-
-            if (mode == 'create') {
-                modal_title = 'Thêm mới lớp học';
-                $(form).find('INPUT').val('');
-                $($(form).find('SELECT OPTION')[0]).prop('selected', 'selected');
-                $(form).find('INPUT[id^="schedule_"][type="checkbox"]').prop('checked', false);
-                status_on_select(1);
-            } else if (mode == 'edit') {
-                modal_title = 'Sửa thông tin lớp học';
-                $(form).find('INPUT#id').val(data.id);
-                $(form).find('INPUT#class_name').val(data.name);
-                $(form).find('INPUT#class_code').val(data.class_code);
-                $(form).find('SELECT#teacher_id').val(data.teacher_id).change();
-                $(form).find('INPUT#start_date').val(data.start_date);
-                $(form).find('INPUT#max_seat').val(data.max_seat);
-                $(form).find('INPUT#status').val(data.status);
-                $(form).find('INPUT#course_name').val(data.course_name);
-
-                status_on_select(data.status);
-
-                $(form).find('INPUT[id^="schedule_"][type="checkbox"]').prop('checked', false);
-                $(form).find('INPUT[id^="time_start_"]').val('');
-                $(form).find('INPUT[id^="time_end_"]').val('');
-
-                if (data.schedule != '') {
-                    var class_schedule = JSON.parse(data.schedule);
-                    for (var wd in class_schedule) {
-                        class_schedule[wd].start = class_schedule[wd].start.length < 5 ? '0' + class_schedule[wd].start : class_schedule[wd].start;
-                        class_schedule[wd].finish = class_schedule[wd].finish.length < 5 ? '0' + class_schedule[wd].finish : class_schedule[wd].finish;
-                        $(form).find('INPUT#schedule_' + wd).prop('checked', true);
-                        $(form).find('INPUT#time_start_' + wd).val(moment('1900-01-01 ' + class_schedule[wd].start).format("LT"));
-                        $(form).find('INPUT#time_end_' + wd).val(moment('1900-01-01 ' + class_schedule[wd].finish).format("LT"));
-                    }
-                }
-            }
-
-            $('div.modal#modal-class DIV.modal-header .modal-title').html(modal_title);
-        };
-
-        var edit_class = function edit_class(class_id) {
-            $.ajax({
-                dataType: 'json',
-                type: 'get',
-                url: 'api/edit-class',
-                data: {
-                    id: class_id
-                },
-                success: function success(response) {
-                    reset_class_form('edit', response);
-                    $('DIV#modal-class').modal("show");
-                }
-            });
-        };
-
-        var status_on_select = function status_on_select(value) {
-            var text = $('DIV#modal-class UL.status_select A.class_status_' + value).text();
-            $('DIV#modal-class BUTTON.status_selected').text(text);
-            $('DIV#modal-class INPUT#status[type="hidden"]').val(value);
-        };
-
-        var get_student_of_class = function get_student_of_class(class_id) {
-            $.ajax({
-                dataType: 'json',
-                type: 'get',
-                url: 'api/get-list-class-student',
-                data: {
-                    id: class_id
-                },
-                success: function success(response) {
-                    var students_list = response.data != undefined ? response.data : [];
-                    render_student_of_class(students_list, class_id);
-                }
-            });
-        };
-
-        var get_student_not_assign = function get_student_not_assign(class_id) {
-            $('SELECT#student_not_assigned').empty();
-            $.ajax({
-                dataType: 'json',
-                type: 'get',
-                url: 'api/get-student-not-in-class',
-                data: {
-                    id: class_id
-                },
-                success: function success(response) {
-                    var students_list = response.data != undefined ? response.data : [];
-                    if (students_list.length > 0) {
-                        for (var i = 0; i < students_list.length; i++) {
-                            var display_text = students_list[i].name + ' (' + (students_list[i].birthday != null ? students_list[i].birthday : students_list[i].birthyear) + ')';
-                            var opt = $('<option></option>', {
-                                value: students_list[i].id,
-                                text: display_text
-                            });
-                            $('SELECT#student_not_assigned').append(opt);
-                        }
-                    }
-                }
-            });
-        };
-
-        var render_student_of_class = function render_student_of_class(students, class_id) {
-            var table = $('DIV.modal#modal-list-student-class TABLE#table-student-of-class');
-            $(table).find('tbody').empty();
-
-            if (students.length == 0) {
-                $(table).find('tbody').append($('<tr><td colspan="4" style="text-align:center">Không có học sinh trong lớp</td></tr>'));
-                return;
-            }
-
-            for (var i = 0; i < students.length; i++) {
-                var tr = $('<tr></tr>', {
-                    'data-student-id': students[i].id
-                });
-                var td_stt = $('<td></td>', {
-                    text: i + 1
-                });
-                var td_name = $('<td></td>', {
-                    text: students[i].name
-                });
-                var td_birthday = $('<td></td>', {
-                    text: students[i].birthday != '' ? students[i].birthday : students[i].birthyear
-                });
-
-                var button = $('<button></button>', {
-                    type: 'button',
-                    title: 'Xoá khỏi danh sách lớp',
-                    class: 'btn btn-sm btn-danger',
-                    'data-student': students[i].id,
-                    'data-class': class_id
-                }).append($('<i class="fa fa-trash-o" aria-hidden="true"></i>'));
-                var td_act = $('<td></td>', {
-                    text: ''
-                }).append(button);
-
-                $(button).bind('click', function (e) {
-                    console.log(e.currentTarget);
-                    var student_id = $(e.currentTarget).data('student');
-                    var class_id = $(e.currentTarget).data('class');
-                    remove_student_class(class_id, student_id);
-                });
-
-                $(tr).append(td_stt, td_name, td_birthday, td_act);
-                $(table).find('tbody').append(tr);
-            }
-        };
-
-        var remove_student_class = function remove_student_class(class_id, student_id) {
-            $.ajax({
-                dataType: 'json',
-                type: 'get',
-                url: 'api/delete-student-class',
-                data: {
-                    class_id: class_id,
-                    student_id: student_id
-                },
-                success: function success(response) {
-                    var table = $('DIV.modal#modal-list-student-class TABLE#table-student-of-class');
-                    var tr = $(table).find('tbody tr td button[data-student="' + student_id + '"]').parent().parent().remove();
-
-                    if ($(table).find('tbody tr').length == 0) {
-                        $(table).find('tbody').append($('<tr><td colspan="4" style="text-align:center">Không có học sinh trong lớp</td></tr>'));
-                    }
-                }
-            });
-        };
-
-        var calc_time_table = function calc_time_table(class_id, start_date, end_date, callback) {
-            data = {
-                'class_id': class_id,
-                'start_date': start_date,
-                'end_date': end_date
-            };
-
-            $.ajax({
-                url: 'api/calc_time_table',
-                dataType: 'json',
-                data: data,
-                type: 'GET',
-                success: function success(response) {
-                    time_table_init(response.data);
-                }
-            }).done(function () {
-                callback();
-            });
-        };
-
-        var time_table_init = function time_table_init(list) {
-            var my_lang = datatable_language;
-            my_lang.emptyTable = 'Chưa có thời khoá biểu';
-            var buttons = '<button type="button" title="Điểm danh" class="btn btn-warning attendance"><i class="fa fa-check-square-o"></i></button>\
-            <button type="button" title="Nhật ký" class="btn btn-info teaching-diary"><i class="fa fa-sticky-note"></i></button>\
-            <button type="button" title="Chỉnh sửa" class="btn bg-olive edit"><i class="fa fa-pencil-square-o"></i></button>';
-
-            var table_timetable = null;
-            if ($.fn.dataTable.isDataTable('DIV#modal-time-table TABLE#table-timetable')) {
-                table_timetable = $('DIV#modal-time-table TABLE#table-timetable').DataTable();
-                table_timetable.clear();
-                table_timetable.rows.add(list);
-                table_timetable.draw();
-            } else {
-                var table_timetable = $('DIV#modal-time-table TABLE#table-timetable').DataTable({
-                    data: list,
-                    language: my_lang,
-                    'autoWidth': false,
-                    "ordering": false,
-                    "searching": false,
-                    "bPaginate": true,
-                    "columnDefs": [{
-                        "searchable": false,
-                        "orderable": false
-                    }, {
-                        targets: [4],
-                        "data": null,
-                        "visible": true,
-                        "defaultContent": buttons
-                    }],
-                    columns: [{
-                        data: null
-                    }, {
-                        data: "date",
-                        name: "date",
-                        render: function render(data, type, row) {
-                            var wd = '<span> (' + vietnamese_weekday_full[row.week_day] + ')</span>';
-                            if (row.week_day == 'sun') wd = '<span style="color:red"> (' + vietnamese_weekday_full[row.week_day] + ')</span>';
-                            return data + wd;
-                        }
-                    }, {
-                        render: function render(data, type, row) {
-                            return row.start + ' - ' + row.finish;
-                        }
-                    }, {
-                        data: "teacher_name",
-                        name: "teacher_name"
-                    }, {
-                        data: null
-                    }]
-                });
-
-                table_timetable.on('draw.dt order.dt search.dt', function () {
-                    table_timetable.column(0, {}).nodes().each(function (cell, i) {
-                        cell.innerHTML = i + 1;
-                    });
-                }).draw();
-
-                table_timetable.on('click', 'button.attendance', function () {
-                    var data = table_timetable.row($(this).parents('tr')).data();
-                    console.log('rollcall', data);
-                });
-
-                table_timetable.on('click', 'button.teaching-diary', function () {
-                    var data = table_timetable.row($(this).parents('tr')).data();
-                    console.log('teaching-diary', data);
-                });
-
-                table_timetable.on('click', 'button.edit', function () {
-                    var data = table_timetable.row($(this).parents('tr')).data();
-                    console.log('edit', data);
-                });
-            }
-        };
-
-        $('DIV#modal-class BUTTON#create-class').on('click', function (e) {
-            var is_valid = form.valid();
-            var id = $(form).find('INPUT#id').val();
-            var data = {};
-            var endpoint = id != '' ? "api/edit-class" : "api/create-class";
-            if (is_valid) {
-                data = {
-                    'name': $(form).find('INPUT#class_name').val(),
-                    'class_code': $(form).find('INPUT#class_code').val(),
-                    'teacher_id': $(form).find('SELECT#teacher_id').val(),
-                    'course_name': $(form).find('INPUT#course_name').val(),
-                    'start_date': $(form).find('INPUT#start_date').val(),
-                    'max_seat': $(form).find('INPUT#max_seat').val(),
-                    'status': $(form).find('INPUT#status').val(),
-                    'schedule': render_schedule()
-                };
-
-                if (id != '') data.id = id;
-
-                $.ajax({
-                    url: endpoint,
-                    method: "POST",
-                    data: data,
-                    success: function success(response) {
-                        table_classes.ajax.reload();
-                        $('DIV#modal-class').modal("hide");
-                    }
-                });
-            }
-        });
-
-        $('DIV#modal-time-table DIV.modal-footer BUTTON#btnSave').on('click', function (e) {
-            if ($.fn.dataTable.isDataTable('DIV#modal-time-table TABLE#table-timetable')) {
-                $(e.target).prop('disabled', true);
-                $(e.target).button('loading');
-
-                var table_timetable = $('DIV#modal-time-table TABLE#table-timetable').DataTable();
-                var data = {
-                    'class_id': $('DIV#modal-time-table DIV.modal-body INPUT#class_id').val(),
-                    'start_date': $('DIV#modal-time-table DIV.modal-body INPUT#start_date').val(),
-                    'end_date': $('DIV#modal-time-table DIV.modal-body INPUT#end_date').val(),
-                    'time_table': []
-                };
-                var time_table = [];
-                table_timetable.data().each(function (d) {
-                    time_table.push(d);
-                });
-
-                data.time_table = time_table;
-
-                var url = 'api/save-time-table';
-                $.ajax({
-                    url: url,
-                    data: JSON.stringify(data),
-                    contentType: 'application/json',
-                    dataType: 'json',
-                    method: 'POST',
-                    success: function success(response) {
-                        $(e.target).prop('disabled', false);
-                        $(e.target).button('reset');
-                        $('DIV#modal-time-table').modal('hide');
-                    }
-                });
-            }
-        });
-
-        $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').on('click', function (e) {
-            var class_id = $('DIV#modal-time-table DIV.modal-body INPUT#class_id').val();
-            var start_date = $('DIV#modal-time-table DIV.modal-body INPUT#start_date').val();
-            var end_date = $('DIV#modal-time-table DIV.modal-body INPUT#end_date').val();
-
-            $(e.target).button('loading');
-            $(e.target).prop('disabled', true);
-
-            calc_time_table(class_id, start_date, end_date, function () {
-                $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').prop('disabled', false);
-                $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').button('reset');
-            });
-        });
-
-        $('DIV#modal-list-student-class').on('show.bs.modal', function (e) {
-            var class_id = $('DIV#modal-list-student-class DIV.modal-body INPUT#class_id').val();
-            get_student_not_assign(class_id);
-            get_student_of_class(class_id);
-        });
-
-        $('DIV#modal-list-student-class').on('hide.bs.modal', function (e) {
-            var table = $('DIV.modal#modal-list-student-class TABLE#table-student-of-class');
-            $(table).find('tbody').empty();
-            $(table).find('tbody').append($('<tr><td colspan="4" style="text-align:center">Không có học sinh trong lớp</td></tr>'));
-        });
-
-        $('DIV#modal-class').on('show.bs.modal', function (e) {
-            create_class_validator.resetForm();
-            form.find(".has-error").removeClass("has-error");
-            form.find(".has-error").removeClass("has-error");
-        });
-
-        $('DIV#modal-time-table').on('hide.bs.modal', function (e) {
-            if ($.fn.dataTable.isDataTable('DIV#modal-time-table TABLE#table-timetable')) {
-                var table_timetable = $('DIV#modal-time-table TABLE#table-timetable').DataTable();
-                table_timetable.clear();
-                table_timetable.rows.add([]);
-                table_timetable.draw();
-            }
-        });
-
-        $('DIV#modal-time-table').on('show.bs.modal', function (e) {
-            var start_date = $('DIV#modal-time-table DIV.modal-body INPUT#start_date').val();
-            var end_date = $('DIV#modal-time-table DIV.modal-body INPUT#end_date').val();
-            var class_id = $('DIV#modal-time-table DIV.modal-body INPUT#class_id').val();
-
-            if ($('DIV#modal-time-table DIV.modal-body INPUT#start_date').val() != '') $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').prop('disabled', false);else $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').prop('disabled', true);
-
-            $.ajax({
-                url: 'api/get-list-timetable',
-                method: 'GET',
-                data: {
-                    'class_id': class_id
-                },
-                success: function success(response) {
-                    time_table_init(response.data);
-                }
-            });
-        });
-
-        $('DIV#modal-list-student-class BUTTON#btnAssignClass').on('click', function (e) {
-            var students = $("SELECT#student_not_assigned").val();
-            var class_id = $('DIV#modal-list-student-class DIV.modal-body INPUT#class_id').val();
-            if (students.length > 0) {
-                assign_to_class(class_id, students);
-            }
-        });
-
-        var render_schedule = function render_schedule() {
-            var form = $('DIV#modal-class FORM#form-class');
-            var container = $(form).find('DIV.row#schedule_row');
-
-            var weekday_check_prefix = 'schedule_';
-            var weekday_time_start_prefix = 'time_start_';
-            var weekday_time_end_prefix = 'time_end_';
-
-            var schedule = {
-                'mon': {},
-                'tue': {},
-                'wed': {},
-                'thu': {},
-                'fri': {},
-                'sat': {},
-                'sun': {}
-            };
-            for (var wd in schedule) {
-                if ($(container).find('INPUT#' + weekday_check_prefix + wd)[0].checked) {
-                    var start_time = $(container).find('INPUT#' + weekday_time_start_prefix + wd).val();
-                    var end_time = $(container).find('INPUT#' + weekday_time_end_prefix + wd).val();
-                    schedule[wd] = {
-                        'start': moment(start_time, "h:mm A").format("HH:mm"),
-                        'finish': moment(end_time, "h:mm A").format("HH:mm")
-                    };
-                } else {
-                    schedule[wd] = {};
-                }
-            }
-
-            return schedule;
-        };
-
-        var assign_to_class = function assign_to_class(class_id, students) {
-            var data = {
-                class_id: class_id,
-                students: students
-            };
-            $.ajax({
-                url: "api/add-student-to-class",
-                method: "POST",
-                data: data,
-                success: function success(response) {
-                    if (response.code == 0) {
-                        get_student_not_assign(class_id);
-                        get_student_of_class(class_id);
-                    } else {
-                        get_student_not_assign(class_id);
-                        get_student_of_class(class_id);
-                    }
-                }
-            });
-        };
-
-        $("SELECT#teacher_id").empty();
-
-        $("SELECT#student_not_assigned").select2({
-            placeholder: "Chọn học sinh",
-            minimumInputLength: 3
-        });
-
-        var contaner = $('DIV#attendance-modal');
-
-        var attendanceCheck = function attendanceCheck(timetable_id, student_id, status, callback) {
-            var data = {
-                'timetable_id': timetable_id,
-                'student_id': student_id,
-                'status': status
-            };
-
-            $.ajax({
-                url: '/api/class/attendance/check',
-                dataType: 'json',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function success(response) {
-                    if (callback != undefined && response.code == 1) {
-                        callback(response.data);
-                    }
-                    console.log('response', response);
-                }
-            });
-        };
-
-        var get_attendance_list = function get_attendance_list(class_id, callback) {
-            $.ajax({
-                url: '/api/class/attendance?class_id=' + class_id,
-                dataType: 'json',
-                method: 'GET',
-                contentType: 'application/json',
-                success: function success(response) {
-                    if (callback != undefined && response.code == 1) {
-                        callback(response.data);
-                    }
-                    console.log('response', response);
-                }
-            });
-        };
-
-        var get_attendance_by_timetable = function get_attendance_by_timetable(timetable_id, callback) {
-            $.ajax({
-                url: '/api/class/attendance/by-date?timetable_id=' + timetable_id,
-                dataType: 'json',
-                method: 'GET',
-                contentType: 'application/json',
-                success: function success(response) {
-                    if (callback != undefined && response.code == 1) {
-                        callback(response.data);
-                    }
-                    console.log('response', response);
-                }
-            });
-        };
-
-        var get_timetable = function get_timetable(class_id, callback) {
-            $.ajax({
-                url: '/api/get-list-timetable?class_id=' + class_id,
-                dataType: 'json',
-                contentType: 'application/json',
-                success: function success(response) {
-                    if (callback != undefined && response.code == 1) {
-                        callback(response.data, class_id);
-                    }
-                    console.log('response', response);
-                }
-            });
-        };
-
-        var render_attendance_table = function render_attendance_table(list) {
-            var list_container = $(contaner).find('TABLE#attendance-table tbody');
-            list_container.empty();
-            if (list.length > 0) {
-                for (var i = 0; i < list.length; i++) {
-                    var tr = $('<tr></tr>');
-                    var item = list[i];
-                    var td_no = $('<th></th>', { text: i + 1, 'style': 'text-align:center' });
-                    $(tr).append(td_no);
-                    for (var attr in item) {
-                        if (attr == 'id' || attr == 'status') continue;
-                        var style = '';
-                        if (attr == 'present' || attr == 'absent' || attr == 'late') {
-                            style = 'text-align:center';
-                        }
-                        var td = $('<td></td>', { text: item[attr], 'style': style });
-                        $(tr).append(td);
-                    }
-
-                    var td_input_present = $('<td></td>', { 'style': 'text-align:center', html: '<input type="radio" data-student="' + item.id + '" value="1" name="' + item.id + '_status">' });
-                    var td_input_absent = $('<td></td>', { 'style': 'text-align:center', html: '<input type="radio" data-student="' + item.id + '" value="-1" name="' + item.id + '_status">' });
-                    var td_input_late = $('<td></td>', { 'style': 'text-align:center', html: '<input type="radio" data-student="' + item.id + '" value="-2" name="' + item.id + '_status">' });
-
-                    $(tr).append(td_input_present, td_input_absent, td_input_late);
-                    $(list_container).append(tr);
-
-                    var radio_present = $(td_input_present).find('INPUT[name="' + item.id + '_status"]');
-                    var radio_absent = $(td_input_absent).find('INPUT[name="' + item.id + '_status"]');
-                    var radio_late = $(td_input_late).find('INPUT[name="' + item.id + '_status"]');
-
-                    $(radio_present).on('click', function (e) {
-                        var timetable_id = $(attendance_modal).find('SELECT#timetable_id').val();
-                        var student_id = $(e.target).data('student');
-                        var status = $(e.target).val();
-                        attendanceCheck(timetable_id, student_id, status);
-                    });
-
-                    $(radio_absent).on('click', function (e) {
-                        var timetable_id = $(attendance_modal).find('SELECT#timetable_id').val();
-                        var student_id = $(e.target).data('student');
-                        var status = $(e.target).val();
-                        attendanceCheck(timetable_id, student_id, status);
-                    });
-
-                    $(radio_late).on('click', function (e) {
-                        var timetable_id = $(attendance_modal).find('SELECT#timetable_id').val();
-                        var student_id = $(e.target).data('student');
-                        var status = $(e.target).val();
-                        attendanceCheck(timetable_id, student_id, status);
-                    });
-                }
-            }
-        };
-
-        var open_attendance = function open_attendance(class_id) {
-            get_timetable(class_id, function (timetables, class_id) {
-                if (timetables.length > 0) {
-                    var timetable_id = $(attendance_modal).find('SELECT#timetable_id');
-                    $(timetable_id).empty();
-                    for (var i = 0; i < timetables.length; i++) {
-                        var timetable_opt = $('<option></option>', { value: timetables[i].id, text: timetables[i].date + ' (' + timetables[i].start + ' - ' + timetables[i].finish + ')' });
-                        $(timetable_id).append(timetable_opt);
-                    }
-
-                    get_attendance_list(class_id, function (list) {
-                        render_attendance_table(list);
-                        $(attendance_modal).modal('show');
-                    });
-                } else {
-                    var msg = 'Lớp ' + $(attendance_modal).find('input#current-class-name').val() + ' chưa thiết lập thời khoá biểu!';
-                    alert(msg);
-                    return;
-                }
-            });
-        };
-
-        var fill_attendance = function fill_attendance(data) {
-            $(attendance_modal).find('TABLE#attendance-table TBODY INPUT[type="radio"]').prop('checked', false);
-            if (data.length > 0) {
-                for (var i = 0; i < data.length; i++) {
-                    var attendance = data[i];
-                    $(attendance_modal).find('TABLE#attendance-table TBODY INPUT[type="radio"][data-student="' + attendance.student_id + '"][value="' + attendance.status + '"]').prop('checked', true);
-                }
-            }
-        };
-
-        $(attendance_modal).on('show.bs.modal', function (e) {
-            $(attendance_modal).find('SELECT#timetable_id').trigger('change');
-        });
-
-        $(attendance_modal).find('SELECT#timetable_id').change(function (e) {
-            var timetable_id = $(attendance_modal).find('SELECT#timetable_id').val();
-            get_attendance_by_timetable(timetable_id, function (data) {
-                fill_attendance(data);
-            });
-        });
-
-        $.ajax({
-            dataType: 'json',
-            type: 'get',
-            url: 'api/get-name-teacher',
-            success: function success(response) {
-                $.each(response.data, function () {
-                    $("DIV#modal-class SELECT#teacher_id").append("<option value=" + this.id + ">" + this.name + "</option>");
-                });
-            }
-        });
-
-        $(form).find('INPUT[type="text"][id^="time_start_"],INPUT[type="text"][id^="time_end_"]').timepicker({
-            showInputs: false,
-            template: 'dropdown'
-        }).on('show.timepicker', function (e) {
-            if ($(e.target).val() != '') {
-                $(e.target).timepicker('setTime', $(e.target).val());
-            } else {
-                $(e.target).val(e.time.value);
-            }
-        }).on('changeTime.timepicker', function (e) {
-            $(e.target).parent().find('label').remove();
-        });
-    }
-});
-
-/***/ }),
-/* 173 */
-/***/ (function(module, exports) {
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-$(function () {
-	if ($('#list-exam').length == 0) return false;
-	var url_string = window.location.href;
-	var url = new URL(url_string);
-	var classid = url.searchParams.get("classid");
-	var Table = $('#list-exam').DataTable({
-		"columnDefs": [{
-			"searchable": false,
-			"orderable": false,
-			"targets": 0
-		}],
-		"order": [[1, 'asc']],
-		paging: true,
-		searching: true,
-		"bDestroy": true,
-		ajax: {
-			url: 'api/get-list-exam',
-			data: { classid: classid },
-			dataSrc: 'data'
-		},
-		"columns": [{ "data": null }, { "data": "name" }, { "data": "name_class" }, { "data": "start_day" }, { "data": "duration" }, { "data": "note" }, {
-			"data": function data(_data, type, full) {
-				return ' <button type="button" examid="' + _data.id + '"  class="button-set-point btn btn-success">\
-					<i class="fa fa-tasks"  aria-hidden="true" title="Thêm điểm kỳ thi"></i></button>\
-					<button type="button" examid="' + _data.id + '"  class="button-get-point btn btn-info">\
-					<i class="fa fa-eye"  aria-hidden="true" title="Xem điểm kỳ thi"></i></button>\
-					<button id="edit" type="button" class="button-edit-exam btn btn-warning"  examid="' + _data.id + '">\
-					<i class="fa fa-pencil-square" aria-hidden="true" title="Sửa kỳ thi"></i></button>\
-					<button type="button" examid="' + _data.id + '" class="button-del-exam btn btn-danger">\
-					<i class="fa fa-trash-o"  aria-hidden="true" title="Xóa kỳ thi"></i></button>';
-			}
-		}]
-
-	});
-	Table.on('order.dt search.dt', function () {
-		Table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
-			cell.innerHTML = i + 1;
-		});
-	}).draw();
-	jQuery.datetimepicker.setLocale('vi');
-	$('#start_day').datetimepicker({
-		format: 'Y-m-d H:i',
-		minDate: '-1970-01-1'
-	});
-});
-$(document).on('click', '.button-add', function (e) {
-	e.preventDefault();
-	$('#model-add').modal('show');
-	$("#name-class").empty();
-	$.ajax({
-		dataType: 'json',
-		type: 'get',
-		url: 'api/get-nameclass',
-		success: function success(response) {
-			$.each(response.data, function () {
-				$("#name-class").append("<option id='class_id' value=" + this.id + ">" + this.name + "</option>");
-			});
-		}
-	});
-	//validate form    
-	$('#form-add-exam').validate(_defineProperty({
-		rules: {
-			name: {
-				required: true,
-				minlength: 10
-
-			},
-			start_day: {
-				required: true
-				//	min : "date('Y-m-d')",
-
-			},
-			duration: {
-				required: true,
-				number: true
-
-			},
-			note: {
-				required: true,
-				minlength: 10
-			}
-		},
-		messages: {
-			name: {
-				required: "Không được đế trống",
-				minlength: "Không đủ 10 ký tự"
-			},
-			start_day: {
-				required: "Không được đế trống"
-				//	min : "Ngày phải lớn hơn ngày hiện tại"
-			},
-			duration: {
-				required: "Không được đế trống",
-				number: "Phải là số"
-			},
-			note: {
-				required: "Không được đế trống",
-				minlength: "Không đủ 10 ký tự"
-			}
-		},
-		highlight: function highlight(element, errorClass) {
-			$(element).closest(".form-group").addClass("has-error");
-		},
-		unhighlight: function unhighlight(element, errorClass) {
-			$(element).closest(".form-group").removeClass("has-error");
-		},
-		errorPlacement: function errorPlacement(error, element) {
-			error.appendTo(element.parent().next());
-		}
-	}, 'errorPlacement', function errorPlacement(error, element) {
-		if (element.attr("type") == "checkbox") {
-			element.closest(".form-group").children(0).prepend(error);
-		} else error.insertAfter(element);
-	}));
-});
-//add exam
-
-//add exam      
-$('#add-exam').click(function (event) {
-	event.preventDefault();
-	var name = $('#name').val();
-	var start_day = $('#start_day').val();
-	var duration = $('#duration').val();
-	var note = $('#note').val();
-	var class_id = $('#class_id').val();
-	if ($('#form-add-exam').valid()) {
-		$.ajax({
-			url: "api/create-exam",
-			method: "POST",
-			data: { name: name, start_day: start_day, duration: duration, note: note, class_id: class_id },
-			dataType: "json",
-			success: function success(response) {
-				$("#model-add").modal("hide");
-				//$('#form-add-exam').dialog("close")
-				$('#list-exam').DataTable().ajax.reload();
-				$("#form-add-exam")[0].reset();
-			}
-		});
-	}
-});
-//del exam
-$(document).on('click', '.button-del-exam', function () {
-	var _this = this;
-
-	swal({
-		title: "Bạn có chắc muốn xóa?",
-		text: "Bạn sẽ không thể khôi phục lại bản ghi này!",
-		icon: "warning",
-		buttons: true,
-		dangerMode: true
-	}).then(function (willDelete) {
-		if (willDelete) {
-			var id = $(_this).attr("examid");
-			console.log(id);
-			$.ajax({
-				dataType: 'json',
-				method: "POST",
-				url: 'api/delete-exam',
-				data: { id: id },
-				success: function success(response) {
-					if (response.code == 1) {
-						$('#list-exam').DataTable().ajax.reload();
-					}
-				}
-			});
-		}
-	});
-});
-//edit exam edit-exam
-$(document).on('click', '.button-edit-exam', function (e) {
-	e.preventDefault();
-	$('#edit-exam').modal('show');
-	var id = $(this).attr("examid");
-	$("#ename_class").empty();
-	jQuery.datetimepicker.setLocale('vi');
-	$('#estart_day').datetimepicker({
-		format: 'Y-m-d H:i',
-		minDate: '-1970-01-1'
-	});
-	$.ajax({
-		dataType: 'json',
-		method: "POST",
-		url: 'api/edit-exam',
-		data: { id: id },
-		resetForm: true,
-		success: function success(response) {
-			$('#update-exam-hd').val(id);
-			var classid = response.data['class_id'];
-			$('#ename').val(response.data['name']);
-			$('#estart_day').val(response.data['start_day']);
-			$('#eduration').val(response.data['duration']);
-			$('#enote').val(response.data['note']);
-			$.ajax({
-				dataType: 'json',
-				type: 'get',
-				url: 'api/get-nameclass',
-				success: function success(response) {
-					$.each(response.data, function () {
-						if (this.id == classid) {
-							$("#ename_class").append("<option id='class_id' value=" + this.id + " selected>" + this.name + "</option>");
-						} else {
-							$("#ename_class").append("<option id='class_id' value=" + this.id + ">" + this.name + "</option>");
-						}
-					});
-				}
-			});
-		}
-	});
-	//validate form exam
-	$('#form-edit-exam').validate(_defineProperty({
-		rules: {
-			name: {
-				required: true,
-				minlength: 10
-
-			},
-			start_day: {
-				required: true
-				//	min : "date('Y-m-d')",
-
-			},
-			duration: {
-				required: true,
-				number: true
-
-			},
-			note: {
-				required: true,
-				minlength: 10
-			}
-		},
-		messages: {
-			name: {
-				required: "Không được đế trống",
-				minlength: "Không đủ 10 ký tự"
-			},
-			start_day: {
-				required: "Không được đế trống"
-				//	min : "Ngày phải lớn hơn ngày hiện tại"
-			},
-			duration: {
-				required: "Không được đế trống",
-				number: "Phải là số"
-			},
-			note: {
-				required: "Không được đế trống",
-				minlength: "Không đủ 10 ký tự"
-			}
-		},
-		highlight: function highlight(element, errorClass) {
-			$(element).closest(".form-group").addClass("has-error");
-		},
-		unhighlight: function unhighlight(element, errorClass) {
-			$(element).closest(".form-group").removeClass("has-error");
-		},
-		errorPlacement: function errorPlacement(error, element) {
-			error.appendTo(element.parent().next());
-		}
-	}, 'errorPlacement', function errorPlacement(error, element) {
-		if (element.attr("type") == "checkbox") {
-			element.closest(".form-group").children(0).prepend(error);
-		} else error.insertAfter(element);
-	}));
-});
-
-//update exam   
-// Update      
-$('#update-exam').click(function (event) {
-	event.preventDefault();
-	var id = $('#update-exam-hd').val();
-	var name = $('#ename').val();
-	var start_day = $('#estart_day').val();
-	var duration = $('#eduration').val();
-	var note = $('#enote').val();
-	var class_id = $('#ename_class').val();
-	if ($('#form-edit-exam').valid()) {
-		$.ajax({
-			url: "api/update-exam",
-			method: "POST",
-			data: { id: id, name: name, start_day: start_day, duration: duration, note: note, class_id: class_id },
-			dataType: "json",
-			success: function success(response) {
-				$("#edit-exam").modal("hide");
-				$('#list-exam').DataTable().ajax.reload();
-				if (response.code == 1) {
-					$('#form-edit-exam').trigger("reset");
-				}
-				document.getElementById("form-edit-exam").reset();
-			}
-		});
-	}
-});
-//set-Point
-$(document).on('click', '.button-set-point', function () {
-	$('#model-add-setPoint').modal('show');
-	var examid = $(this).attr("examid");
-	var aTable = $('#set-point').DataTable({
-		"columnDefs": [{
-			"searchable": false,
-			"orderable": false,
-			"targets": 0
-		}],
-		"order": [[1, 'asc']],
-		paging: false,
-		searching: false,
-		"bDestroy": true,
-		"autoWidth": false,
-
-		ajax: {
-			url: 'api/get-liststudent',
-			data: { examid: examid },
-			dataSrc: 'data'
-		},
-		"columns": [{ "data": "id" }, { "data": "student_code" }, { "data": "name" }, {
-			"data": function data(_data2, type, full) {
-				return "<input min='1' max='10' value='' id='ip-set-point' class='set-point' type='number'>\
-					<input type='hidden' name='' value='" + _data2.exams_id + "' id='get_examid'>";
-			}
-		}]
-	});
-	aTable.on('order.dt search.dt', function () {
-		aTable.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
-			cell.innerHTML = i + 1;
-		});
-	}).draw();
-});
-
-// Thêm điểm
-
-$('#setPoint').on('click', function () {
-	var student_id = [];
-	var point = [];
-	var exams_id = [];
-	var pointnull = 0;
-
-	for ($i = 0; $i < $('#set-point').DataTable().data().count(); $i++) {
-		student_id.push($('#set-point').DataTable().cell($i, 0).data());
-		point.push($('#set-point').DataTable().cell($i, 3).nodes().to$().find('input').val());
-		exams_id.push($('#get_examid').val());
-		if ($('#set-point').DataTable().cell($i, 3).nodes().to$().find('input').val() == "") {
-			pointnull++;
-		}
-	}
-	if (pointnull == 0) {
-		$.ajax({
-			url: "api/add-pointexam",
-			method: "POST",
-			data: { student_id: student_id, point: point, exams_id: exams_id },
-			dataType: "json",
-			success: function success(response) {
-
-				$("#model-add-setPoint").modal("hide");
-				//		 $('#model-add-setPoint').DataTable().ajax.reload();
-				if (response.code == 1) {
-					$('#ip-set-point').prop('readonly', true);
-				}
-			}
-		});
-	}
-});
-
-// Xem Điểm
-$(document).on('click', '.button-get-point', function () {
-	$('#model-get-Point').modal('show');
-	var examid = $(this).attr("examid");
-	var tablesetpoint = $('#get-point').DataTable({
-		paging: false,
-		searching: false,
-		"bDestroy": true,
-		"autoWidth": false,
-		ajax: {
-			url: 'api/get-pointexam',
-			data: { examid: examid },
-			dataSrc: 'data'
-		},
-		"columns": [{ "data": "student_code" }, { "data": "student_name" }, {
-			"data": function data(_data3, type, full) {
-				return "<input min='1' max='10' value='" + _data3.point + "' id='" + _data3.student_id + "' class='set-point-update'  type='number'>\
-					<input type='hidden' name='' value='" + examid + "' id='get_examid'>";
-			}
-		}, {
-			"data": function data(_data4, type, full) {
-				return '<button type="button" student_id="' + _data4.student_id + '"  class="button-update-point btn btn-info">\
-					<i class="fa fa-check-square" aria-hidden="true"></i></button>';
-			}
-		}]
-	});
-});
-//update điểm
-
-$(document).on('click', '.button-update-point', function () {
-	var student_id = $(this).attr("student_id");
-	var examination_id = $('#get_examid').val();
-	var point = $('#' + student_id).val();
-	$('#form-add-exam').validate(_defineProperty({
-		rules: {
-			point: {
-				required: true
-			}
-		},
-		messages: {
-			point: {
-				required: "Không được đế trống"
-			}
-		},
-		highlight: function highlight(element, errorClass) {
-			$(element).closest(".form-group").addClass("has-error");
-		},
-		unhighlight: function unhighlight(element, errorClass) {
-			$(element).closest(".form-group").removeClass("has-error");
-		},
-		errorPlacement: function errorPlacement(error, element) {
-			error.appendTo(element.parent().next());
-		}
-	}, 'errorPlacement', function errorPlacement(error, element) {
-		if (element.attr("type") == "checkbox") {
-			element.closest(".form-group").children(0).prepend(error);
-		} else error.insertAfter(element);
-	}));
-	if ($('#form-edit-exam').valid()) {
-
-		$.ajax({
-			url: "api/update-point",
-			method: "POST",
-			data: { examination_id: examination_id, student_id: student_id, point: point },
-			dataType: "json",
-			success: function success(response) {
-				$('#get-point').DataTable().ajax.reload();
-			}
-		});
-	}
-});
-
-/***/ }),
-/* 174 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_stream__ = __webpack_require__(175);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_stream___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_stream__);
-
-
-$(document).ready(function () {
-
-	/**
- *validate form add
- */
-	function validateEmail(email) {
-		var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-		return re.test(email);
-	}
-
-	function getBranchList(currentBranchId) {
-		if ($('FORM#frmStaff').length == 0) return;
-
-		$.ajax('/api/branch/list', {
-			type: 'GET',
-			success: function success(response) {
-				var select = $('SELECT#branch_id');
-				$(select).find('OPTION').not(':first').remove();
-				if (response.data.length > 0) {
-					for (var i = 0; i < response.data.length; i++) {
-						var branch = response.data[i];
-						var opt = $('<option></option>', { value: branch.id, text: branch.branch_name });
-						if (currentBranchId == branch.id) $(opt).prop('selected', 'selected');
-						$(select).append(opt);
-					}
-				}
-			},
-			error: function error(e) {
-				console.log(e);
-			}
-		});
-	}
-
-	function validate() {
-		var isValid = false;
-		var $result = $("#errorEmail");
-		var email = $("#inputEmail").val();
-		var password = $('#inputPassword').val();
-		var password_1 = $('#inputPassword_1').val();
-		var name = $('#inputName').val();
-		var phoneNumber = $('#inputPhone').val();
-
-		$('SPAN.bell [id^="error"]').addClass('hidden');
-		var emailValid = validateEmail(email);
-		if (emailValid) {
-			isValid = true;
-			$result.addClass('hidden');
-		} else {
-			$result.removeClass('hidden');
-			isValid = false;
-		}
-		if (password.length <= 8 || password == "") {
-			$('#errorPassword').addClass('hidden');
-			isValid = true;
-		} else {
-			$('#errorPassword').removeClass('hidden');
-			isValid = false;
-		}
-
-		if (password != password_1) {
-			$('#errorPassword_1').removeClass('hidden');
-			isValid = true;
-		} else {
-			$('#errorPassword_1').addClass('hidden');
-			isValid = false;
-		}
-
-		if (name) {
-			$('#errorName').addClass('hidden');
-			isValid = true;
-		} else {
-			$('#errorName').removeClass('hidden');
-			isValid = false;
-		}
-
-		if (phoneNumber.length >= 15 || phoneNumber == "") {
-			$('#errorPhone').removeClass('hidden');
-			isValid = false;
-		} else {
-			$('#errorPhone').addClass('hidden');
-			isValid = true;
-		}
-
-		return isValid;
-	}
-
-	/*
- * validate form edit password
- **/
-	function validateForm() {
-		var password = $("#newPassword").val();
-		var newPassword1 = $('#newPassword1').val();
-		if (!password || password.length < 8) {
-			$("#errorPassword").css("display", "block");
-		} else {
-			$("#errorPassword").css("display", "none");
-		}
-		if (password == newPassword1) {
-			$("#q1").css("display", "none");
-		} else {
-			$("#errorPass_1").css("display", "block");
-		}
-	}
-
-	$("#submit").bind("click", validateForm);
-
-	/*
- * ajax add staff
- */
-	$('BUTTON#addStaff').click(function (event) {
-
-		var isValided = validate();
-		if (!isValided) {
-			return false;
-		}
-
-		var email = $('#inputEmail').val();
-		var password = $('#inputPassword').val();
-		var password_1 = $('#inputPassword_1').val();
-		var name = $('#inputName').val();
-		var gender = $('#inputGender').val();
-		var birthDate = $('#inputBirthDate').val();
-		var address = $('#inputAddress').val();
-		var phone = $('#inputPhone').val();
-		var branch_id = $('SELECT#branch_id').val();
-
-		var formData = new FormData();
-		formData.append('email', email);
-		formData.append('password', password);
-		formData.append('name', name);
-		formData.append('gender', gender);
-		formData.append('birth_date', birthDate);
-		formData.append('address', address);
-		formData.append('phone_number', phone);
-		formData.append('branch_id', branch_id);
-
-		$.ajax({
-			url: '/api/add-staff',
-			method: "POST",
-			contentType: false,
-			processData: false,
-			data: formData,
-			success: function success(response) {
-				//location.reload();
-				alert(response.message);
-			},
-			error: function error(e) {
-				alert("Can not add staff !!");
-			}
-		});
-	});
-
-	getBranchList(null);
-
-	if ($('TABLE#staff_list').length == 0) {
-		return false;
-	}
-
-	/*
- * ajax get list staff
- */
-	var t = $('TABLE#staff_list').DataTable({
-		"ajax": 'api/get-list-staff',
-		"responsive": true,
-		"columns": [{ "data": null }, { "data": "name" }, { "data": "email" }, {
-			"data": "gender",
-			render: function render(data, type, row) {
-				var gender;
-				switch (row.gender) {
-					case 0:
-						gender = "Nữ";
-						break;
-					case 1:
-						gender = "Nam";
-						break;
-					case 2:
-						gender = "Khác";
-						break;
-					default:
-						gender = "";
-						break;
-				}
-				return gender;
-			}
-
-		}, {
-			"render": function render(data, type, row, meta) {
-				return row.image ? '<img style=\"width:200px;\" src="' + img + row.image + '">' : '';
-			}
-		}, { "data": "birth_date" }, { "data": "address" }, { "data": "phone_number" }, { "data": null }],
-		// "columnDefs": [ ],
-		// "order": [[ 1, 'asc' ]],
-		"columnDefs": [{
-			"searchable": false,
-			"orderable": false,
-			"targets": 0
-		}, {
-			"targets": -1,
-			"data": null,
-			"defaultContent": "<button type='button' href=" + asset + "staff/edit" + " class=\"btn btn-warning _action fa fa-pencil-square-o\" title=\"Chỉnh sửa\" id=\"edit_staff\"></button>" + "<a href=\"#\" class=\"btn btn-danger _action fa fa-trash\" title=\"Xoa\" type=\"button\" id=\"delete\" ></a>" + "<a href=\"#\" title=\"Đôi mật khẩu\" class=\"btn btn-info _action fa fa-key\" data-toggle=\"modal\" data-target=\"#myModal\" id=\"change_password\"></a>"
-		}]
-	});
-	// var t = $('#example').DataTable()
-	t.on('order.dt search.dt', function () {
-		t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
-			cell.innerHTML = i + 1;
-		});
-	}).draw();
-
-	$('TABLE#staff_list tbody').on('click', '#delete', function () {
-		var table = $('TABLE#staff_list').DataTable();
-		var data = table.row($(this).parents('tr')).data();
-		data = data.id;
-		var formData = new FormData();
-		formData.append('id', data);
-		swal({
-			title: "Bạn có chắc muốn xóa?",
-			text: "Bạn sẽ không thể khôi phục lại bản ghi này!",
-			icon: "warning",
-			buttons: true,
-			dangerMode: true
-		}).then(function (willDelete, data) {
-			if (willDelete) {
-				$.ajax({
-					url: '/api/delete-staff',
-					method: "POST",
-					contentType: false,
-					processData: false,
-					data: formData,
-					success: function success(response) {
-						location.reload();
-					}
-				});
-			}
-		});
-	});
-	$('TABLE#staff_list').on('click', '#change_password', function () {
-		var table = $('#example').DataTable();
-		var data = table.row($(this).parents('tr')).data();
-		data = data.id;
-		editPassword(data);
-	});
-
-	function editPassword(data) {
-		$('#formm').on('click', '#submit', function () {
-			var current_password_input = $('#currentPassword').val();
-			var new_password = $('#newPassword').val();
-			var new_password_1 = $('#newPassword1').val();
-			if (new_password == new_password_1 && new_password.length >= 8) {
-				var formData = new FormData();
-				formData.append('id', data);
-				formData.append('currentPassword', current_password_input);
-				formData.append('newPassword', new_password);
-				$.ajax({
-					url: '/api/edit-password-staff',
-					method: "POST",
-					contentType: false,
-					processData: false,
-					data: formData,
-					success: function success(response) {
-						alert(response.message);
-						location.reload();
-					},
-					error: function error(response) {
-						alert('Can not edit info this !!');
-						location.reload();
-					}
-				});
-			}
-		});
-	}
-
-	/*
- * ajax edit staff
- */
-	$('TABLE#staff_list').on('click', '#edit_staff', function () {
-		var table = $('TABLE#staff_list').DataTable();
-		var data = table.row($(this).parents('tr')).data();
-		//data = data.id;
-		if (typeof Storage !== "undefined") {
-			//localStorage.setItem("id", data);
-		} else {
-				//alert('Trình duyệt của bạn không hỗ trợ');
-			}
-	});
-});
-
-$('#editStaff_1').click(function (event) {
-	var id = localStorage.getItem("id");
-	var email = $('#inputEmail3').val();
-	var password = $('#inputPassword').val();
-	var password_1 = $('#inputPassword_1').val();
-	var name = $('#inputName').val();
-	var gender = $('#inputGender').val();
-	var birthDate = $('#inputBirthDate').val();
-	var address = $('#inputAddress').val();
-	var phone = $('#inputPhone').val();
-	if (email != "" && password != "" && name != "" && gender != "" && birthDate != "" && address != "" && password.length >= 8 && password == password_1 && $('#inputFile')[0].files[0]) {
-		var formData = new FormData();
-		formData.append('id', id);
-		formData.append('email', email);
-		formData.append('password', password);
-		formData.append('name', name);
-		formData.append('gender', gender);
-		formData.append('birth_date', birthDate);
-		formData.append('address', address);
-		formData.append('phone_number', phone);
-		formData.append("file", $('#inputFile')[0].files[0]);
-		$.ajax({
-			url: '/api/edit-staff',
-			method: "POST",
-			contentType: false,
-			processData: false,
-			data: formData,
-			success: function success(response) {
-				location.reload();
-				alert(response.message);
-			},
-			error: function error(e) {
-				alert("Can not edit staff !!");
-			}
-		});
-	} else {
-		alert('Thong tin dien vao khong hop le !!!');
-	}
-});
-
-/***/ }),
-/* 175 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-module.exports = Stream;
-
-var EE = __webpack_require__(9).EventEmitter;
-var inherits = __webpack_require__(3);
-
-inherits(Stream, EE);
-Stream.Readable = __webpack_require__(10);
-Stream.Writable = __webpack_require__(185);
-Stream.Duplex = __webpack_require__(186);
-Stream.Transform = __webpack_require__(187);
-Stream.PassThrough = __webpack_require__(188);
-
-// Backwards-compat with node 0.4.x
-Stream.Stream = Stream;
-
-
-
-// old-style streams.  Note that the pipe method (the only relevant
-// part of this class) is overridden in the Readable class.
-
-function Stream() {
-  EE.call(this);
-}
-
-Stream.prototype.pipe = function(dest, options) {
-  var source = this;
-
-  function ondata(chunk) {
-    if (dest.writable) {
-      if (false === dest.write(chunk) && source.pause) {
-        source.pause();
-      }
-    }
-  }
-
-  source.on('data', ondata);
-
-  function ondrain() {
-    if (source.readable && source.resume) {
-      source.resume();
-    }
-  }
-
-  dest.on('drain', ondrain);
-
-  // If the 'end' option is not supplied, dest.end() will be called when
-  // source gets the 'end' or 'close' events.  Only dest.end() once.
-  if (!dest._isStdio && (!options || options.end !== false)) {
-    source.on('end', onend);
-    source.on('close', onclose);
-  }
-
-  var didOnEnd = false;
-  function onend() {
-    if (didOnEnd) return;
-    didOnEnd = true;
-
-    dest.end();
-  }
-
-
-  function onclose() {
-    if (didOnEnd) return;
-    didOnEnd = true;
-
-    if (typeof dest.destroy === 'function') dest.destroy();
-  }
-
-  // don't leave dangling pipes when there are errors.
-  function onerror(er) {
-    cleanup();
-    if (EE.listenerCount(this, 'error') === 0) {
-      throw er; // Unhandled stream error in pipe.
-    }
-  }
-
-  source.on('error', onerror);
-  dest.on('error', onerror);
-
-  // remove all the event listeners that were added.
-  function cleanup() {
-    source.removeListener('data', ondata);
-    dest.removeListener('drain', ondrain);
-
-    source.removeListener('end', onend);
-    source.removeListener('close', onclose);
-
-    source.removeListener('error', onerror);
-    dest.removeListener('error', onerror);
-
-    source.removeListener('end', cleanup);
-    source.removeListener('close', cleanup);
-
-    dest.removeListener('close', cleanup);
-  }
-
-  source.on('end', cleanup);
-  source.on('close', cleanup);
-
-  dest.on('close', cleanup);
-
-  dest.emit('pipe', source);
-
-  // Allow for unix-like usage: A.pipe(B).pipe(C)
-  return dest;
-};
-
-
-/***/ }),
-/* 176 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-exports.byteLength = byteLength
-exports.toByteArray = toByteArray
-exports.fromByteArray = fromByteArray
-
-var lookup = []
-var revLookup = []
-var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
-
-var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-for (var i = 0, len = code.length; i < len; ++i) {
-  lookup[i] = code[i]
-  revLookup[code.charCodeAt(i)] = i
-}
-
-// Support decoding URL-safe base64 strings, as Node.js does.
-// See: https://en.wikipedia.org/wiki/Base64#URL_applications
-revLookup['-'.charCodeAt(0)] = 62
-revLookup['_'.charCodeAt(0)] = 63
-
-function getLens (b64) {
-  var len = b64.length
-
-  if (len % 4 > 0) {
-    throw new Error('Invalid string. Length must be a multiple of 4')
-  }
-
-  // Trim off extra bytes after placeholder bytes are found
-  // See: https://github.com/beatgammit/base64-js/issues/42
-  var validLen = b64.indexOf('=')
-  if (validLen === -1) validLen = len
-
-  var placeHoldersLen = validLen === len
-    ? 0
-    : 4 - (validLen % 4)
-
-  return [validLen, placeHoldersLen]
-}
-
-// base64 is 4/3 + up to two characters of the original data
-function byteLength (b64) {
-  var lens = getLens(b64)
-  var validLen = lens[0]
-  var placeHoldersLen = lens[1]
-  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
-}
-
-function _byteLength (b64, validLen, placeHoldersLen) {
-  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
-}
-
-function toByteArray (b64) {
-  var tmp
-  var lens = getLens(b64)
-  var validLen = lens[0]
-  var placeHoldersLen = lens[1]
-
-  var arr = new Arr(_byteLength(b64, validLen, placeHoldersLen))
-
-  var curByte = 0
-
-  // if there are placeholders, only get up to the last complete 4 chars
-  var len = placeHoldersLen > 0
-    ? validLen - 4
-    : validLen
-
-  for (var i = 0; i < len; i += 4) {
-    tmp =
-      (revLookup[b64.charCodeAt(i)] << 18) |
-      (revLookup[b64.charCodeAt(i + 1)] << 12) |
-      (revLookup[b64.charCodeAt(i + 2)] << 6) |
-      revLookup[b64.charCodeAt(i + 3)]
-    arr[curByte++] = (tmp >> 16) & 0xFF
-    arr[curByte++] = (tmp >> 8) & 0xFF
-    arr[curByte++] = tmp & 0xFF
-  }
-
-  if (placeHoldersLen === 2) {
-    tmp =
-      (revLookup[b64.charCodeAt(i)] << 2) |
-      (revLookup[b64.charCodeAt(i + 1)] >> 4)
-    arr[curByte++] = tmp & 0xFF
-  }
-
-  if (placeHoldersLen === 1) {
-    tmp =
-      (revLookup[b64.charCodeAt(i)] << 10) |
-      (revLookup[b64.charCodeAt(i + 1)] << 4) |
-      (revLookup[b64.charCodeAt(i + 2)] >> 2)
-    arr[curByte++] = (tmp >> 8) & 0xFF
-    arr[curByte++] = tmp & 0xFF
-  }
-
-  return arr
-}
-
-function tripletToBase64 (num) {
-  return lookup[num >> 18 & 0x3F] +
-    lookup[num >> 12 & 0x3F] +
-    lookup[num >> 6 & 0x3F] +
-    lookup[num & 0x3F]
-}
-
-function encodeChunk (uint8, start, end) {
-  var tmp
-  var output = []
-  for (var i = start; i < end; i += 3) {
-    tmp =
-      ((uint8[i] << 16) & 0xFF0000) +
-      ((uint8[i + 1] << 8) & 0xFF00) +
-      (uint8[i + 2] & 0xFF)
-    output.push(tripletToBase64(tmp))
-  }
-  return output.join('')
-}
-
-function fromByteArray (uint8) {
-  var tmp
-  var len = uint8.length
-  var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
-  var parts = []
-  var maxChunkLength = 16383 // must be multiple of 3
-
-  // go through the array every three bytes, we'll deal with trailing stuff later
-  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
-    parts.push(encodeChunk(
-      uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)
-    ))
-  }
-
-  // pad the end with zeros, but make sure to not forget the extra bytes
-  if (extraBytes === 1) {
-    tmp = uint8[len - 1]
-    parts.push(
-      lookup[tmp >> 2] +
-      lookup[(tmp << 4) & 0x3F] +
-      '=='
-    )
-  } else if (extraBytes === 2) {
-    tmp = (uint8[len - 2] << 8) + uint8[len - 1]
-    parts.push(
-      lookup[tmp >> 10] +
-      lookup[(tmp >> 4) & 0x3F] +
-      lookup[(tmp << 2) & 0x3F] +
-      '='
-    )
-  }
-
-  return parts.join('')
-}
-
-
-/***/ }),
-/* 177 */
-/***/ (function(module, exports) {
-
-exports.read = function (buffer, offset, isLE, mLen, nBytes) {
-  var e, m
-  var eLen = (nBytes * 8) - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var nBits = -7
-  var i = isLE ? (nBytes - 1) : 0
-  var d = isLE ? -1 : 1
-  var s = buffer[offset + i]
-
-  i += d
-
-  e = s & ((1 << (-nBits)) - 1)
-  s >>= (-nBits)
-  nBits += eLen
-  for (; nBits > 0; e = (e * 256) + buffer[offset + i], i += d, nBits -= 8) {}
-
-  m = e & ((1 << (-nBits)) - 1)
-  e >>= (-nBits)
-  nBits += mLen
-  for (; nBits > 0; m = (m * 256) + buffer[offset + i], i += d, nBits -= 8) {}
-
-  if (e === 0) {
-    e = 1 - eBias
-  } else if (e === eMax) {
-    return m ? NaN : ((s ? -1 : 1) * Infinity)
-  } else {
-    m = m + Math.pow(2, mLen)
-    e = e - eBias
-  }
-  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
-}
-
-exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
-  var e, m, c
-  var eLen = (nBytes * 8) - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
-  var i = isLE ? 0 : (nBytes - 1)
-  var d = isLE ? 1 : -1
-  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
-
-  value = Math.abs(value)
-
-  if (isNaN(value) || value === Infinity) {
-    m = isNaN(value) ? 1 : 0
-    e = eMax
-  } else {
-    e = Math.floor(Math.log(value) / Math.LN2)
-    if (value * (c = Math.pow(2, -e)) < 1) {
-      e--
-      c *= 2
-    }
-    if (e + eBias >= 1) {
-      value += rt / c
-    } else {
-      value += rt * Math.pow(2, 1 - eBias)
-    }
-    if (value * c >= 2) {
-      e++
-      c /= 2
-    }
-
-    if (e + eBias >= eMax) {
-      m = 0
-      e = eMax
-    } else if (e + eBias >= 1) {
-      m = ((value * c) - 1) * Math.pow(2, mLen)
-      e = e + eBias
-    } else {
-      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
-      e = 0
-    }
-  }
-
-  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
-
-  e = (e << mLen) | m
-  eLen += mLen
-  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
-
-  buffer[offset + i - d] |= s * 128
-}
-
-
-/***/ }),
-/* 178 */
-/***/ (function(module, exports) {
-
-/* (ignored) */
-
-/***/ }),
-/* 179 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Buffer = __webpack_require__(8).Buffer;
-var util = __webpack_require__(180);
-
-function copyBuffer(src, target, offset) {
-  src.copy(target, offset);
-}
-
-module.exports = function () {
-  function BufferList() {
-    _classCallCheck(this, BufferList);
-
-    this.head = null;
-    this.tail = null;
-    this.length = 0;
-  }
-
-  BufferList.prototype.push = function push(v) {
-    var entry = { data: v, next: null };
-    if (this.length > 0) this.tail.next = entry;else this.head = entry;
-    this.tail = entry;
-    ++this.length;
-  };
-
-  BufferList.prototype.unshift = function unshift(v) {
-    var entry = { data: v, next: this.head };
-    if (this.length === 0) this.tail = entry;
-    this.head = entry;
-    ++this.length;
-  };
-
-  BufferList.prototype.shift = function shift() {
-    if (this.length === 0) return;
-    var ret = this.head.data;
-    if (this.length === 1) this.head = this.tail = null;else this.head = this.head.next;
-    --this.length;
-    return ret;
-  };
-
-  BufferList.prototype.clear = function clear() {
-    this.head = this.tail = null;
-    this.length = 0;
-  };
-
-  BufferList.prototype.join = function join(s) {
-    if (this.length === 0) return '';
-    var p = this.head;
-    var ret = '' + p.data;
-    while (p = p.next) {
-      ret += s + p.data;
-    }return ret;
-  };
-
-  BufferList.prototype.concat = function concat(n) {
-    if (this.length === 0) return Buffer.alloc(0);
-    if (this.length === 1) return this.head.data;
-    var ret = Buffer.allocUnsafe(n >>> 0);
-    var p = this.head;
-    var i = 0;
-    while (p) {
-      copyBuffer(p.data, ret, i);
-      i += p.data.length;
-      p = p.next;
-    }
-    return ret;
-  };
-
-  return BufferList;
-}();
-
-if (util && util.inspect && util.inspect.custom) {
-  module.exports.prototype[util.inspect.custom] = function () {
-    var obj = util.inspect({ length: this.length });
-    return this.constructor.name + ' ' + obj;
-  };
-}
-
-/***/ }),
-/* 180 */
-/***/ (function(module, exports) {
-
-/* (ignored) */
-
-/***/ }),
-/* 181 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
-            (typeof self !== "undefined" && self) ||
-            window;
-var apply = Function.prototype.apply;
-
-// DOM APIs, for completeness
-
-exports.setTimeout = function() {
-  return new Timeout(apply.call(setTimeout, scope, arguments), clearTimeout);
-};
-exports.setInterval = function() {
-  return new Timeout(apply.call(setInterval, scope, arguments), clearInterval);
-};
-exports.clearTimeout =
-exports.clearInterval = function(timeout) {
-  if (timeout) {
-    timeout.close();
-  }
-};
-
-function Timeout(id, clearFn) {
-  this._id = id;
-  this._clearFn = clearFn;
-}
-Timeout.prototype.unref = Timeout.prototype.ref = function() {};
-Timeout.prototype.close = function() {
-  this._clearFn.call(scope, this._id);
-};
-
-// Does not start the time, just sets up the members needed.
-exports.enroll = function(item, msecs) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = msecs;
-};
-
-exports.unenroll = function(item) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = -1;
-};
-
-exports._unrefActive = exports.active = function(item) {
-  clearTimeout(item._idleTimeoutId);
-
-  var msecs = item._idleTimeout;
-  if (msecs >= 0) {
-    item._idleTimeoutId = setTimeout(function onTimeout() {
-      if (item._onTimeout)
-        item._onTimeout();
-    }, msecs);
-  }
-};
-
-// setimmediate attaches itself to the global object
-__webpack_require__(182);
-// On some exotic environments, it's not clear which object `setimmediate` was
-// able to install onto.  Search each possibility in the same order as the
-// `setimmediate` library.
-exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
-                       (typeof global !== "undefined" && global.setImmediate) ||
-                       (this && this.setImmediate);
-exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
-                         (typeof global !== "undefined" && global.clearImmediate) ||
-                         (this && this.clearImmediate);
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
-
-/***/ }),
-/* 182 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
-    "use strict";
-
-    if (global.setImmediate) {
-        return;
-    }
-
-    var nextHandle = 1; // Spec says greater than zero
-    var tasksByHandle = {};
-    var currentlyRunningATask = false;
-    var doc = global.document;
-    var registerImmediate;
-
-    function setImmediate(callback) {
-      // Callback can either be a function or a string
-      if (typeof callback !== "function") {
-        callback = new Function("" + callback);
-      }
-      // Copy function arguments
-      var args = new Array(arguments.length - 1);
-      for (var i = 0; i < args.length; i++) {
-          args[i] = arguments[i + 1];
-      }
-      // Store and register the task
-      var task = { callback: callback, args: args };
-      tasksByHandle[nextHandle] = task;
-      registerImmediate(nextHandle);
-      return nextHandle++;
-    }
-
-    function clearImmediate(handle) {
-        delete tasksByHandle[handle];
-    }
-
-    function run(task) {
-        var callback = task.callback;
-        var args = task.args;
-        switch (args.length) {
-        case 0:
-            callback();
-            break;
-        case 1:
-            callback(args[0]);
-            break;
-        case 2:
-            callback(args[0], args[1]);
-            break;
-        case 3:
-            callback(args[0], args[1], args[2]);
-            break;
-        default:
-            callback.apply(undefined, args);
-            break;
-        }
-    }
-
-    function runIfPresent(handle) {
-        // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
-        // So if we're currently running a task, we'll need to delay this invocation.
-        if (currentlyRunningATask) {
-            // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
-            // "too much recursion" error.
-            setTimeout(runIfPresent, 0, handle);
-        } else {
-            var task = tasksByHandle[handle];
-            if (task) {
-                currentlyRunningATask = true;
-                try {
-                    run(task);
-                } finally {
-                    clearImmediate(handle);
-                    currentlyRunningATask = false;
-                }
-            }
-        }
-    }
-
-    function installNextTickImplementation() {
-        registerImmediate = function(handle) {
-            process.nextTick(function () { runIfPresent(handle); });
-        };
-    }
-
-    function canUsePostMessage() {
-        // The test against `importScripts` prevents this implementation from being installed inside a web worker,
-        // where `global.postMessage` means something completely different and can't be used for this purpose.
-        if (global.postMessage && !global.importScripts) {
-            var postMessageIsAsynchronous = true;
-            var oldOnMessage = global.onmessage;
-            global.onmessage = function() {
-                postMessageIsAsynchronous = false;
-            };
-            global.postMessage("", "*");
-            global.onmessage = oldOnMessage;
-            return postMessageIsAsynchronous;
-        }
-    }
-
-    function installPostMessageImplementation() {
-        // Installs an event handler on `global` for the `message` event: see
-        // * https://developer.mozilla.org/en/DOM/window.postMessage
-        // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
-
-        var messagePrefix = "setImmediate$" + Math.random() + "$";
-        var onGlobalMessage = function(event) {
-            if (event.source === global &&
-                typeof event.data === "string" &&
-                event.data.indexOf(messagePrefix) === 0) {
-                runIfPresent(+event.data.slice(messagePrefix.length));
-            }
-        };
-
-        if (global.addEventListener) {
-            global.addEventListener("message", onGlobalMessage, false);
-        } else {
-            global.attachEvent("onmessage", onGlobalMessage);
-        }
-
-        registerImmediate = function(handle) {
-            global.postMessage(messagePrefix + handle, "*");
-        };
-    }
-
-    function installMessageChannelImplementation() {
-        var channel = new MessageChannel();
-        channel.port1.onmessage = function(event) {
-            var handle = event.data;
-            runIfPresent(handle);
-        };
-
-        registerImmediate = function(handle) {
-            channel.port2.postMessage(handle);
-        };
-    }
-
-    function installReadyStateChangeImplementation() {
-        var html = doc.documentElement;
-        registerImmediate = function(handle) {
-            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
-            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
-            var script = doc.createElement("script");
-            script.onreadystatechange = function () {
-                runIfPresent(handle);
-                script.onreadystatechange = null;
-                html.removeChild(script);
-                script = null;
-            };
-            html.appendChild(script);
-        };
-    }
-
-    function installSetTimeoutImplementation() {
-        registerImmediate = function(handle) {
-            setTimeout(runIfPresent, 0, handle);
-        };
-    }
-
-    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
-    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
-    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
-
-    // Don't get fooled by e.g. browserify environments.
-    if ({}.toString.call(global.process) === "[object process]") {
-        // For Node.js before 0.9
-        installNextTickImplementation();
-
-    } else if (canUsePostMessage()) {
-        // For non-IE10 modern browsers
-        installPostMessageImplementation();
-
-    } else if (global.MessageChannel) {
-        // For web workers, where supported
-        installMessageChannelImplementation();
-
-    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
-        // For IE 6–8
-        installReadyStateChangeImplementation();
-
-    } else {
-        // For older browsers
-        installSetTimeoutImplementation();
-    }
-
-    attachTo.setImmediate = setImmediate;
-    attachTo.clearImmediate = clearImmediate;
-}(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4), __webpack_require__(6)))
-
-/***/ }),
-/* 183 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {
-/**
- * Module exports.
- */
-
-module.exports = deprecate;
-
-/**
- * Mark that a method should not be used.
- * Returns a modified function which warns once by default.
- *
- * If `localStorage.noDeprecation = true` is set, then it is a no-op.
- *
- * If `localStorage.throwDeprecation = true` is set, then deprecated functions
- * will throw an Error when invoked.
- *
- * If `localStorage.traceDeprecation = true` is set, then deprecated functions
- * will invoke `console.trace()` instead of `console.error()`.
- *
- * @param {Function} fn - the function to deprecate
- * @param {String} msg - the string to print to the console when `fn` is invoked
- * @returns {Function} a new "deprecated" version of `fn`
- * @api public
- */
-
-function deprecate (fn, msg) {
-  if (config('noDeprecation')) {
-    return fn;
-  }
-
-  var warned = false;
-  function deprecated() {
-    if (!warned) {
-      if (config('throwDeprecation')) {
-        throw new Error(msg);
-      } else if (config('traceDeprecation')) {
-        console.trace(msg);
-      } else {
-        console.warn(msg);
-      }
-      warned = true;
-    }
-    return fn.apply(this, arguments);
-  }
-
-  return deprecated;
-}
-
-/**
- * Checks `localStorage` for boolean values for the given `name`.
- *
- * @param {String} name
- * @returns {Boolean}
- * @api private
- */
-
-function config (name) {
-  // accessing global.localStorage can trigger a DOMException in sandboxed iframes
-  try {
-    if (!global.localStorage) return false;
-  } catch (_) {
-    return false;
-  }
-  var val = global.localStorage[name];
-  if (null == val) return false;
-  return String(val).toLowerCase() === 'true';
-}
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
-
-/***/ }),
-/* 184 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// a passthrough stream.
-// basically just the most minimal sort of Transform stream.
-// Every written chunk gets output as-is.
-
-
-
-module.exports = PassThrough;
-
-var Transform = __webpack_require__(142);
-
-/*<replacement>*/
-var util = __webpack_require__(5);
-util.inherits = __webpack_require__(3);
-/*</replacement>*/
-
-util.inherits(PassThrough, Transform);
-
-function PassThrough(options) {
-  if (!(this instanceof PassThrough)) return new PassThrough(options);
-
-  Transform.call(this, options);
-}
-
-PassThrough.prototype._transform = function (chunk, encoding, cb) {
-  cb(null, chunk);
-};
-
-/***/ }),
-/* 185 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(11);
-
-
-/***/ }),
-/* 186 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(1);
-
-
-/***/ }),
-/* 187 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(10).Transform
-
-
-/***/ }),
-/* 188 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(10).PassThrough
-
-
-/***/ }),
-/* 189 */
-/***/ (function(module, exports) {
-
-$(function () {
-
-    var table_teachers = $('TABLE#teacher-list');
-    var table = null;
-    var modal_teacher_schedule = $('DIV#modal-teacher-schedule');
-    var modal_add_schedule = $('DIV#modal-teacher-schedule-add');
-    var table_schedule = null;
-
-    var table_act_buttons = '<button type="button" title="Sửa thông tin giáo viên" class="edit btn btn-sm btn-warning"><i title="Sửa thông tin giáo viên" class="fa fa-pencil-square-o" aria-hidden="true"></i></button>\
-    <button type="button" title="Xoá giáo viên" class="delete btn btn-sm btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>\
-    <button type="button" title="Lịch" class="schedule btn btn-sm btn-info"><i class="fa fa-calendar-times-o" aria-hidden="true"></i></button>';
-
-    var getTeacherList = function getTeacherList(mode) {
-        var url = '/api/list-teachers';
-        $.ajax(url, {
-            method: 'GET',
-            dataType: 'json',
-            success: function success(response) {
-                var list = response.data;
-                if (mode == 'load') {
-                    renderTeacherList(list);
-                } else if (mode == 'reload') {
-                    console.log(mode);
-                    table.clear();
-                    table.rows.add(list);
-                    table.draw();
-                }
-            }
-        });
-    };
-
-    var renderTeacherList = function renderTeacherList(list) {
-        table = $('TABLE#teacher-list').DataTable({
-            data: list,
-            language: datatable_language,
-            columns: [{ data: null }, { data: 'name' }, {
-                data: 'email',
-                render: function render(data, type, row) {
-                    return data != null ? '<a href="mailto:' + data + '">' + data + '</a>' : '';
-                }
-            }, { data: 'mobile' }, { data: 'address' }, { data: 'nationality' }, { data: null }],
-            "columnDefs": [{
-                "targets": -1,
-                "data": null,
-                "defaultContent": table_act_buttons
-            }]
-        });
-
-        table.on('order.dt search.dt', function () {
-            table.column(0, {
-                search: 'applied',
-                order: 'applied'
-            }).nodes().each(function (cell, i) {
-                cell.innerHTML = i + 1;
-            });
-        }).draw();
-
-        table.on('click', 'button.delete', function () {
-            var data = table.row($(this).parents('tr')).data();
-            modalConfirm(function (confirm) {
-                if (confirm) {
-                    del(data.id);
-                }
-            }, 'Bạn có muốn xoá giáo viên <strong>' + data.name + '</strong> không?');
-        });
-
-        table.on('click', 'button.edit', function () {
-            var data = table.row($(this).parents('tr')).data();
-            $('FORM#frmTeacher INPUT#id').val(data.id);
-            showTeacherModal('edit');
-        });
-
-        table.on('click', 'button.schedule', function () {
-            var data = table.row($(this).parents('tr')).data();
-            $(modal_teacher_schedule).find('.modal-title').html('Lịch của giáo viên <strong>' + data.name + '</strong>');
-
-            get_teacher_schedule(data.id, function () {
-                $(modal_teacher_schedule).find('FORM#frmTeacher INPUT#teacher_id').val(data.id);
-                $(modal_teacher_schedule).modal('show');
-            });
-        });
-    };
-
-    var getCountries = function getCountries() {
-        var nationality = $('SELECT.select2[id="nationality"]');
-        $.ajax('/api/countries', {
-            type: 'GET',
-            contentType: 'application/json',
-            success: function success(response) {
-                if (response.code == 1) {
-                    if (response.data != undefined) {
-
-                        for (var n in response.data) {
-                            var national = response.data[n];
-                            var opt = $('<option></option>', {
-                                value: national.citizenship,
-                                text: national.citizenship
-                            });
-                            $(nationality).append(opt);
-                        }
-
-                        $($(nationality).find('OPTION')[0]).attr('selected', 'selected');
-                    }
-                }
-            }
-        });
-    };
-
-    var getTeacher = function getTeacher(id, callback) {
-        var url = '/api/get-teacher/?id=' + id;
-        $.ajax(url, {
-            method: 'GET',
-            dataType: 'json',
-            success: function success(response) {
-                if (response.code == 1) {
-                    var teacher = response.data[0];
-                    $('DIV#modal-teacher-form FORM INPUT#crm_id').val(teacher.crm_id);
-                    $('DIV#modal-teacher-form FORM INPUT#name').val(teacher.name);
-                    $('DIV#modal-teacher-form FORM SELECT#nationality').val(teacher.nationality).change();
-                    $('DIV#modal-teacher-form FORM INPUT#email').val(teacher.email);
-                    $('DIV#modal-teacher-form FORM INPUT#address').val(teacher.address);
-                    $('DIV#modal-teacher-form FORM INPUT#mobile').val(teacher.mobile);
-                    $('DIV#modal-teacher-form FORM INPUT#birthdate').val(teacher.birthdate);
-                    $('DIV#modal-teacher-form FORM SELECT#gender').val(teacher.gender).change();
-                    $('DIV#modal-teacher-form FORM INPUT#experience').val(teacher.experience);
-                    $('DIV#modal-teacher-form FORM INPUT#certificate').val(teacher.certificate);
-                    $('DIV#modal-teacher-form FORM TEXTAREA#description').html(teacher.description);
-                    callback();
-                }
-            }
-        });
-    };
-
-    var save = function save(mode) {
-        var data = {
-            'id': $('FORM#frmTeacher INPUT#id').val().trim(),
-            'crm_id': $('FORM#frmTeacher INPUT#crm_id').val().trim(),
-            'name': $('FORM#frmTeacher INPUT#name').val().trim(),
-            'nationality': $('FORM#frmTeacher SELECT#nationality').val().trim(),
-            'email': $('FORM#frmTeacher INPUT#email').val().trim(),
-            'address': $('FORM#frmTeacher INPUT#address').val().trim(),
-            'mobile': $('FORM#frmTeacher INPUT#mobile').val().trim(),
-            'birthdate': $('FORM#frmTeacher INPUT#birthdate').val().trim(),
-            'gender': $('FORM#frmTeacher SELECT#gender').val().trim(),
-            'experience': $('FORM#frmTeacher INPUT#experience').val().trim(),
-            'certificate': $('FORM#frmTeacher INPUT#certificate').val().trim(),
-            'description': $('FORM#frmTeacher TEXTAREA#description').val().trim()
-        };
-
-        var url = mode == 'new' ? '/api/add-teacher' : '/api/edit-teacher';
-
-        $.ajax(url, {
-            method: "POST",
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function success(response) {
-                if (response.code == 1) {
-                    $('DIV#modal-teacher-form').modal('hide');
-                    getTeacherList('reload');
-                }
-            }
-        });
-    };
-
-    var del = function del(id) {
-        var url = '/api/delete-teacher';
-        $.ajax(url, {
-            method: 'POST',
-            dataType: 'json',
-            data: {
-                "id": id
-            },
-            success: function success(response) {
-                getTeacherList('reload');
-            }
-        });
-    };
-
-    var showTeacherModal = function showTeacherModal(mode) {
-        if (mode == 'new') {
-            $('DIV#modal-teacher-form DIV.modal-header H2.modal-title').text('Thêm giáo viên');
-            $('DIV#modal-teacher-form FORM')[0].reset();
-            $('DIV#modal-teacher-form').modal('show');
-        } else if (mode == 'edit') {
-            $('DIV#modal-teacher-form DIV.modal-header H2.modal-title').text('Thay đổi thông tin giáo viên');
-            getTeacher($('FORM#frmTeacher INPUT#id').val().trim(), function () {
-                $('DIV#modal-teacher-form').modal('show');
-            });
-        }
-    };
-
-    var get_teacher_schedule = function get_teacher_schedule(teacher_id, callback) {
-        var data = {
-            id: teacher_id
-        };
-        $.ajax({
-            url: 'api/get-teacher-schedule',
-            method: 'GET',
-            data: data,
-            success: function success(response) {
-                render_teacher_schedule(response.data, callback);
-            }
-        });
-    };
-
-    var render_teacher_schedule = function render_teacher_schedule(data, calllback) {
-        if ($.fn.dataTable.isDataTable('DIV#modal-teacher-schedule TABLE#table-schedule')) {
-            table_schedule = $('DIV#modal-teacher-schedule TABLE#table-schedule').DataTable();
-            table_schedule.clear();
-            table_schedule.rows.add(data);
-            table_schedule.draw();
-        } else {
-            table_schedule = $('DIV#modal-teacher-schedule TABLE#table-schedule').DataTable({
-                data: data,
-                language: datatable_language,
-                'autoWidth': false,
-                "ordering": false,
-                "searching": false,
-                "bPaginate": true,
-                "columnDefs": [{
-                    "searchable": false,
-                    "orderable": false
-                }],
-                columns: [{ data: null }, {
-                    data: null,
-                    render: function render(data, type, row) {
-                        return 'Từ: ' + row.start_time + '<br />' + 'Đến: ' + row.end_time;
-                    }
-                }, {
-                    data: 'appoinment_type',
-                    render: function render(data, type, row) {
-                        return schedule_type[data];
-                    }
-                }, {
-                    data: 'desc'
-                }]
-            });
-            table_schedule.on('draw.dt order.dt search.dt', function () {
-                table_schedule.column(0, {}).nodes().each(function (cell, i) {
-                    cell.innerHTML = i + 1;
-                });
-            }).draw();
-        }
-        if (calllback != undefined) calllback();
-    };
-
-    var show_add_schedule_modal = function show_add_schedule_modal() {
-        if ($(modal_teacher_schedule).is(':visible')) {
-            var teacher_id = $(modal_teacher_schedule).find('FORM#frmTeacher INPUT#teacher_id').val();
-            $(modal_teacher_schedule).removeClass("fade").modal("hide");
-            $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val(teacher_id);
-            $(modal_add_schedule).modal("show").addClass("fade");
-        }
-    };
-
-    $(modal_teacher_schedule).find('BUTTON#btnAddSchedule').on('click', function (e) {
-        show_add_schedule_modal();
-    });
-
-    var schedule_type_select = function schedule_type_select(selected) {
-        var appoinment_type = $(modal_add_schedule).find('SELECT#appoinment_type');
-        $(appoinment_type).empty();
-        for (var i in schedule_type) {
-            if (i == 1) continue;
-            var opt = $('<option></option>', {
-                value: i,
-                text: schedule_type[i]
-            });
-            if (selected == i) opt.prop('selected', 'selected');
-            appoinment_type.append(opt);
-        }
-        if (selected == undefined) $($(appoinment_type).find('OPTION')[0]).attr('selected', 'selected');
-    };
-
-    var get_class_list = function get_class_list(selected) {
-        var class_id = $('SELECT.select2[id="class_id"]');
-        $(class_id).empty();
-        $(class_id).append($('<option></option>', { value: '0', text: '[Chọn lớp]' }));
-        $.ajax('api/get-list-class', {
-            type: 'GET',
-            contentType: 'application/json',
-            success: function success(response) {
-                if (response.code == 1) {
-                    if (response.data.length > 0) {
-                        for (var i = 0; i < response.data.length; i++) {
-                            var cls = response.data[i];
-                            var opt = $('<option></option>', { value: cls.id, text: cls.name });
-                            if (selected == cls.id) opt.prop('selected', 'selected');
-                            $(class_id).append(opt);
-                        }
-                        if (selected == undefined) $($(class_id).find('OPTION')[0]).attr('selected', 'selected');
-                    }
-                }
-            }
-        });
-    };
-
-    var get_student_list = function get_student_list(callback) {
-        $(student_id).empty();
-        $.ajax('/invoice/student-list', {
-            type: 'GET',
-            contentType: 'application/json',
-            success: function success(response) {
-                var student_target = $(modal_add_schedule).find('SELECT#student_id');
-                if (response.code == 0) {
-                    var first_val = null;
-                    if (response.data.list.length > 0) {
-                        for (var i = 0; i < response.data.list.length; i++) {
-                            var student = response.data.list[i];
-
-                            first_val = first_val == null ? student.id : first_val;
-
-                            var display_text = (student.student_code ? 'Code: <span class="text-bold">' + student.student_code + '</span> - ' : 'NO CODE - ') + student.name;
-                            var opt = $('<option></option>', {
-                                value: student.id,
-                                html: display_text
-                            });
-                            $(student_target).append(opt);
-                        }
-                        if (callback != undefined) {
-                            callback();
-                        }
-                    }
-                    $(modal_add_schedule).find('SELECT#appoinment_type').change();
-                }
-            }
-        });
-    };
-
-    var add_teacher_schedule = function add_teacher_schedule(callback) {
-        var data = {};
-        var form = $(modal_add_schedule).find('FORM#frmTeacherSchedule');
-        var inputs = $(form).find('input,select,textarea');
-        $(inputs).each(function (index, el) {
-            data[el.id] = $(el).val();
-        });
-
-        $.ajax({
-            url: 'api/add_teacher_schedule',
-            method: 'POST',
-            data: JSON.stringify(data),
-            contentType: 'application/json',
-            success: function success(response) {
-                var teacher_id = $(form).find('INPUT#teacher_id').val();
-                get_teacher_schedule(teacher_id, function () {
-                    if ($(modal_add_schedule).is(':visible')) {
-                        $(modal_add_schedule).removeClass("fade").modal("hide");
-                        $(modal_teacher_schedule).modal("show").addClass("fade");
-                    }
-                });
-            }
-        });
-    };
-
-    if ($(modal_add_schedule).length > 0) {
-        $(modal_add_schedule).find('SELECT#appoinment_type').on('change', function (e) {
-            var selected_type = $(e.target).children("option:selected").val();
-            if (selected_type == 2) {
-                $('DIV#related_class').addClass('hidden');
-                $('DIV#related_student').removeClass('hidden');
-            } else {
-                $('DIV#related_student').addClass('hidden');
-                $('DIV#related_class').removeClass('hidden');
-            }
-        });
-    }
-
-    if (table_teachers.length > 0) {
-        getTeacherList('load');
-        $('#btnOpenModalTeacher').on('click', function (e) {
-            showTeacherModal('new');
-            e.preventDefault();
-        });
-
-        var modalConfirm = function modalConfirm(callback, message) {
-            if (message != undefined) {
-                $("#confirm-delete DIV.modal-header H5.modal-title").html(message);
-            }
-            $("#confirm-delete").modal('show');
-
-            $("#modal-btn-yes").unbind('click').bind("click", function () {
-                callback(true);
-                $("#confirm-delete").modal('hide');
-            });
-
-            $("#modal-btn-no").unbind('click').bind("click", function () {
-                callback(false);
-                $("#confirm-delete").modal('hide');
-            });
-        };
-    }
-
-    if ($('FORM#frmTeacher').length > 0) {
-        getCountries();
-
-        $('FORM#frmTeacher input#birthdate').datetimepicker({
-            format: 'Y-m-d'
-        });
-
-        $('DIV#modal-teacher-form DIV.modal-footer BUTTON#btnSave').on('click', function (e) {
-            var mode = $('FORM#frmTeacher INPUT#id').val().trim() !== '' ? 'edit' : 'new';
-            save(mode);
-        });
-
-        $(modal_add_schedule).on('show.bs.modal', function (e) {
-            var teacher_id = $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val();
-            $(modal_add_schedule).find('FORM#frmTeacherSchedule')[0].reset();
-            $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val(teacher_id);
-            schedule_type_select();
-            get_class_list();
-            get_student_list();
-        });
-    }
-
-    if ($(modal_add_schedule).find('FORM#frmTeacherSchedule').length > 0) {
-        $(modal_add_schedule).find('DIV.modal-footer BUTTON#btnSave').on('click', function (e) {
-            add_teacher_schedule();
-        });
-
-        $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#start_time').datetimepicker({
-            format: 'Y-m-d H:i'
-        });
-
-        $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#end_time').datetimepicker({
-            format: 'Y-m-d H:i'
-        });
-    }
-});
-
-/***/ }),
-/* 190 */
-/***/ (function(module, exports) {
-
-$(function () {
-    if ($('UL#invoice_tabs').length == 0) return false;
-
-    var frmTutorFee = $('FORM#frmTutorFee');
-    var frmOtherFee = $('FORM#frmOtherFee');
-
-    var select2_tutor_studentid = null;
-    var select2_tutor_classid = null;
-
-    var select2_other_studentid = null;
-    var select2_other_classid = null;
-
-    var tab_headers = $('UL.nav#invoice_tabs');
-    var tab_contents = $('DIV.tab-content');
-    var tab_col = $(tab_headers).find('LI');
-    var actived_tab = $(tab_contents).find("DIV[role='tabpanel'].active");
-    var invoice_list_table = null;
-    var students = {};
-
-    var student_id = $('FORM#frmTutorFee SELECT.select2[id="student_id"]');
-    var class_id = $('FORM#frmTutorFee SELECT.select2[id="class_id"]').select2();
-
-    var student_other_id = $('FORM#frmOtherFee SELECT.select2[id="student_id"]').select2();
-    var class_other_id = $('FORM#frmOtherFee SELECT.select2[id="class_id"]').select2();
-
-    var tab_activate = function tab_activate(target) {
-        $(tab_col).removeClass('active');
-        $(target).parent().addClass('active');
-        $(tab_contents).find("DIV[role='tabpanel']").removeClass('active');
-        actived_tab = $(tab_contents).find("DIV[role='tabpanel']#" + $(target).data('tab')).addClass('active');
-
-        if ($(actived_tab).prop('id') == 'invoicelist-tab') {
-            $('BUTTON#btnSaveInvoice').css('display', 'none');
-            $('BUTTON#btnPrintInvoice').css('display', 'none');
-            $('BUTTON#btnCreateInvoice').css('display', 'inline');
-            $(frmTutorFee)[0].reset();
-            $(frmOtherFee)[0].reset();
-            $(tab_headers).find('LI').addClass('disabled');
-            $(tab_headers).find('A[data-tab="invoicelist-tab"]').parent().removeClass('disabled');
-        } else {
-            $('BUTTON#btnSaveInvoice').css('display', 'inline');
-            $('BUTTON#btnPrintInvoice').css('display', 'inline');
-            $('BUTTON#btnCreateInvoice').css('display', 'none');
-        }
-    };
-
-    $(tab_headers).find('A').bind('click', function (e) {
-        if ($(e.target).parent().hasClass('disabled')) {
-            return;
-        }
-        tab_activate(e.target);
-        e.preventDefault();
-        e.stopPropagation();
-    });
-
-    var get_student_list = function get_student_list(callback, student_target, class_target) {
-        $(student_id).empty();
-        $(class_id).empty();
-
-        $(student_other_id).empty();
-        $(class_other_id).empty();
-
-        $.ajax('/invoice/student-list', {
-            type: 'GET',
-            contentType: 'application/json',
-            success: function success(response) {
-                if (response.code == 0) {
-                    var first_val = null;
-                    if (response.data.list.length > 0) {
-                        for (var i = 0; i < response.data.list.length; i++) {
-                            var student = response.data.list[i];
-
-                            first_val = first_val == null ? student.id : first_val;
-
-                            students[student.id] = student;
-
-                            var display_text = (student.student_code ? 'Code: <span class="text-bold">' + student.student_code + '</span> - ' : 'NO CODE - ') + student.name;
-                            var opt = $('<option></option>', {
-                                value: student.id,
-                                html: display_text
-                            });
-                            $(student_target).append(opt);
-                        }
-                        if (callback != undefined) {
-                            callback(first_val, class_target);
-                        }
-                    }
-                }
-            }
-        });
-    };
-
-    var get_class_list = function get_class_list(std_id, target, callback) {
-        $(target).empty();
-        $.ajax('/invoice/class-list?student_id=' + std_id, {
-            type: 'GET',
-            contentType: 'application/json',
-            success: function success(response) {
-                if (response.code == 0) {
-                    if (response.data.list.length > 0) {
-                        for (var i = 0; i < response.data.list.length; i++) {
-                            var cls = response.data.list[i];
-                            var opt = $('<option></option>', {
-                                value: cls.id,
-                                html: cls.name
-                            });
-                            $(target).append(opt);
-                        }
-                        $(frmTutorFee).find('INPUT#price').val(numeral(response.data.list[0].price).format('0,0'));
-                        toggle_tuition_frmTutorFee(true);
-                    } else {
-                        var opt = $('<option></option>', {
-                            value: 0,
-                            html: 'Chưa có lớp'
-                        });
-                        $(target).append(opt);
-                        toggle_tuition_frmTutorFee(false);
-                    }
-                    $($(target).find('OPTION')[0]).attr('selected', 'selected');
-                    if (callback != undefined) {
-                        callback();
-                    }
-                }
-            }
-        });
-    };
-
-    var get_parent_list = function get_parent_list(student_id, callback) {
-        $(frmTutorFee).find('INPUT#payer').val('');
-        $.get('/api/parent/list', {
-            student_id: student_id
-        }, function (response) {
-            for (var i = 0; i < response.data.length; i++) {
-                if (response.data[i].id === students[student_id].parent_id) {
-                    $(frmTutorFee).find('INPUT#payer').val(response.data[i].fullname);
-                    $(frmTutorFee).find('INPUT#payer').trigger("change");
-                }
-            }
-            if (callback != undefined) callback();
-        });
-    };
-
-    var tuition_fee_calculate = function tuition_fee_calculate() {
-
-        var data = {
-            'class_id': $(frmTutorFee).find('SELECT#class_id').val(),
-            'start_date': $(frmTutorFee).find('INPUT#start_date').val(),
-            'end_date': $(frmTutorFee).find('INPUT#end_date').val(),
-            'duration': $(frmTutorFee).find('INPUT#duration').val(),
-            'price': numeral($(frmTutorFee).find('INPUT#price').val()).value(),
-            'discount': $(frmTutorFee).find('INPUT#discount').val(),
-            'prepaid': numeral($(frmTutorFee).find('INPUT#prepaid').val()).value()
-        };
-
-        if (data.class_id != '' && data.start_date != '' && (data.end_date != '' || data.duration != '') && data.price) {
-            $.ajax('/invoice/tuition_fee_calculate', {
-                method: "POST",
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function success(response) {
-                    if (response.code == 0) {
-                        var res_data = response.data;
-                        if (data.duration == '') {
-                            $(frmTutorFee).find('INPUT#duration').val(res_data.duration);
-                        } else if (data.end_date == '') {
-                            $(frmTutorFee).find('INPUT#end_date').val(res_data.end_date);
-                        }
-                        $(amount).val(numeral(res_data.amount).format('0,0'));
-                        $(amount).change();
-                    } else {
-                        alert(response.message);
-                    }
-                }
-            });
-        }
-    };
-
-    var toggle_tuition_frmTutorFee = function toggle_tuition_frmTutorFee(toggle) {
-        $(frmTutorFee).find('INPUT#reservation').prop('disabled', !toggle);
-        $(frmTutorFee).find('INPUT#duration').prop('disabled', !toggle);
-        $(frmTutorFee).find('INPUT#discount').prop('disabled', !toggle);
-        $(frmTutorFee).find('INPUT#discount-desc').prop('disabled', !toggle);
-        $(frmTutorFee).find('INPUT#prepaid').prop('disabled', !toggle);
-        $(frmTutorFee).find('INPUT#amount').prop('disabled', !toggle);
-    };
-
-    var save_invoice = function save_invoice(callback, form_activated, data) {
-        $(form_activated).find('.help-block').hide();
-        $(form_activated).find('.has-error').removeClass('has-error');
-
-        if ($(form_activated).prop('id') == 'frmTutorFee') {
-            if (!tutorfee_validate(data)) return;
-        } else if ($(form_activated).prop('id') == 'frmOtherFee') {
-            if (!otherfee_validate(data)) return;
-        }
-
-        $.ajax('/invoice/save', {
-            method: "POST",
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            success: function success(response) {
-                $(form_activated).find('input#iid').val(response.id);
-                if (callback != undefined) {
-                    callback(response.id);
-                }
-            },
-            error: function error(xhr, status, err) {
-                alert(err);
-            }
-        });
-    };
-
-    var print_invoice = function print_invoice(invoice_id, callback) {
-        $.ajax({
-            url: '/invoice/print/' + invoice_id + '/print',
-            type: 'GET',
-            dataType: 'html',
-            success: function success(response) {
-                var w = window.open();
-                w.document.write(response);
-                setTimeout(function () {
-                    w.print();
-                    w.close();
-                }, 1000);
-                if (callback != undefined) {
-                    callback();
-                }
-            },
-            error: function error(jqXHR, textStatus, errorThrown) {
-                var response = JSON.parse(jqXHR.responseText);
-                alert(response.message);
-            }
-        });
-    };
-
-    var view_invoice = function view_invoice(invoice_id) {
-        $.ajax({
-            url: '/invoice/print/' + invoice_id + '/view',
-            type: 'GET',
-            dataType: 'html',
-            success: function success(response) {
-                $('DIV.modal#view-invoice').find('DIV.modal-body').empty();
-                $('DIV.modal#view-invoice').find('DIV.modal-body').append(response);
-                $('DIV.modal#view-invoice').modal('show');
-            }
-        });
-    };
-
-    var tutorfee_validate = function tutorfee_validate(data) {
-        $(frmTutorFee).find('.has-error').removeClass('has-error');
-        $(frmTutorFee).find('.help-block').hide();
-
-        var is_valided = true;
-        var container = null;
-        if (data.payer == '') {
-            container = $(frmTutorFee).find('INPUT#payer').parent();
-            $(container).addClass('has-error');
-            $(container).find('.help-block').html('Hãy nhập Người đóng tiền').show();
-            is_valided = false;
-        }
-
-        if (data.price != '' && isNaN(data.price)) {
-            container = $(frmTutorFee).find('INPUT#price').parent().parent();
-            $(container).addClass('has-error');
-            $(container).find('.help-block').html('Hãy nhập giá trị là số cho Học phí mỗi buổi học').show();
-            is_valided = false;
-        }
-
-        if (data.discount != '' && isNaN(data.discount)) {
-            container = $(frmTutorFee).find('INPUT#discount').parent();
-            $(container).addClass('has-error');
-            $(container).find('.help-block').html('Hãy nhập giá trị là số nhỏ hơn hoặc bằng 100').show();
-            is_valided = false;
-        }
-
-        if (data.discount != '' && !isNaN(data.discount)) {
-            if (data.discount_desc == '') {
-                container = $(frmTutorFee).find('INPUT#discount-desc').parent();
-                $(container).addClass('has-error');
-                $(container).find('.help-block').html('Hãy nhập Lý do chiết khấu').show();
-                is_valided = false;
-            }
-        }
-
-        return is_valided;
-    };
-
-    var otherfee_validate = function otherfee_validate(data) {
-        $(frmOtherFee).find('.has-error').removeClass('has-error');
-        $(frmOtherFee).find('.help-block').hide();
-
-        var is_valided = true;
-        var container = null;
-        if (data.payer == '') {
-            container = $(frmOtherFee).find('INPUT#payer').parent();
-            $(container).addClass('has-error');
-            $(container).find('.help-block').html('Hãy nhập Người đóng tiền').show();
-            is_valided = false;
-        }
-
-        if (data.reason == '') {
-            container = $(frmOtherFee).find('textarea#reason').parent();
-            $(container).addClass('has-error');
-            $(container).find('.help-block').html('Hãy nhập Lý do nộp').show();
-            is_valided = false;
-        }
-
-        if (data.amount == '' || data.amount == null) {
-            container = $(frmOtherFee).find('INPUT#amount').parent().parent();
-            $(container).addClass('has-error');
-            $(container).find('.help-block').html('Hãy nhập Tổng số tiền').show();
-            is_valided = false;
-        }
-
-        return is_valided;
-    };
-
-    var get_last_tutor_invoice_duration = function get_last_tutor_invoice_duration(student_id, class_id, callback) {
-        $.ajax({
-            url: '/invoice/get-last-invoice/' + student_id + '/' + class_id
-        });
-    };
-
-    var invoice_list_init = function invoice_list_init() {
-        if ($.fn.dataTable.isDataTable('TABLE#invoice-list')) {
-            invoice_list_table = $('TABLE#invoice-list').DataTable();
-        } else {
-
-            $.fn.dataTable.ext.buttons.reload = {
-                text: 'Làm mới dữ liệu',
-                action: function action(e, dt, node, config) {
-                    dt.ajax.reload();
-                }
-            };
-
-            invoice_list_table = $('TABLE#invoice-list').DataTable({
-                language: datatable_language,
-                "columnDefs": [{
-                    targets: [7],
-                    "data": null,
-                    "visible": true,
-                    "defaultContent": ''
-                }],
-                ajax: {
-                    url: 'invoice/list',
-                    dataSrc: 'data.list'
-                },
-                "order": [[1, 'asc']],
-                columns: [{
-                    data: 'invoice_number',
-                    name: 'invoice_number'
-                }, {
-                    data: 'created_at',
-                    name: 'created_at',
-                    render: function render(data, type, row, meta) {
-                        return moment(data).format("YYYY-MM-DD kk:mm");
-                    }
-                }, {
-                    data: 'type',
-                    name: 'type',
-                    render: function render(data, type, row, meta) {
-                        return data == 1 ? 'Học phí' : 'Thu khác';
-                    }
-                }, {
-                    data: 'std_name',
-                    name: 'std_name'
-                }, {
-                    data: 'c_name',
-                    name: 'c_name'
-                }, {
-                    data: 'payer',
-                    name: 'payer'
-                }, {
-                    data: 'invoice_status',
-                    name: 'invoice_status',
-                    render: function render(data, type, row, meta) {
-                        var status = '';
-                        switch (data) {
-                            case 0:
-                                status = '<span class="label label-info">Lưu (chưa in)</span>';
-                                break;
-                            case 1:
-                                status = '<span class="label label-warning">Đã in lần 1</span>';
-                                break;
-                            case 2:
-                                status = '<span class="label label-warning">Đã in lần 2</span>';
-                                break;
-                            case 3:
-                                status = '<span class="label label-success">Đã duyệt</span>';
-                                break;
-                            case 4:
-                                status = '<span class="label label-danger">Đã huỷ</span>';
-                                break;
-                            default:
-                                break;
-                        }
-
-                        return status;
-                    }
-                }, {
-                    data: null,
-                    name: 'buttons',
-                    render: function render(data, type, row, meta) {
-                        var user_info = {
-                            id: $('meta[name="user-id"]').attr('content'),
-                            name: btoa($('meta[name="user-name"]').attr('content')),
-                            email: $('meta[name="user-email"]').attr('content'),
-                            branch: $('meta[name="user-branch_id"]').attr('content'),
-                            role: $('meta[name="user-role"]').attr('content')
-                        };
-
-                        var b_print = $('<button title="In phiếu thu" class="btn btn-primary print-invoice" style="margin-right: 2px;"><i class="fa fa-print" aria-hidden="true"></i></button>');
-                        var b_view = $('<button title="Xem" class="btn btn-info view-invoice" style="margin-right: 2px;"><i class="fa fa-eye" aria-hidden="true"></i></button>');
-                        var b_trash = $('<button title="Huỷ" class="btn btn-danger del-invoice"><i class="fa fa-trash" aria-hidden="true"></i></button>');
-                        var b_accountant_locked = $('<button title="Duyệt" class="btn btn-success approve-invoice" style="margin-right: 2px;"><i class="fa fa-check-square-o" aria-hidden="true"></i></button>');
-
-                        var content = $('<span></span>');
-                        content.append(b_view, b_print, b_accountant_locked, b_trash);
-
-                        if (row.invoice_status >= 2) {
-                            $(b_print).prop('disabled', true);
-                        }
-
-                        if (row.invoice_status > 2) {
-                            $(b_trash).prop('disabled', true);
-                        }
-
-                        if (user_info.role != 4) {
-                            $(b_accountant_locked).css('display', 'none');
-                            $('TABLE#invoice-list tbody tr td:nth-child(8)').css('width', '8%');
-                        } else if (row.invoice_status > 2) {
-                            $(b_accountant_locked).prop('disabled', true);
-                        }
-
-                        return content.html();
-                    }
-                }],
-                initComplete: function initComplete() {
-                    var filter_bar = filter_bar_render();
-
-                    $('DIV#invoice-list_wrapper').prepend(filter_bar, $('<div></div>', { class: 'row', style: 'height:20px' }));
-                }
-            });
-
-            invoice_list_table.on('draw.dt', function () {
-                var user_role = $('meta[name="user-role"]').attr('content');
-                if (user_role != 4) {
-                    $('TABLE#invoice-list tbody tr td:nth-child(8)').css('width', '8%');
-                }
-            });
-
-            invoice_list_table.on('click', 'button.print-invoice', function () {
-                var data = invoice_list_table.row($(this).parents('tr')).data();
-                print_invoice(data.id, function () {
-                    setTimeout(function () {
-                        invoice_list_table.ajax.reload();
-                    }, 500);
-                });
-            });
-
-            invoice_list_table.on('click', 'button.view-invoice', function () {
-                var data = invoice_list_table.row($(this).parents('tr')).data();
-                view_invoice(data.id);
-            });
-
-            invoice_list_table.on('click', 'button.del-invoice', function () {
-                var data = invoice_list_table.row($(this).parents('tr')).data();
-                if (confirm('Bạn có chắc muốn huỷ hoá đơn sô ' + data.invoice_number + ' không?')) {
-                    $.ajax('/invoice/delete', {
-                        method: "POST",
-                        contentType: 'application/json',
-                        data: JSON.stringify({ "id": data.id }),
-                        success: function success(response) {
-                            alert('Đã huỷ!');
-                            invoice_list_table.ajax.reload();
-                        },
-                        error: function error(xhr, status, err) {
-                            alert(err);
-                        }
-                    });
-                }
-            });
-
-            invoice_list_table.on('click', 'button.approve-invoice', function () {
-                var data = invoice_list_table.row($(this).parents('tr')).data();
-                if (confirm('Bạn có chắc muốn duyệt hoá đơn sô ' + data.invoice_number + ' không?')) {
-                    $.ajax('/invoice/approve', {
-                        method: "POST",
-                        contentType: 'application/json',
-                        data: JSON.stringify({ "id": data.id }),
-                        success: function success(response) {
-                            alert('Đã duyệt!');
-                            invoice_list_table.ajax.reload();
-                        },
-                        error: function error(xhr, status, err) {
-                            alert(err);
-                        }
-                    });
-                }
-            });
-        }
-    };
-
-    var invoice_list_event_binding = function invoice_list_event_binding() {
-        $('BUTTON#btnCreateInvoice').on('click', function () {
-            frmTutorFee[0].reset();
-            $(tab_headers).find('LI').removeClass('disabled');
-            tab_activate($(tab_headers).find('A[data-tab="tutorfee-tab"]')[0]);
-        });
-    };
-
-    var invoice_tutor_form_event_binding = function invoice_tutor_form_event_binding() {
-
-        $(frmTutorFee).find('INPUT#reservation').daterangepicker({
-            opens: 'right',
-            locale: daterange_locale
-        }, function (start, end) {
-            $(frmTutorFee).find('INPUT#start_date').val(start.format('YYYY-MM-DD'));
-            $(frmTutorFee).find('INPUT#end_date').val(end.format('YYYY-MM-DD'));
-            tuition_fee_calculate();
-        });
-
-        $(frmTutorFee).find('input#price,input#duration,input#discount,input#prepaid').on('blur', function (e) {
-            var value = $(e.target).val().trim();
-            if (e.target.id == 'price' || e.target.id == 'prepaid') {
-                $(e.target).val(numeral(value).format('0,0'));
-            }
-            tuition_fee_calculate();
-        });
-
-        $(frmTutorFee).find('input#amount').on('change', function (e) {
-            if ($(e.target).val() != '') {
-                $('BUTTON#btnSaveInvoice').prop('disabled', false);
-                $('BUTTON#btnPrintInvoice').prop('disabled', false);
-            }
-        });
-
-        select2_tutor_studentid.on('change', function (e) {
-            get_parent_list($(e.target).val(), function () {
-                get_class_list($(e.target).val(), $(class_id));
-            });
-        });
-
-        $(frmTutorFee).on('keyup change paste', 'input, select, textarea', function (e) {
-            $(e.target).closest('.has-error').find('.help-block').hide();
-            $(e.target).closest('.has-error').removeClass('has-error');
-        });
-    };
-
-    var invoice_other_form_event_binding = function invoice_other_form_event_binding() {
-        $(frmOtherFee).find('input#amount').on('blur', function (e) {
-            var value = $(e.target).val().trim();
-            if (value != '') {
-                $(e.target).val(numeral(value).format('0,0'));
-                var container = $(e.target).parent().parent();
-                $(container).removeClass('has-error');
-                $(container).find('.help-block').html('Hãy nhập Tổng số tiền').hide();
-            }
-        });
-
-        $(frmOtherFee).on('keyup change paste', 'input, select, textarea', function (e) {
-            $(e.target).closest('.has-error').find('.help-block').hide();
-            $(e.target).closest('.has-error').removeClass('has-error');
-        });
-    };
-
-    var filter_bar_render = function filter_bar_render() {
-        var wrapper = $('<div></div>', { id: 'invoice_filter_bar', class: 'row' });
-
-        var wrapper_title = $('<div></div>', { text: '' });
-
-        var status_filter = $('<select></select>', { id: 'invoice-list-status-filter', class: 'form-control' });
-        var date_filter = $('<input>', { id: 'invoice-list-date-filter', class: 'form-control', type: 'text', style: 'width:100px' });
-        var type_filter = $('<select></select>', { id: 'invoice-list-type-filter', class: 'form-control' });
-
-        $(status_filter).append($('<option></option>', { 'value': -1, html: '[ Tất cả trạng thái ]' }));
-        var status = ['Lưu (chưa in)', 'Đã in lần 1', 'Đã in lần 2', 'Đã duyệt', 'Đã huỷ'];
-        for (var i = 0; i < status.length; i++) {
-            $(status_filter).append($('<option></option>', { 'value': status[i], html: status[i] }));
-        }
-
-        $(status_filter).on('change', function (e) {
-            var search_value = $(e.target).val() == -1 ? '' : $(e.target).val();
-            invoice_list_table.column(6).search(search_value).draw();
-        });
-
-        $(type_filter).append($('<option></option>', { 'value': -1, html: '[ Tất cả ]' }));
-        var type = ['Học phí', 'Thu khác'];
-        for (var i = 0; i < type.length; i++) {
-            $(type_filter).append($('<option></option>', { 'value': type[i], html: type[i] }));
-        }
-
-        $(type_filter).on('change', function (e) {
-            var search_value = $(e.target).val() == -1 ? '' : $(e.target).val();
-            invoice_list_table.column(2).search(search_value).draw();
-        });
-
-        wrapper.append($('<div></div>', { class: 'col-sm-3' }).append(wrapper_title), $('<div></div>', { class: 'col-sm-3' }).append($('<label>Loại hoá đơn: </label>').append(type_filter)), $('<div></div>', { class: 'col-sm-3' }).append($('<label>Trạng thái hoá đơn: </label>').append(status_filter)), $('<div></div>', { class: 'col-sm-3' }).append($('<label>Thời gian lập: </label>').append(date_filter)));
-
-        $(date_filter).datepicker({
-            autoclose: true,
-            format: 'yyyy-mm-dd'
-        });
-
-        $(date_filter).on('change', function (e) {
-            var search_value = $.fn.dataTable.util.escapeRegex($(e.target).val());
-            console.log(search_value);
-            invoice_list_table.column(1).search(search_value ? '^' + search_value : '', true, false).draw();
-        });
-
-        return wrapper;
-    };
-
-    var init = function init() {
-        invoice_list_init();
-        invoice_list_event_binding();
-
-        $('.help-block').hide();
-        $('.has-error').removeClass('has-error');
-        toggle_tuition_frmTutorFee(false);
-
-        tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
-
-        select2_tutor_studentid = $(student_id).select2();
-        select2_tutor_classid = $(class_id).select2();
-
-        select2_other_studentid = $(student_other_id).select2();
-        select2_other_classid = $(class_other_id).select2();
-
-        toggle_tuition_frmTutorFee(false);
-
-        get_student_list(function (std_id, class_target) {
-            get_class_list(std_id, class_target);
-        }, $('SELECT.select2[id="student_id"]'), $('SELECT.select2[id="class_id"]'));
-
-        invoice_tutor_form_event_binding();
-        invoice_other_form_event_binding();
-
-        $('BUTTON#btnSaveInvoice, BUTTON#btnPrintInvoice').on('click', function (e) {
-            var save_callback = null;
-            var data = null;
-            var actived_tab_id = $(actived_tab).prop('id');
-            var invoice_type = actived_tab_id == 'tutorfee-tab' ? 'tutorfee' : actived_tab_id == 'otherfee-tab' ? 'otherfee' : '';
-            var form = actived_tab_id == 'tutorfee-tab' ? frmTutorFee : actived_tab_id == 'otherfee-tab' ? frmOtherFee : null;
-            if (invoice_type == 'tutorfee') {
-                data = {
-                    "type": 1,
-                    "student_id": $(form).find('SELECT#student_id').val(),
-                    "class_id": $(form).find('SELECT#class_id').val(),
-                    "price": numeral($(form).find('INPUT#price').val()).value(),
-                    "start_date": $(form).find('INPUT#start_date').val(),
-                    "end_date": $(form).find('INPUT#end_date').val(),
-                    "duration": $(form).find('INPUT#duration').val(),
-                    "payer": $(form).find('INPUT#payer').val(),
-                    "prepaid": numeral($(form).find('INPUT#prepaid').val()).value(),
-                    "amount": numeral($(form).find('INPUT#amount').val()).value(),
-                    "discount": $(form).find('INPUT#discount').val(),
-                    "discount_desc": $(form).find('INPUT#discount_desc').val(),
-                    "payment_method": $(form).find('INPUT[name="payment_method"]:checked').val(),
-                    "invoice_status": 0,
-                    "currency": 'VND'
-                };
-            } else if (invoice_type == 'otherfee') {
-                data = {
-                    "type": 2,
-                    "student_id": $(form).find('SELECT#student_id').val(),
-                    "class_id": $(form).find('SELECT#class_id').val(),
-                    "payer": $(form).find('INPUT#payer').val(),
-                    "reason": $(form).find('TEXTAREA#reason').val(),
-                    "amount": numeral($(form).find('INPUT#amount').val()).value(),
-                    "payment_method": $(form).find('INPUT[name="payment_method"]:checked').val(),
-                    "invoice_status": 0,
-                    "currency": 'VND'
-                };
-            }
-
-            if (!eval(invoice_type + '_validate(data)')) {
-                return false;
-            } else {
-                if ($(e.target).prop('id') == 'btnSaveInvoice') {
-                    save_callback = function save_callback() {
-                        tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
-                        invoice_list_table.ajax.reload();
-                    };
-                } else if ($(e.target).prop('id') == 'btnPrintInvoice') {
-                    save_callback = function save_callback(invoce_id) {
-                        print_invoice(invoce_id, function () {
-                            invoice_list_table.ajax.reload();
-                        });
-                        tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
-                    };
-                }
-
-                save_invoice(save_callback, form, data);
-            }
-        });
-    };
-
-    init();
-});
-
-/***/ }),
-/* 191 */
-/***/ (function(module, exports) {
-
-$(function () {
-    if ($('#branch-list').length == 0) return false;
-    var tableBranch = $('#branch-list').DataTable({
-        language: datatable_language,
-        ajax: {
-            url: 'api/branch/list'
-        },
-        columns: [{
-            data: null
-        }, {
-            data: 'branch_name'
-        }, {
-            data: 'address'
-        }, {
-            data: 'email',
-            render: function render(data, type, row) {
-                return data != '' ? '<a href="mailto:' + data + '">' + data + '</a>' : '';
-            }
-        }, {
-            data: 'phone_1'
-        }, {
-            data: null
-        }],
-        "columnDefs": [{
-            "targets": -1,
-            "data": null,
-            //"defaultContent": '<a class="edit">Sửa</a>&nbsp;&nbsp;<a class="delete">Xoá</a>'
-            "defaultContent": ''
-        }]
-    });
-
-    tableBranch.on('order.dt search.dt', function () {
-        tableBranch.column(0, {
-            search: 'applied',
-            order: 'applied'
-        }).nodes().each(function (cell, i) {
-            cell.innerHTML = i + 1;
-        });
-    }).draw();
-});
-
-/***/ }),
-/* 192 */
-/***/ (function(module, exports) {
-
-$(function () {
-    var table_schedule = $('TABLE#teacher-weekly-schedule');
-    if (table_schedule.length > 0) {
-        var form = $('FORM#frmReport');
-        var teacher_list = null;
-        var curr_page = 1;
-        var total_page = 1;
-        var teacher_per_page = 2;
-        var offset = 0;
-        var curr_teachers = [];
-        var classes = [];
-        var start = '2018-11-01';
-        var end = '2018-11-30';
-        var bootpag = null;
-        var appointment_durations = [];
-        var minute_inteval = 30;
-
-        var init = function init() {
-            get_teacher_list(function (data) {
-                paginate(data);
-            });
-        };
-
-        var render_table = function render_table(list) {
-            $(table_schedule).find('thead tr#weekdays th:not(:first-child)').prop('colspan', curr_teachers.length);
-            $(table_schedule).find('thead tr#teacher_header').remove();
-            $(table_schedule).find('tbody').empty();
-
-            var teachers_row = $('<tr></tr>', {
-                id: 'teacher_header'
-            }).append($('<td></td>'));
-
-            for (var wd = 1; wd <= 7; wd++) {
-                for (var t = 0; t < curr_teachers.length; t++) {
-                    var td = $('<td></td>', {
-                        text: curr_teachers[t].name,
-                        'style': 'text-align:center'
-                    });
-                    $(teachers_row).append(td);
-                }
-            }
-
-            for (var hour in list) {
-                var tr = $('<tr></tr>');
-                var hour_cell = $('<th></th>', {
-                    class: 'schedule_hour',
-                    'style': 'text-align:center',
-                    text: hour
-                });
-
-                $(tr).append(hour_cell);
-                var schedule_obj = list[hour];
-                for (var wd in schedule_obj) {
-                    for (var tid in schedule_obj[wd]) {
-                        var content = '';
-                        var class_schedule = null;
-                        var style = '';
-                        finish_hour = '';
-                        start_hour = '';
-                        last_time = '';
-                        finish_hour = '';
-
-                        if (schedule_obj[wd][tid] != '') {
-                            for (var c in classes) {
-                                if (classes[c].id == schedule_obj[wd][tid]) {
-                                    content = classes[c].name;
-                                    class_schedule = JSON.parse(classes[c].schedule);
-                                    var diff = diff_minutes(class_schedule[wd.toLowerCase()].start, class_schedule[wd.toLowerCase()].finish);
-                                    var finish_hour = add_minutes(class_schedule[wd.toLowerCase()].start, diff - 30);
-                                    last_time = (finish_hour.getHours() + '').length == 1 ? '0' + finish_hour.getHours() + '_' + finish_hour.getMinutes() : finish_hour.getHours() + '_' + finish_hour.getMinutes();
-                                    style = 'background-color:yellow;text-align:center';
-                                    break;
-                                }
-                            }
-                        }
-
-                        var cell_id = wd + '_' + hour.replace(':', '_') + '_' + tid;
-                        var last_cell_id = wd + '_' + last_time + '_' + tid;
-                        if (last_time != '') {
-                            appointment_durations.push({
-                                'wd': wd,
-                                'tid': tid,
-                                'start': cell_id,
-                                'start_time': hour,
-                                'end': last_cell_id,
-                                'end_time': finish_hour.getHours() + ':' + finish_hour.getMinutes()
-                            });
-                            console.log(appointment_durations);
-                        }
-
-                        var td = $('<td></td>', {
-                            id: cell_id,
-                            class: 'schedule_content',
-                            text: content,
-                            'style': style
-                        });
-
-                        $(tr).append(td);
-                    }
-                }
-                $(table_schedule).find('tbody').append(tr);
-            }
-
-            $(table_schedule).find('thead').append(teachers_row);
-
-            var style = 'background-color:yellow;text-align:center';
-
-            for (var cell = 0; cell < appointment_durations.length; cell++) {
-                var diff_time = diff_minutes(appointment_durations[cell].start_time, appointment_durations[cell].end_time);
-                if (diff_time > minute_inteval) {
-                    var next_hour = new Date(start + ' ' + appointment_durations[cell].start_time);
-                    for (var i = 1; i <= diff_time / minute_inteval; i++) {
-                        next_hour = add_minutes(next_hour.getHours() + ':' + next_hour.getMinutes(), minute_inteval);
-                        var h = (next_hour.getHours() + '').length == 1 ? '0' + next_hour.getHours() : next_hour.getHours();
-                        var m = (next_hour.getMinutes() + '').length == 1 ? '0' + next_hour.getMinutes() : next_hour.getMinutes();
-                        tmp_time = h + '_' + m;
-                        var next_cell = appointment_durations[cell].wd + '_' + tmp_time + '_' + appointment_durations[cell].tid;
-                        $(table_schedule).find('tbody td#' + next_cell).prop('style', style);
-                        next_hour = new Date(start + ' ' + tmp_time.replace('_', ':'));
-                    }
-                }
-                $(table_schedule).find('tbody td#' + appointment_durations[cell].end).prop('style', style);
-            }
-        };
-
-        var get_schedule_list = function get_schedule_list(ids, callback) {
-            var params = ids.join('&teachers[]=');
-            var end_point = 'api/teacher_weekly_time_table?start=' + start + '&end=' + end + '&teachers[]=' + params;
-
-            $.ajax({
-                url: end_point,
-                method: 'GET',
-                contentType: 'application/json',
-                dataType: 'json',
-                success: function success(response) {
-                    if (response.code == 1) {
-                        classes = response.classes;
-                        callback(response.data);
-                    }
-                }
-            });
-        };
-
-        var get_teacher_list = function get_teacher_list(callback) {
-            $.ajax({
-                url: '/api/list-teachers',
-                method: 'GET',
-                dataType: 'json',
-                contentType: 'application/json',
-                success: function success(response) {
-                    if (response.code == 1) {
-                        teacher_list = response.data;
-                        if (callback != undefined) callback(teacher_list);
-                    }
-                }
-            });
-        };
-
-        var paginate = function paginate(teacher_list) {
-            if (teacher_list == null) return '';
-            total_page = Math.ceil(teacher_list.length / teacher_per_page);
-
-            if (curr_page == 1) {
-                offset = 0;
-            }
-
-            bootpag = $('.paginate').bootpag({
-                total: total_page,
-                next: 'Sau',
-                prev: 'Trước'
-            }).on("page", function (event, num) {
-                curr_page = num;
-                if (num == 1) {
-                    offset = 0;
-                } else {
-                    offset = teacher_per_page * (num - 1);
-                }
-
-                curr_teachers = teacher_list.slice(offset, offset + teacher_per_page);
-                var ids = [];
-
-                for (var i = 0; i < curr_teachers.length; i++) {
-                    ids[i] = curr_teachers[i].id;
-                }
-                get_schedule_list(ids, render_table);
-            });
-
-            bootpag.trigger('page', curr_page);
-        };
-
-        var refresh_schedule = function refresh_schedule() {
-            start = $(form).find('INPUT#start').val();
-            end = $(form).find('INPUT#end').val();
-            if (start != '' && end != '') {
-                bootpag.unbind('page');
-                init();
-            }
-        };
-
-        var add_minutes = function add_minutes(start_time, minutes) {
-            var date = new Date(start + ' ' + start_time);
-            return new Date(date.getTime() + minutes * 60000);
-        };
-
-        var diff_minutes = function diff_minutes(start_time, end_time) {
-            var date_start = new Date(start + ' ' + start_time);
-            var date_end = new Date(start + ' ' + end_time);
-
-            var diff = (date_end.getTime() - date_start.getTime()) / 1000;
-            diff /= 60;
-            return Math.abs(Math.round(diff));
-        };
-
-        $(form).find('BUTTON#btnRefresh').on('click', function (e) {
-            refresh_schedule();
-        });
-
-        init();
-    }
-});
-
-/***/ }),
-/* 193 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 194 */,
-/* 195 */,
-/* 196 */,
-/* 197 */,
-/* 198 */,
-/* 199 */,
-/* 200 */
-/***/ (function(module, exports) {
-
 /*!
  * Timepicker Component for Twitter Bootstrap
  *
@@ -64802,6 +59415,5390 @@ $(function () {
 
 })(jQuery, window, document);
 
+
+/***/ }),
+/* 167 */
+/***/ (function(module, exports) {
+
+$(function () {
+	if ($('TABLE#list-student').length > 0) {
+		var table_student = null;
+		var save_student_button = $('DIV#student-form-modal DIV.modal-footer BUTTON#btnSave');
+		var add_student_button = $('BUTTON.add-student');
+		var add_parent_button = $("DIV#student-form-modal DIV.modal-body BUTTON.add-parent");
+		var parent_info_panel = $("DIV#student-form-modal DIV.modal-body DIV.row#parent-info");
+		var student_form = $("DIV#student-form-modal DIV.modal-body FORM#frmStudent");
+
+		var init = function init() {
+			if ($.fn.dataTable.isDataTable('TABLE#list-student')) {
+				table_student = $('TABLE#list-student').DataTable();
+			} else {
+				var buttons = '<button title="thêm học sinh vào lớp" class="btn btn-primary assign-to-class hidden"><i class="fa fa-plus" aria-hidden="true"></i></button>\
+							<button title="Hồ sơ chi tiết học sinh" class="edit-student btn btn-warning"><i class="fa fa-pencil" aria-hidden="true"></i></button>\
+							<button title="xóa học sinh" class="del-student btn btn-danger"><i class="fa fa-trash" aria-hidden="true"></i></button>';
+				table_student = $('#list-student').DataTable({
+					language: datatable_language,
+					"columnDefs": [{
+						"searchable": false,
+						"orderable": false,
+						"targets": 0
+					}, {
+						targets: [7],
+						"data": null,
+						"visible": true,
+						"defaultContent": buttons
+					}],
+					"order": [[1, 'asc']],
+					ajax: {
+						url: 'api/get-list-student',
+						dataSrc: 'data'
+					},
+					columns: [{
+						data: null
+					}, {
+						data: 'student_code',
+						name: 'student_code'
+					}, {
+						data: 'name',
+						name: 'name'
+					}, {
+						data: 'birthday',
+						name: 'birthday',
+						render: function render(data, type, row, meta) {
+							if (data != null) {
+								data = moment(data).format("DD-MM-YYYY");
+							} else if (row.birthyear != null) {
+								data = row.birthyear;
+							} else {
+								data = '';
+							}
+
+							return data;
+						}
+					}, {
+						data: 'class_name',
+						name: 'class_name'
+					}, {
+						data: 'parent_name',
+						name: 'parent_name'
+					}, {
+						data: 'stage',
+						name: 'stage'
+					}, {
+						'data': null
+					}]
+				});
+
+				table_student.on('order.dt search.dt', function () {
+					table_student.column(0, {
+						search: 'applied',
+						order: 'applied'
+					}).nodes().each(function (cell, i) {
+						cell.innerHTML = i + 1;
+					});
+				}).draw();
+
+				table_student.on('click', 'button.assign-to-class', function () {
+					var data = table_student.row($(this).parents('tr')).data();
+					console.log('assign-to-class', data);
+				});
+
+				table_student.on('click', 'button.edit-student', function () {
+					var data = table_student.row($(this).parents('tr')).data();
+					window.location.href = '/student/detail?student_id=' + data.id;
+				});
+
+				table_student.on('click', 'button.del-student', function () {
+					var data = table_student.row($(this).parents('tr')).data();
+					show_delete_student_confirm_modal(data);
+					console.log('del-student', data);
+				});
+			}
+
+			$(save_student_button).bind('click', function (e) {
+				$(e.target).button('loading');
+				$(e.target).prop('disabled', true);
+				//save_student();
+			});
+
+			$(add_student_button).bind('click', function (e) {
+				var student_id = null;
+				show_student_form();
+			});
+
+			$(add_parent_button).bind('click', function (e) {
+				$(parent_info_panel).show();
+			});
+
+			$('DIV#student-form-modal').on('show.bs.modal', function (e) {
+				console.log(e);
+			});
+		};
+
+		var show_assign_class_modal = function show_assign_class_modal(student_id) {};
+		var get_class_list_to_assign = function get_class_list_to_assign(student_id) {};
+		var assign_to_class = function assign_to_class(student_id, class_id) {};
+
+		var show_student_form = function show_student_form(student_id) {
+			var modal_title = 'Thêm mới học sinh';
+			$("DIV#student-form-modal").find('FORM#frmStudent INPUT#id').val();
+			$("DIV#student-form-modal").find('FORM#frmStudent INPUT#crm_id').val();
+
+			if (student_id != null) {
+				modal_title = 'Sửa thông tin học sinh';
+				$("DIV#student-form-modal").find('FORM#frmStudent INPUT#id').val(student_id);
+				get_student(student_id, function (student, parent) {
+					reset_student_form(student, parent);
+					$("DIV#student-form-modal").modal('show');
+				});
+			} else {
+				reset_student_form(null, null);
+				$("DIV#student-form-modal").modal('show');
+			}
+
+			$("DIV#student-form-modal").find('.modal-title').html(modal_title);
+		};
+
+		var reset_student_form = function reset_student_form(student, parent) {
+			var form_inputs = $(student_form).find('INPUT');
+			if (student == null) {
+				$(form_inputs).val('');
+				$(student_form).find('SELECT#gender').val('0').change();
+				return;
+			}
+
+			$(form_inputs).each(function (index, el) {
+				var field = el.id.indexOf('parent-') == 0 ? el.id.substr(7, el.id.length) : el.id;
+				if (student != null) {
+					if (student[field] != undefined && el.id.indexOf('parent-') == -1) {
+						$(el).val(student[field]);
+					} else if (student[field] == undefined) {
+						$(el).val('');
+					}
+				}
+
+				if (parent != null) {
+					if (parent[field] != undefined && el.id.indexOf('parent-') == 0) {
+						$(el).val(parent[field]);
+					} else if (parent[field] == undefined) {
+						$(el).val('');
+					}
+				}
+			});
+
+			$(student_form).find('SELECT#gender').val(student.gender).change();
+		};
+
+		var get_student = function get_student(student_id, callback) {
+			$.ajax({
+				url: 'api/get-student',
+				data: {
+					'id': student_id
+				},
+				method: 'GET',
+				success: function success(response) {
+					var student = response.data.student;
+					var parent = response.data.parent;
+					callback(student, parent);
+				}
+			});
+		};
+
+		var validate = function validate(data) {
+			return true;
+			// var result = false;
+			// if (data.student.name == '') {
+
+			// }
+		};
+
+		var save_student = function save_student() {
+
+			var data = {
+				"student": {
+					"id": "",
+					"name": "",
+					"crm_id": "",
+					"email": "",
+					"mobile": "",
+					"birthday": "",
+					"birthyear": "",
+					"address": "",
+					"gender": ""
+				},
+				"parent": {
+					"id": "",
+					"fullname": "",
+					"email": "",
+					"phone": "",
+					"role": "",
+					"facebook": ""
+				}
+			};
+
+			var form_parent_inputs = $(student_form).find('INPUT[id^="parent-"]');
+			var form_student_inputs = $(student_form).find('INPUT:not([id^="parent-"])');
+			form_student_inputs.push($(student_form).find('SELECT#gender')[0]);
+
+			$(form_parent_inputs).each(function (index, el) {
+				var field = el.id.substr(7, el.id.length);
+				if (field == "search") return;
+				data.parent[field] = $(el).val();
+			});
+
+			$(form_student_inputs).each(function (index, el) {
+				data.student[el.id] = $(el).val();
+			});
+
+			$.ajax({
+				url: 'api/save-student',
+				data: JSON.stringify(data),
+				contentType: 'application/json',
+				method: 'POST',
+				success: function success(response) {
+					console.log(response);
+					table_student.ajax.reload();
+					$("DIV#student-form-modal").modal('hide');
+				}
+			}).done(function () {
+				$(save_student_button).prop('disabled', false);
+				$(save_student_button).button('reset');
+			});
+		};
+
+		var show_delete_student_confirm_modal = function show_delete_student_confirm_modal(data) {
+			modalConfirm(function (confirm) {
+				if (confirm) {
+					delete_student(data.id);
+				}
+			}, 'Bạn có muốn xoá học sinh <strong>' + data.name + '</strong> không?');
+		};
+
+		var delete_student = function delete_student(student_id) {
+			console.log(student_id);
+		};
+
+		var modalConfirm = function modalConfirm(callback, message) {
+			if (message != undefined) {
+				$("#confirm-delete DIV.modal-header H5.modal-title").html(message);
+			}
+			$("#confirm-delete").modal('show');
+
+			$("#modal-btn-yes").unbind('click').bind("click", function () {
+				callback(true);
+				$("#confirm-delete").modal('hide');
+			});
+
+			$("#modal-btn-no").unbind('click').bind("click", function () {
+				callback(false);
+				$("#confirm-delete").modal('hide');
+			});
+		};
+
+		init();
+	}
+});
+
+/***/ }),
+/* 168 */
+/***/ (function(module, exports, __webpack_require__) {
+
+$(function () {
+    var tab_headers = $('UL.nav#student_detail');
+    var tab_contents = $('DIV.tab-content');
+    var student_id = null;
+
+    var student_data = {
+        profile: null,
+        parents: null,
+        activities: null,
+        exams: null,
+        teacher_reports: null,
+        payment: null,
+        attendance: null
+    };
+
+    var assessment_status = {
+        '-1': 'Chưa hẹn lịch',
+        '0': 'Chưa có kết quả',
+        '1': 'Đã có kết quả'
+    };
+
+    var trial_status = {
+        '0': 'Chưa có lịch học thử',
+        '1': 'Đã hẹn học thử',
+        '2': 'Đã học thử'
+    };
+
+    var activity_types = {
+        '1': 'Làm assessment',
+        '2': 'Học thử',
+        '3': 'Nhập học chính thức',
+        '4': 'Đã gửi nội dung học 2 tuần tới',
+        '5': 'Chuyển lớp',
+        '6': 'Kiểm tra',
+        '7': 'Kết thúc'
+    };
+
+    if (tab_headers.length == 0) return false;
+
+    var tab_col = $(tab_headers).find('LI');
+
+    var tab_activate = function tab_activate(target) {
+        $(tab_col).removeClass('active');
+        $(target).parent().addClass('active');
+        $(tab_contents).find("DIV[role='tabpanel']").removeClass('active');
+        $(tab_contents).find("DIV[role='tabpanel']#" + $(target).data('tab')).addClass('active');
+    };
+
+    $(tab_headers).find('A').bind('click', function (e) {
+        tab_activate(e.target);
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    $('BUTTON#btnSaveAll').on('click', function (e) {
+        save();
+    });
+
+    $('BUTTON#btn_change_parent').on('click', function (e) {
+        tab_activate($(tab_col).find('a[data-tab="parents"]'));
+    });
+
+    $('A#btnSaveActivity').on('click', function (e) {
+        save_activities();
+    });
+
+    var get_url_param = function get_url_param($param_name) {
+        var hash;
+        var q = document.URL.split('?')[1];
+        if (q != undefined) {
+            q = q.split('&');
+            for (var i = 0; i < q.length; i++) {
+                hash = q[i].split('=');
+                if (hash[0] == $param_name) return hash[1];
+            }
+            return null;
+        }
+        return null;
+    };
+
+    var get_student_profile = function get_student_profile(callback) {
+        get('/api/student/get-profile', {
+            id: student_id
+        }, function (data) {
+            student_data.profile = data;
+            fill_profile(data);
+            if (callback != undefined) callback();
+        });
+    };
+
+    var get_parent_list = function get_parent_list(callback) {
+        get('/api/parent/list', {
+            student_id: student_id
+        }, function (data) {
+            student_data.parents = data;
+            fill_parent_list(data);
+            if (callback != undefined) callback();
+        });
+    };
+
+    var get_exam_results = function get_exam_results() {};
+
+    var get_teacher_reports = function get_teacher_reports() {};
+
+    var get_payment_history = function get_payment_history() {};
+
+    var get_activities = function get_activities() {
+        get('/api/student/get-activity', {
+            student_id: student_id
+        }, function (data) {
+            student_data.activities = data;
+            fill_activities(data);
+        });
+    };
+
+    var get_attendance_history = function get_attendance_history() {
+        get('/api/student/attendance', { student_id: student_id }, function (data) {
+            student_data.attendance = data;
+            fill_attendance(data);
+        });
+    };
+
+    var fill_profile = function fill_profile(data) {
+        var form = $('FORM#frmStudent');
+        if (data.student !== null) {
+            $(form).find('INPUT#student-name').val(data.student.name);
+            $(form).find('INPUT#student-e_name').val(data.student.e_name);
+            $(form).find('INPUT#student-gender').val(data.student.gender);
+            $(form).find('INPUT#student-birthyear').val(data.student.birthyear);
+            $(form).find('INPUT#student-birthday').val(data.student.birthday);
+        }
+
+        if (data.parent !== null) {
+            $(form).find('INPUT#parent_id').val(data.parent.id);
+            $(form).find('INPUT#parent-fullname').val(data.parent.fullname);
+            $(form).find('INPUT#parent-parent_role').val(data.parent.parent_role);
+            $(form).find('INPUT#parent-phone').val(data.parent.phone);
+            $(form).find('INPUT#parent-email').val(data.parent.email);
+            $(form).find('INPUT#parent-facebook').val(data.parent.facebook);
+        }
+
+        if (data.staff !== null) {
+            $(form).find('INPUT#dependent_staff_name').val(data.staff.name);
+            $(form).find('INPUT#staff_id').val(data.staff.id);
+        }
+
+        if (data.register_branch !== null) {
+            $(form).find('INPUT#branch-register_branch_name').val(data.register_branch.branch_name);
+            $(form).find('INPUT#register_branch_id').val(data.register_branch.id);
+        }
+
+        if (data.dependent_branch !== null) {
+            $(form).find('INPUT#branch-dependent_branch_name').val(data.dependent_branch.branch_name);
+            $(form).find('INPUT#dependent_branch_id').val(data.dependent_branch.id);
+        }
+
+        if (data.assessment !== null) {
+            $(form).find('INPUT#assessment_status').val(assessment_status[data.assessment.status]);
+            $(form).find('INPUT#assessment_date').val(moment(data.assessment.assessment_date).format("YYYY-MM-DDTkk:mm"));
+            $(form).find('INPUT#assessment_teacher').val(data.assessment.teacher_name);
+            $(form).find('INPUT#assessment_teacher_id').val(data.assessment.teacher_id);
+            $(form).find('INPUT#assessment_result').val(data.assessment.assessment_result);
+
+            $(form).find('INPUT#trial_status').val(trial_status[data.assessment.trial_status]);
+            $(form).find('INPUT#trial_start_date').val(moment(data.assessment.trial_start_date).format("YYYY-MM-DDTkk:mm"));
+            $(form).find('INPUT#trial_class').val(data.assessment.class_name);
+            $(form).find('INPUT#assessment_trial_class_id').val(data.assessment.trial_class_id);
+        } else {
+            $(form).find('INPUT#assessment_status').val(assessment_status['-1']);
+            $(form).find('INPUT#trial_status').val(trial_status['0']);
+        }
+    };
+
+    var fill_activities = function fill_activities(data) {
+        var table = $('DIV.box#box_history > DIV.box-body > TABLE');
+        $(table).find('tbody').empty();
+        if (data.length > 0) {
+            for (var i = 0; i < data.length; i++) {
+                var obj = data[i];
+                var tr = $('<TR></TR>');
+                var index_cell = $('<TH></TH>', {
+                    text: i + 1
+                });
+                var activity_cell = $('<TD></TD>', {
+                    text: activity_types[obj.act_type]
+                });
+                var note_cell = $('<TD></TD>', {
+                    text: obj.note
+                });
+                var start_date_cell = $('<TD></TD>', {
+                    text: obj.start_time
+                });
+                var act_cell = $('<TD></TD>');
+                // var act_edit = $('<a></a>', {html:'<i class="fa fa-pencil"></i>', class:'btn btn-sm btn-info', role:'button'});
+                var act_del = $('<a></a>', {
+                    html: '<i class="fa fa-remove"></i>',
+                    class: 'btn btn-sm btn-danger',
+                    role: 'button'
+                });
+                $(tr).append(index_cell, activity_cell, note_cell, start_date_cell, act_cell);
+                $(table).find('tbody').append(tr);
+            }
+        } else {
+            var tr = $('<TR></TR>');
+            var cell = $('<TD></TD>', {
+                colspan: 5,
+                text: 'Không có hoạt động nào',
+                style: 'text-align:center'
+            });
+            $(table).find('tbody').append(tr.append(cell));
+        }
+    };
+
+    var fill_parent_list = function fill_parent_list(data) {
+        var table = $('DIV.box#box_parent_list > DIV.box-body > TABLE');
+        $(table).find('tbody').empty();
+        if (data.length > 0) {
+            for (var i = 0; i < data.length; i++) {
+                var obj = data[i];
+                var set_primary_button = $('<a></a>', {
+                    class: 'text-white',
+                    text: 'Chọn',
+                    title: 'Chọn làm liên hệ chính',
+                    style: 'color:white;cursor: pointer',
+                    'data-parent': JSON.stringify(obj)
+                });
+                var btn_container = $('<span></span>', {
+                    class: 'badge bg-dark',
+                    style: 'margin-left:30px'
+                }).append(set_primary_button);
+
+                var primary_contact = obj.id == student_data.profile.parent.id ? $('<span style="margin-left:30px" title="" class="badge bg-light-blue"><i class="fa fa-check"></span></i>') : btn_container;
+
+                var tr = $('<TR></TR>');
+                var index_cell = $('<TH></TH>', {
+                    text: i + 1
+                });
+                var role_cell = $('<TD></TD>', {
+                    text: obj.parent_role
+                });
+                var name_cell = $('<TD></TD>', {
+                    text: obj.fullname
+                });
+                var phone_cell = $('<TD></TD>', {
+                    text: obj.phone
+                });
+                var email_cell = $('<TD></TD>', {
+                    html: obj.email != null ? '<a href="mailto:' + obj.email + '">' + obj.email + '</a>' : ''
+                });
+                var address_cell = $('<TD></TD>', {
+                    text: obj.address
+                });
+                var primary_contact_cell = $('<TD></TD>', {
+                    html: primary_contact
+                });
+                var act_edit = $('<a></a>', {
+                    text: 'Thay đổi'
+                });
+                var act_del = $('<a></a>', {
+                    text: 'Xoá'
+                });
+                var act_cell = $('<TD></TD>').append(act_edit, '&nbsp;|&nbsp;', act_del);
+
+                $(tr).append(index_cell, role_cell, name_cell, phone_cell, email_cell, address_cell, primary_contact_cell, act_cell);
+                $(table).find('tbody').append(tr);
+
+                $(set_primary_button).on('click', function (e) {
+                    set_primary_parent($(e.target).data('parent'));
+                });
+            }
+        } else {
+            var tr = $('<TR></TR>');
+            var cell = $('<TD></TD>', {
+                colspan: 8,
+                text: 'Không có danh sách phụ huynh',
+                style: 'text-align:center'
+            });
+            $(table).find('tbody').append(tr.append(cell));
+        }
+    };
+
+    var fill_exam_results = function fill_exam_results(data) {};
+
+    var fill_teacher_reports = function fill_teacher_reports(data) {};
+
+    var fill_payment_history = function fill_payment_history(data) {};
+
+    var fill_attendance = function fill_attendance(data) {
+        var container = $('DIV#box_attendance');
+        var table = $(container).find('TABLE > TBODY');
+        $(table).empty();
+
+        if (data.length > 0) {
+            for (var i = 0; i < data.length; i++) {
+                var cls = data[i];
+
+                var class_cell = $('<td></td>', {
+                    'colspan': '6',
+                    'class': 'text-left',
+                    'html': '<h4>Lớp <b>' + cls.name + '</b></h4>'
+                });
+
+                var class_row = $('<tr></tr>').append(class_cell);
+
+                $(table).append(class_row);
+
+                if (cls.attendance.length > 0) {
+                    for (var x = 0; x < cls.attendance.length; x++) {
+                        var attend = cls.attendance[x];
+                        var attend_row = $('<tr></tr>');
+                        var td_num = $('<td></td>', {
+                            'text': x + 1
+                        });
+
+                        var td_date = $('<td></td>', {
+                            'text': attend.date
+                        });
+
+                        var td_present = $('<td></td>', {
+                            'html': attend.present !== '' ? '<i class="fa fa-check text-success" style="font-size: 1.5em"></i>' : ''
+                        });
+
+                        var td_absent = $('<td></td>', {
+                            'html': attend.absent !== '' ? '<i class="fa fa-check text-danger" style="font-size: 1.5em"></i>' : ''
+                        });
+
+                        var td_late = $('<td></td>', {
+                            'html': attend.late !== '' ? '<i class="fa fa-check text-warning" style="font-size: 1.5em"></i>' : ''
+                        });
+
+                        var td_note = $('<td></td>', {
+                            'text': attend.note
+                        });
+
+                        $(attend_row).append(td_num, td_date, td_present, td_absent, td_late, td_note);
+                        $(table).append(attend_row);
+                    }
+                } else {
+                    var class_cell = $('<td></td>', {
+                        'colspan': '6',
+                        'class': 'text-center',
+                        'text': 'Không có dữ liệu'
+                    });
+
+                    var class_row = $('<tr></tr>').append(class_cell);
+                    $(table).append(class_row);
+                }
+            }
+        } else {
+            var class_cell = $('<td></td>', {
+                'colspan': '6',
+                'class': 'text-center',
+                'text': 'Không có dữ liệu'
+            });
+
+            var class_row = $('<tr></tr>').append(class_cell);
+            $(table).append(class_row);
+        }
+    };
+
+    var get = function get(end_point, data, callback) {
+        $.ajax({
+            url: end_point + '/?' + $.param(data, true),
+            method: 'GET',
+            dataType: 'json',
+            //contentType: 'application/json',
+            success: function success(response) {
+                if (response.code == 1) {
+                    callback(response.data);
+                } else {
+                    console.log(response.message);
+                }
+            }
+        });
+    };
+
+    var post = function post(end_point, data, callback) {
+        $.ajax({
+            url: end_point,
+            method: 'POST',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function success(response) {
+                if (response.code == 1) {
+                    callback(response.data);
+                } else {
+                    console.log(response.message);
+                }
+            }
+        });
+    };
+
+    var save_profile = function save_profile() {
+        var form = $('FORM#frmStudent');
+        var assessment_date = $(form).find('INPUT#assessment_date').val().trim();
+        assessment_date = assessment_date == '' ? null : moment(assessment_date).format("YYYY-MM-DD HH:mm:ss");
+        console.log(assessment_date);
+        var data = {
+            'student_id': student_id,
+            'student': {
+                'name': $(form).find('INPUT#student-name').val().trim(),
+                'e_name': $(form).find('INPUT#student-e_name').val().trim(),
+                'gender': $(form).find('SELECT#student-gender').val().trim(),
+                'birthyear': $(form).find('INPUT#student-birthyear').val().trim(),
+                'birthday': $(form).find('INPUT#student-birthday').val().trim(),
+                'parent_id': $(form).find('INPUT#parent_id').val().trim(),
+                'register_branch_id': $(form).find('INPUT#register_branch_id').val().trim(),
+                'dependent_branch_id': $(form).find('INPUT#dependent_branch_id').val().trim(),
+                'staff_id': $(form).find('INPUT#staff_id').val().trim(),
+                'register_note': $(form).find('textarea#register_note').val().trim()
+            },
+            'assessment': {
+                'assessment_date': assessment_date,
+                'assessment_result': $(form).find('INPUT#assessment_result').val().trim(),
+                'teacher_id': $(form).find('INPUT#assessment_teacher_id').val().trim(),
+                'trial_class_id': $(form).find('INPUT#assessment_teacher_id').val().trim()
+            }
+        };
+
+        post('/api/student/save', data, function (response) {
+            console.log(response);
+        });
+    };
+
+    var save_activities = function save_activities() {
+        var form = $('DIV#box_history');
+        var time = $(form).find('INPUT#start_time').val().trim();
+        var data = {
+            'student_id': student_id,
+            'act_type': $(form).find('SELECT#act_type').val(),
+            'start_time': time == '' ? null : moment(time).format("YYYY-MM-DD HH:mm:ss"),
+            'note': $(form).find('INPUT#note').val().trim()
+        };
+
+        post('/api/student/save-activity', data, function (response) {
+            get_activities();
+        });
+
+        $(form).find('SELECT#act_type').val('');
+        $(form).find('INPUT#start_time').val('');
+        $(form).find('INPUT#note').val('');
+    };
+
+    var save = function save() {
+        save_profile();
+    };
+
+    var set_primary_parent = function set_primary_parent(parent) {
+        student_data.profile.parent = parent;
+        fill_profile(student_data.profile);
+        fill_parent_list(student_data.parents);
+        tab_activate($(tab_col).find('a[data-tab="profile"]'));
+    };
+
+    var init = function init() {
+        student_id = get_url_param('student_id');
+        if (student_id == null) {
+            console.log('NO DATA');
+            return false;
+        }
+
+        $('FORM#frmStudent').find('INPUT#student_id').val(student_id);
+
+        var form = $('FORM#frmStudent');
+        for (var i = 1; i <= 6; i++) {
+            var opt = $('<option></option>', { text: activity_types[i], value: i });
+            $(form).find('SELECT#act_type').append(opt);
+        }
+
+        get_student_profile(function () {
+            get_activities();
+            get_parent_list();
+            get_exam_results();
+            get_teacher_reports();
+            get_payment_history();
+            get_attendance_history();
+        });
+    };
+
+    __webpack_require__(169);
+    init();
+});
+
+/***/ }),
+/* 169 */
+/***/ (function(module, exports) {
+
+$(function () {
+    var modal_branch = $('DIV#branch-select-modal');
+    var modal_teacher = $('DIV#teacher-select-modal');
+    var modal_classes = $('DIV#classes-select-modal');
+    var modal_staff = $('DIV#staff-select-modal');
+
+    var table_branch = null;
+    var table_teacher = null;
+    var table_classes = null;
+    var table_staff = null;
+
+    var branch_list_render = function branch_list_render() {
+        if ($.fn.dataTable.isDataTable('DIV#branch-select-modal TABLE#branch-list-student')) {
+            table_student = $(modal_branch).find('TABLE#branch-list-student').DataTable();
+            table_branch.ajax.reload();
+        } else {
+            table_branch = $(modal_branch).find('TABLE#branch-list-student').DataTable({
+                language: datatable_language,
+                "ordering": false,
+                "lengthChange": false,
+                ajax: {
+                    url: '/api/branch/list'
+                },
+                columns: [{
+                    data: null
+                }, {
+                    data: 'branch_name'
+                }, {
+                    data: 'address'
+                }, {
+                    data: null
+                }],
+                "columnDefs": [{
+                    "targets": [0],
+                    "data": null,
+                    "defaultContent": ''
+                }, {
+                    targets: 3,
+                    "data": null,
+                    "visible": true,
+                    "defaultContent": '<span class="badge bg-dark" style="margin-left:30px"><a title="Chọn trung tâm" class="text-white branch-selection" style="color:white;cursor: pointer">Chọn</a></span>'
+                }]
+            });
+
+            table_branch.on('order.dt search.dt', function () {
+                table_branch.column(0, {
+                    search: 'applied',
+                    order: 'applied'
+                }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+            table_branch.on('click', 'a.branch-selection', function () {
+                var data = table_branch.row($(this).parents('tr')).data();
+                var form = $('FORM#frmStudent');
+                var target_prefix = $(modal_branch).find('INPUT#target-form-control[type="hidden"]').val();
+                $(form).find('INPUT#' + target_prefix + '_id').val(data.id);
+                $(form).find('INPUT#branch-' + target_prefix + '_name').val(data.branch_name);
+                $(modal_branch).modal('hide');
+            });
+        }
+    };
+
+    var classes_list_render = function classes_list_render() {
+        if ($.fn.dataTable.isDataTable('DIV#classes-select-modal TABLE#classes-list-student')) {
+            table_classes = $(modal_classes).find('TABLE#classes-list-student').DataTable();
+        } else {
+            table_classes = $(modal_classes).find('TABLE#classes-list-student').DataTable({
+                language: datatable_language,
+                "ordering": false,
+                "lengthChange": false,
+                ajax: {
+                    url: '/api/get-list-class'
+                },
+                columns: [{
+                    data: null
+                }, {
+                    data: 'name'
+                }, {
+                    data: 'branch_name'
+                }, {
+                    data: null
+                }],
+                "columnDefs": [{
+                    "targets": [0],
+                    "data": null,
+                    "defaultContent": ''
+                }, {
+                    targets: 3,
+                    "data": null,
+                    "visible": true,
+                    "defaultContent": '<span class="badge bg-dark" style="margin-left:30px"><a title="Chọn lớp" class="text-white classes-selection" style="color:white;cursor: pointer">Chọn</a></span>'
+                }]
+            });
+
+            table_classes.on('order.dt search.dt', function () {
+                table_classes.column(0, {
+                    search: 'applied',
+                    order: 'applied'
+                }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+            table_classes.on('click', 'a.classes-selection', function () {
+                var data = table_classes.row($(this).parents('tr')).data();
+                var form = $('FORM#frmStudent');
+                $(form).find('INPUT#assessment_trial_class_id').val(data.id);
+                $(form).find('INPUT#trial_class').val(data.name);
+                $(modal_classes).modal('hide');
+            });
+        }
+    };
+
+    var teacher_list_render = function teacher_list_render() {
+        if ($.fn.dataTable.isDataTable('DIV#teacher-select-modal TABLE#teacher-list-student')) {
+            table_teacher = $(modal_teacher).find('TABLE#teacher-list-student').DataTable();
+        } else {
+            table_teacher = $(modal_teacher).find('TABLE#teacher-list-student').DataTable({
+                language: datatable_language,
+                "ordering": false,
+                "lengthChange": false,
+                ajax: {
+                    url: '/api/list-teachers'
+                },
+                columns: [{
+                    data: null
+                }, {
+                    data: 'name'
+                }, {
+                    data: 'email'
+                }, {
+                    data: null
+                }],
+                "columnDefs": [{
+                    "targets": [0],
+                    "data": null,
+                    "defaultContent": ''
+                }, {
+                    targets: 3,
+                    "data": null,
+                    "visible": true,
+                    "defaultContent": '<span class="badge bg-dark" style="margin-left:30px"><a title="Chọn lớp" class="text-white teacher-selection" style="color:white;cursor: pointer">Chọn</a></span>'
+                }]
+            });
+
+            table_teacher.on('order.dt search.dt', function () {
+                table_teacher.column(0, {
+                    search: 'applied',
+                    order: 'applied'
+                }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+            table_teacher.on('click', 'a.teacher-selection', function () {
+                var data = table_teacher.row($(this).parents('tr')).data();
+                var form = $('FORM#frmStudent');
+                $(form).find('INPUT#assessment_teacher_id').val(data.id);
+                $(form).find('INPUT#assessment_teacher').val(data.name);
+                $(modal_teacher).modal('hide');
+            });
+        }
+    };
+
+    var staff_list_render = function staff_list_render() {
+        if ($.fn.dataTable.isDataTable('DIV#staff-select-modal TABLE#staff-list-student')) {
+            table_staff = $(modal_staff).find('TABLE#staff-list-student').DataTable();
+        } else {
+            table_staff = $(modal_staff).find('TABLE#staff-list-student').DataTable({
+                language: datatable_language,
+                "ordering": false,
+                "lengthChange": false,
+                ajax: {
+                    url: '/api/get-list-staff'
+                },
+                columns: [{
+                    data: null
+                }, {
+                    data: 'name'
+                }, {
+                    data: 'email'
+                }, {
+                    data: 'branch_name'
+                }, {
+                    data: null
+                }],
+                "columnDefs": [{
+                    "targets": [0],
+                    "data": null,
+                    "defaultContent": ''
+                }, {
+                    targets: 4,
+                    "data": null,
+                    "visible": true,
+                    "defaultContent": '<span class="badge bg-dark" style="margin-left:30px"><a title="Chọn lớp" class="text-white staff-selection" style="color:white;cursor: pointer">Chọn</a></span>'
+                }]
+            });
+
+            table_staff.on('order.dt search.dt', function () {
+                table_staff.column(0, {
+                    search: 'applied',
+                    order: 'applied'
+                }).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+
+            table_staff.on('click', 'a.staff-selection', function () {
+                var data = table_staff.row($(this).parents('tr')).data();
+                var form = $('FORM#frmStudent');
+                $(form).find('INPUT#staff_id').val(data.id);
+                console.log(data);
+                $(form).find('INPUT#dependent_staff_name').val(data.name);
+                $(modal_staff).modal('hide');
+            });
+        }
+    };
+
+    var events_binding = function events_binding() {
+        $('A#btn_register_branch').on('click', function (e) {
+            $(modal_branch).find('INPUT#target-form-control[type="hidden"]').val('register_branch');
+            modal_branch.modal('show');
+        });
+
+        $('A#btn_dependent_branch').on('click', function (e) {
+            $(modal_branch).find('INPUT#target-form-control[type="hidden"]').val('dependent_branch');
+            modal_branch.modal('show');
+        });
+
+        $('A#btn_staff').on('click', function (e) {
+            modal_staff.modal('show');
+        });
+
+        $('A#btn_trial_class').on('click', function (e) {
+            modal_classes.modal('show');
+        });
+
+        $('A#btn_teacher').on('click', function (e) {
+            modal_teacher.modal('show');
+        });
+
+        modal_branch.on('show.bs.modal', function (e) {
+            branch_list_render();
+        });
+
+        modal_classes.on('show.bs.modal', function (e) {
+            classes_list_render();
+        });
+
+        modal_teacher.on('show.bs.modal', function (e) {
+            teacher_list_render();
+        });
+
+        modal_staff.on('show.bs.modal', function (e) {
+            staff_list_render();
+        });
+    };
+
+    events_binding();
+});
+
+/***/ }),
+/* 170 */
+/***/ (function(module, exports) {
+
+$(function () {
+
+    if ($('#timeTableClass').length == 0) return false;
+
+    var url_string = window.location.href;
+    var url = new URL(url_string);
+    var id = url.searchParams.get("classid");
+    function getTimeEnd(data, type, row) {
+        var d = moment(data.time, 'HH:mm:ss').add(data.duration, 'hour').format('HH:mm:ss');
+        return d;
+    }
+    function getDayAndDate(data, type, dataToSet) {
+        return data.date + "<br>" + data.week_days;
+    }
+    var tableTimetable = $('#timeTableClass').DataTable({
+        "columnDefs": [{
+            "searchable": false,
+            "orderable": false,
+            "targets": 0
+        }],
+        "order": [[1, 'asc']],
+        ajax: {
+            url: 'api/get-list-timetable',
+            data: { id: id },
+            dataSrc: 'data'
+        },
+        columns: [{ data: null }, {
+            data: getDayAndDate,
+            render: function render(data, type, row) {
+                var day;
+                switch (row.week_days) {
+                    case 0:
+                        day = "Chủ nhật";
+                        break;
+                    case 1:
+                        day = "Thứ hai";
+                        break;
+                    case 2:
+                        day = "Thứ ba";
+                        break;
+                    case 3:
+                        day = "Thứ tư";
+                        break;
+                    case 4:
+                        day = "Thứ năm";
+                        break;
+                    case 5:
+                        day = "Thứ sáu";
+                        break;
+                    case 6:
+                        day = "Thứ bảy";
+                }
+                return row.date + "<br>" + day;
+            }
+        }, { data: 'time', name: 'time' }, { data: getTimeEnd }, {
+            'data': null,
+            'render': function render(data, type, row) {
+                return '<button timetableID=\"' + row.id + '\" title=\"Sửa thời khóa biểu\"' + 'class=\"btn btn-warning editTimetable\"><i class=\"fa fa-pencil\" ' + 'aria-hidden=\"true\"></i>' + '</button> <button classID=\"' + row.class_id + '\" timetableID=\"' + row.id + '\" ' + 'class="rollCallPage btn btn-success" ' + 'title="Điểm danh"><i class="fa fa-sticky-note" ' + 'aria-hidden="true"></i></button>';
+            }
+        }]
+    });
+
+    tableTimetable.on('order.dt search.dt', function () {
+        tableTimetable.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+            cell.innerHTML = i + 1;
+        });
+    }).draw();
+
+    jQuery.datetimepicker.setLocale('vi');
+    $('#change-date').datetimepicker({
+        format: 'Y-m-d',
+        timepicker: false,
+        minDate: '-1970-01-1'
+    });
+    $('#change-time').datetimepicker({
+        format: 'H:i',
+        datepicker: false,
+        allowTimes: ['07:30', '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00']
+    });
+
+    $(document).on('click', '.editTimetable', function () {
+        var id = $(this).attr('timetableID');
+        $.ajax({
+            type: 'get',
+            url: "api/edit-timetable",
+            data: { id: id },
+            success: function success(response) {
+                $('#edit-timetable').modal('show');
+                $('#change-date').val(response['data'][0].date);
+                $('#change-time').val(response['data'][0].time);
+                $('#getClass_id').val(response['data'][0].class_id);
+                $('#update-timetable1').attr('data-id', response['data'][0].id);
+            }
+        });
+    });
+
+    $('#update-timetable1').click(function (e) {
+        e.preventDefault();
+        var id = $(this).attr('data-id');
+        var time = $('#change-time').val();
+        var date = $('#change-date').val();
+        var class_id = $('#getClass_id').val();
+        $.ajax({
+            method: "POST",
+            url: "api/update-timetable",
+            data: { id: id, date: date, time: time, class_id: class_id },
+            success: function success(response) {
+                tableTimetable.ajax.reload();
+                $('#edit-timetable').modal('hide');
+            }
+        });
+    });
+
+    $(document).on('click', '.rollCallPage', function () {
+        var idOfTimetable = $(this).attr('timetableID');
+        localStorage.setItem("idOfTimetable", idOfTimetable);
+        window.location.href = asset + "rollcall";
+    });
+});
+
+/***/ }),
+/* 171 */
+/***/ (function(module, exports) {
+
+$(function () {
+    if ($('#table-rollcall').length == 0) return false;
+
+    var timetable_id = localStorage.getItem("idOfTimetable");
+    var tableRollCall = $('#table-rollcall').DataTable({
+        "columnDefs": [{
+            "searchable": false,
+            "orderable": false,
+            "targets": 0
+        }],
+        "order": [[1, 'asc']],
+        ajax: {
+            url: 'api/get-list-roll-call-student',
+            data: { timetable_id: timetable_id },
+            dataSrc: 'data'
+        },
+        columns: [{ data: null }, { data: 'student_code', name: 'student_code' }, { data: 'name', name: 'name' }, {
+            'render': function render(data, type, row) {
+                var tmp = row.status == 0 ? 'checked' : "";
+                var tmp1 = row.status == 1 ? 'checked' : "";
+                var tmp2 = row.status == 2 ? 'checked' : "";
+                var tmp3 = row.status == 3 ? 'checked' : "";
+                return '<label class="container1">Đ' + '<input class="rol" studentID=\"' + row.id + '\" ' + tmp + ' value="0" type="radio" name=\"' + row.id + '\">' + '<span class="checkmark"></span>' + '</label>' + '<label class="container1">P' + '<input class="rol" studentID=\"' + row.id + '\" ' + tmp1 + ' value="1" type="radio" name=\"' + row.id + '\">' + '<span class="checkmark"></span>' + '</label>' + '<label class="container1">M' + '<input class="rol" studentID=\"' + row.id + '\" ' + tmp2 + ' value="2" type="radio" name=\"' + row.id + '\">' + '<span class="checkmark"></span>' + '</label>' + '<label class="container1">V' + '<input class="rol" studentID=\"' + row.id + '\" ' + tmp3 + ' value="3" type="radio" name=\"' + row.id + '\">' + '<span class="checkmark"></span>' + '</label>';
+            }
+        }, {
+            'render': function render(data, type, row) {
+                if (row.note == null) {
+                    return '';
+                } else {
+                    return row.note;
+                }
+            }
+        }, {
+            'render': function render(data, type, row) {
+                return '<button rolID="' + row.rol_id + '" class="show-note btn btn-success" ' + 'title="Nhập ghi chú">' + '<i class="fa fa-newspaper-o" aria-hidden="true"></i></button>';
+            }
+        }]
+    });
+
+    tableRollCall.on('order.dt search.dt', function () {
+        tableRollCall.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+            cell.innerHTML = i + 1;
+        });
+    }).draw();
+
+    $(document).on('change', '.rol', function (e) {
+        e.preventDefault();
+        var student_id = $(this).attr('studentID');
+        var status = $('input[name=' + student_id + ']:checked').val();
+        $.ajax({
+            method: "POST",
+            url: "api/roll-call-student",
+            data: { status: status, student_id: student_id, timetable_id: timetable_id },
+            success: function success(response) {
+                tableRollCall.ajax.reload();
+            }
+        });
+    });
+
+    $(document).on('click', '.show-note', function () {
+        $('#enter-note').modal('show');
+        var id = $(this).attr('rolID');
+        $('#rollID').val(id);
+    });
+
+    $('#update-note').click(function (e) {
+        e.preventDefault();
+        var note = $('#note1').val();
+        var id = $('#rollID').val();
+        $.ajax({
+            method: "POST",
+            url: "api/update-note",
+            data: { id: id, note: note },
+            success: function success(response) {
+                $('#enter-note').modal('hide');
+                $('#enter-note').on('hidden.bs.modal', function () {
+                    $(this).find('form')[0].reset();
+                });
+                tableRollCall.ajax.reload();
+            }
+        });
+    });
+});
+
+/***/ }),
+/* 172 */
+/***/ (function(module, exports) {
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+$(function () {
+	if ($('#list-holiday').length == 0) return false;
+	var tableHoliday = $('#list-holiday').DataTable({
+		"columnDefs": [{
+			"searchable": false,
+			"orderable": false,
+			"targets": 0
+		}],
+		"order": [[1, 'asc']],
+		ajax: {
+			url: 'api/get-list-holiday',
+			dataSrc: 'data'
+		},
+		columns: [{ data: null }, { data: 'holiday', name: 'holiday' }, {
+			'data': null,
+			'render': function render(data, type, row) {
+				return '<button holidayID=\"' + row.id + '\" title=\"xóa ngày nghỉ\" ' + 'class=\"deleteHoliday btn btn-danger\"><i class=\"fa fa-trash\" ' + 'aria-hidden=\"true\"></i></button>';
+			}
+		}]
+	});
+
+	tableHoliday.on('order.dt search.dt', function () {
+		tableHoliday.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+			cell.innerHTML = i + 1;
+		});
+	}).draw();
+
+	$('.add-holiday').click(function () {
+		$('#add-holiday').modal('show');
+	});
+
+	var formAddHoliday = $('#form-add-holiday');
+	formAddHoliday.validate(_defineProperty({
+		rules: {
+			"holiday": {
+				required: true,
+				date: true
+			}
+		},
+		messages: {
+			"holiday": {
+				required: "Bắt buộc nhập ngày",
+				date: "Hãy nhập đúng định dạng ngày"
+			}
+		},
+		highlight: function highlight(element, errorClass) {
+			$(element).closest(".form-group").addClass("has-error");
+		},
+		unhighlight: function unhighlight(element, errorClass) {
+			$(element).closest(".form-group").removeClass("has-error");
+		},
+		errorPlacement: function errorPlacement(error, element) {
+			error.appendTo(element.parent().next());
+		}
+	}, 'errorPlacement', function errorPlacement(error, element) {
+		if (element.attr("type") == "checkbox") {
+			element.closest(".form-group").children(0).prepend(error);
+		} else error.insertAfter(element);
+	}));
+
+	$('#store-holiday').click(function (e) {
+		e.preventDefault();
+		var holiday = $('#holiday').val();
+		if (formAddHoliday.valid()) {
+			$.ajax({
+				method: "POST",
+				url: 'api/add-holiday',
+				data: { holiday: holiday },
+				success: function success(response) {
+					$('#add-holiday').modal('hide');
+					$('#add-holiday').on('hidden.bs.modal', function () {
+						$(this).find('form')[0].reset();
+					});
+					tableHoliday.ajax.reload();
+				}
+			});
+		}
+	});
+
+	$(document).on('click', '.deleteHoliday', function () {
+		var id = $(this).attr('holidayID');
+		swal({
+			title: "Bạn có chắc muốn xóa?",
+			text: "Bạn sẽ không thể khôi phục lại bản ghi này!",
+			icon: "warning",
+			buttons: true,
+			dangerMode: true
+		}).then(function (willDelete) {
+			if (willDelete) {
+				$.ajax({
+					method: "POST",
+					url: 'api/delete-holiday',
+					data: { id: id },
+					success: function success(response) {
+						tableHoliday.ajax.reload();
+					}
+				});
+			}
+		});
+	});
+
+	jQuery.datetimepicker.setLocale('vi');
+	$('#holiday').datetimepicker({
+		format: 'Y-m-d',
+		timepicker: false,
+		minDate: '-1970-01-1'
+	});
+});
+
+/***/ }),
+/* 173 */
+/***/ (function(module, exports) {
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+$(document).on({
+    ajaxStart: function ajaxStart() {
+        $('div.modal#modal-class').find('div.modal-footer > button#create-class').button('loading');
+        $('div.modal#modal-class').find('div.modal-footer > button#create-class').prop('disabled', true);
+        $('DIV#modal-class FORM#form-class').closest('.form-group').prop('disabled', true);
+    },
+    ajaxStop: function ajaxStop() {
+        $('div.modal#modal-class').find('div.modal-footer > button#create-class').prop('disabled', false);
+        $('div.modal#modal-class').find('div.modal-footer > button#create-class').button('reset');
+        $('DIV#modal-class FORM#form-class').closest('.form-group').prop('disabled', false);
+    }
+});
+
+//require('./attendance.js');
+
+$(function () {
+    if ($('TABLE#list_class').length > 0) {
+
+        var form = $('DIV#modal-class FORM#form-class');
+        var attendance_modal = $('DIV#attendance-modal');
+
+        var table_act_buttons = '<button type="button" title="Danh sách lớp" class="list-student-class btn btn-sm btn-info"><i class="fa fa-address-book-o" aria-hidden="true"></i></button>\
+                            <button type="button"  title="Thời Khóa Biểu" class="show-timetable btn btn-sm bg-purple"><i class="fa fa-calendar-times-o" aria-hidden="true"></i></button>\
+                            <button type="button" title="Sửa thông tin lớp" class="edit-class btn btn-sm btn-primary"><i title="Sửa thông tin lớp" class="fa fa-pencil-square-o" aria-hidden="true"></i></button>\
+                            <button type="button" title="Điểm danh" class="attendance-class btn btn-sm btn-warning"><i class="fa fa-check" aria-hidden="true"></i></button>';
+        // <button type="button" title="Xoá lớp" class="delete-class btn btn-sm btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>';
+
+        var vietnamese_weekday = {
+            'mon': 'T2',
+            'tue': 'T3',
+            'wed': 'T4',
+            'thu': 'T5',
+            'fri': 'T6',
+            'sat': 'T7',
+            'sun': 'CN'
+        };
+
+        var vietnamese_weekday_full = {
+            'mon': 'Thứ 2',
+            'tue': 'Thứ 3',
+            'wed': 'Thứ 4',
+            'thu': 'Thứ 5',
+            'fri': 'Thứ 6',
+            'sat': 'Thứ 7',
+            'sun': 'Chủ nhật'
+        };
+
+        var date_range_time_table = $('DIV#modal-time-table DIV.modal-body INPUT#reservation').daterangepicker({
+            "locale": {
+                "format": "YYYY-MM-DD",
+                "separator": " - ",
+                "applyLabel": "Chọn",
+                "cancelLabel": "Đóng",
+                "fromLabel": "From",
+                "toLabel": "To",
+                "customRangeLabel": "Custom",
+                "daysOfWeek": ["CN", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7"],
+                "monthNames": ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"],
+                "firstDay": 1
+            },
+            autoUpdateInput: false
+        });
+
+        date_range_time_table.on('apply.daterangepicker', function (e, picker) {
+            $(e.target).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+            $('DIV#modal-time-table DIV.modal-body INPUT#start_date').val(picker.startDate.format('YYYY-MM-DD'));
+            $('DIV#modal-time-table DIV.modal-body INPUT#end_date').val(picker.endDate.format('YYYY-MM-DD'));
+            $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').prop('disabled', false);
+        });
+
+        $('DIV#modal-time-table DIV.modal-body INPUT#reservation').on('change', function (e) {
+            if ($(e.target).val() == '') {
+                $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').prop('disabled', true);
+            }
+        });
+
+        $('SELECT.select2[id="teacher_id"]').select2({
+            placeholder: "Chọn giáo viên"
+        });
+
+        var create_class_validate_rules = {
+            class_name: {
+                required: true
+            },
+            /* max_seat: {
+                required: true,
+                number: true,
+                min: 1
+            }, */
+            start_date: {
+                required: true,
+                date: true
+            }
+        };
+
+        var create_class_validate_messages = {
+            class_name: {
+                required: "Tên lớp không được trống!"
+            },
+            /* max_seat: {
+                required: "Số học sinh tối đa không được trống!",
+                number: "Hãy nhập giá trị là số lớn hơn 0!",
+                min: "Hãy nhập giá trị là số lớn hơn 0!"
+            }, */
+            start_date: {
+                required: 'Ngày bắt đầu không được trống!',
+                date: 'Hãy nhập giá trị là một ngày!'
+            }
+        };
+
+        $(form).find('INPUT[id^="time_start_"]').each(function () {
+            var name_postfix = this.name.substr(this.name.length - 3, 3);
+            create_class_validate_rules[this.name] = {
+                required: 'input#schedule_' + name_postfix + '[type="checkbox"]:checked'
+            };
+            create_class_validate_messages[this.name] = {
+                required: 'Nhập giờ bắt đầu!'
+            };
+        });
+
+        $(form).find('INPUT[id^="time_end_"]').each(function () {
+            var name_postfix = this.name.substr(this.name.length - 3, 3);
+            create_class_validate_rules[this.name] = {
+                required: 'input#schedule_' + name_postfix + '[type="checkbox"]:checked'
+            };
+            create_class_validate_messages[this.name] = {
+                required: 'Nhập giờ kết thúc!'
+            };
+        });
+
+        $(form).find('INPUT[id^="schedule_"]').on('click', function (e) {
+            var name_postfix = $(e.target).prop('id').substr($(e.target).prop('id').length - 3, 3);
+            if ($(e.target)[0].checked == false) {
+                $(form).find('INPUT[id^="time_start_' + name_postfix + '"]').val('');
+                $(form).find('INPUT[id^="time_end_' + name_postfix + '"]').val('');
+            }
+        });
+
+        var create_class_validator = form.validate(_defineProperty({
+            debug: true,
+            success: "valid",
+            rules: create_class_validate_rules,
+            messages: create_class_validate_messages,
+            highlight: function highlight(element, errorClass) {
+                $(element).closest(".form-group").addClass("has-error");
+            },
+            unhighlight: function unhighlight(element, errorClass) {
+                $(element).closest(".form-group").removeClass("has-error");
+            },
+            errorPlacement: function errorPlacement(error, element) {
+                error.appendTo(element.parent().next());
+            }
+        }, 'errorPlacement', function errorPlacement(error, element) {
+            if (element.attr("type") == "checkbox") {
+                element.closest(".form-group").children(0).prepend(error);
+            } else error.insertAfter(element);
+        }));
+
+        var table_classes = $('TABLE#list_class').DataTable({
+            language: datatable_language,
+            "order": [[1, 'asc']],
+            ajax: {
+                url: 'api/get-list-class',
+                dataSrc: 'data'
+            },
+            columns: [{
+                data: null
+            }, {
+                data: "name",
+                name: "name"
+            }, {
+                data: "teacher_name",
+                name: "teacher_name"
+            }, {
+                data: "seat_count",
+                name: "seat_count"
+            }, {
+                data: "start_date",
+                name: "start_date",
+                render: function render(data, type, row) {
+                    return data != null ? moment(data).format("DD/MM/YYYY") : '';
+                }
+            }, {
+                data: "schedule",
+                name: "schedule",
+                render: function render(data, type, row) {
+                    return show_schedule(data);
+                }
+            }, {
+                data: "status",
+                name: "status",
+                render: function render(data, type, row) {
+                    var obj_status = {
+                        0: 'Chưa khai giảng',
+                        1: 'Chưa khai giảng',
+                        2: 'Đang học',
+                        3: 'Kết thúc'
+                    };
+                    return obj_status[data];
+                }
+            }],
+            'autoWidth': false,
+            "columnDefs": [{
+                "searchable": false,
+                "orderable": false,
+                "targets": [7],
+                "data": null,
+                "defaultContent": table_act_buttons
+            }]
+
+        });
+
+        table_classes.on('order.dt search.dt', function () {
+            table_classes.column(0, {
+                search: 'applied',
+                order: 'applied'
+            }).nodes().each(function (cell, i) {
+                cell.innerHTML = i + 1;
+            });
+        }).draw();
+
+        table_classes.on('click', 'button.list-student-class', function () {
+            var data = table_classes.row($(this).parents('tr')).data();
+            $('DIV#modal-list-student-class DIV.modal-body INPUT#class_id').val(data.id);
+            $('DIV#modal-list-student-class DIV.modal-dialog .modal-title').html('Danh sách học sinh của lớp <strong>' + data.name + '</strong>');
+            $('DIV#modal-list-student-class').modal('show');
+        });
+
+        table_classes.on('click', 'button.show-timetable', function () {
+            var data = table_classes.row($(this).parents('tr')).data();
+            $('DIV#modal-time-table DIV.modal-body INPUT#class_id').val(data.id);
+            $('DIV#modal-time-table').modal('show');
+        });
+
+        table_classes.on('click', 'button.attendance-class', function () {
+            var data = table_classes.row($(this).parents('tr')).data();
+            $(attendance_modal).find('H3.modal-title').html('Điểm danh cho lớp ' + data.name);
+            $(attendance_modal).find('input#current-class-id').val(data.id);
+            $(attendance_modal).find('input#current-class-name').val(data.name);
+            open_attendance(data.id);
+        });
+
+        table_classes.on('click', 'button.edit-class', function () {
+            var data = table_classes.row($(this).parents('tr')).data();
+            edit_class(data.id);
+        });
+
+        $('DIV#modal-class UL.status_select A').on('click', function (e) {
+            var text = $(e.target).text();
+            var val = $(e.target).data('value');
+            $('DIV#modal-class BUTTON.status_selected').text(text);
+            $('DIV#modal-class INPUT#status[type="hidden"]').val(val);
+        });
+
+        $("DIV.content-class BUTTON#button-create-class").click(function () {
+            reset_class_form('create');
+            $('DIV#modal-class').modal('show');
+        });
+
+        var show_schedule = function show_schedule(json_schedule) {
+            var schedule = json_schedule ? JSON.parse(json_schedule) : null;
+            var result = [];
+
+            if (schedule != null) {
+                for (var wd in schedule) {
+                    schedule[wd].start = schedule[wd].start.length < 5 ? '0' + schedule[wd].start : schedule[wd].start;
+                    schedule[wd].finish = schedule[wd].finish.length < 5 ? '0' + schedule[wd].finish : schedule[wd].finish;
+                    result.push('<div>' + vietnamese_weekday[wd] + ': ' + schedule[wd].start + ' - ' + schedule[wd].finish + '</div>');
+                }
+
+                return result.join('');
+            }
+            return '';
+        };
+
+        var reset_class_form = function reset_class_form(mode, data) {
+            var modal_title = '';
+            $(form)[0].reset();
+            create_class_validator.resetForm();
+            form.find(".error").removeClass("error");
+
+            if (mode == 'create') {
+                modal_title = 'Thêm mới lớp học';
+                $(form).find('INPUT').val('');
+                $($(form).find('SELECT OPTION')[0]).prop('selected', 'selected');
+                $(form).find('INPUT[id^="schedule_"][type="checkbox"]').prop('checked', false);
+                status_on_select(1);
+            } else if (mode == 'edit') {
+                modal_title = 'Sửa thông tin lớp học';
+                $(form).find('INPUT#id').val(data.id);
+                $(form).find('INPUT#class_name').val(data.name);
+                $(form).find('INPUT#class_code').val(data.class_code);
+                $(form).find('SELECT#teacher_id').val(data.teacher_id).change();
+                $(form).find('INPUT#start_date').val(data.start_date);
+                $(form).find('INPUT#max_seat').val(data.max_seat);
+                $(form).find('INPUT#status').val(data.status);
+                $(form).find('INPUT#course_name').val(data.course_name);
+
+                status_on_select(data.status);
+
+                $(form).find('INPUT[id^="schedule_"][type="checkbox"]').prop('checked', false);
+                $(form).find('INPUT[id^="time_start_"]').val('');
+                $(form).find('INPUT[id^="time_end_"]').val('');
+
+                if (data.schedule != '') {
+                    var class_schedule = JSON.parse(data.schedule);
+                    for (var wd in class_schedule) {
+                        class_schedule[wd].start = class_schedule[wd].start.length < 5 ? '0' + class_schedule[wd].start : class_schedule[wd].start;
+                        class_schedule[wd].finish = class_schedule[wd].finish.length < 5 ? '0' + class_schedule[wd].finish : class_schedule[wd].finish;
+                        $(form).find('INPUT#schedule_' + wd).prop('checked', true);
+                        $(form).find('INPUT#time_start_' + wd).val(moment('1900-01-01 ' + class_schedule[wd].start).format("LT"));
+                        $(form).find('INPUT#time_end_' + wd).val(moment('1900-01-01 ' + class_schedule[wd].finish).format("LT"));
+                    }
+                }
+            }
+
+            $('div.modal#modal-class DIV.modal-header .modal-title').html(modal_title);
+        };
+
+        var edit_class = function edit_class(class_id) {
+            $.ajax({
+                dataType: 'json',
+                type: 'get',
+                url: 'api/edit-class',
+                data: {
+                    id: class_id
+                },
+                success: function success(response) {
+                    reset_class_form('edit', response);
+                    $('DIV#modal-class').modal("show");
+                }
+            });
+        };
+
+        var status_on_select = function status_on_select(value) {
+            var text = $('DIV#modal-class UL.status_select A.class_status_' + value).text();
+            $('DIV#modal-class BUTTON.status_selected').text(text);
+            $('DIV#modal-class INPUT#status[type="hidden"]').val(value);
+        };
+
+        var get_student_of_class = function get_student_of_class(class_id) {
+            $.ajax({
+                dataType: 'json',
+                type: 'get',
+                url: 'api/get-list-class-student',
+                data: {
+                    id: class_id
+                },
+                success: function success(response) {
+                    var students_list = response.data != undefined ? response.data : [];
+                    render_student_of_class(students_list, class_id);
+                }
+            });
+        };
+
+        var get_student_not_assign = function get_student_not_assign(class_id) {
+            $('SELECT#student_not_assigned').empty();
+            $.ajax({
+                dataType: 'json',
+                type: 'get',
+                url: 'api/get-student-not-in-class',
+                data: {
+                    id: class_id
+                },
+                success: function success(response) {
+                    var students_list = response.data != undefined ? response.data : [];
+                    if (students_list.length > 0) {
+                        for (var i = 0; i < students_list.length; i++) {
+                            var display_text = students_list[i].name + ' (' + (students_list[i].birthday != null ? students_list[i].birthday : students_list[i].birthyear) + ')';
+                            var opt = $('<option></option>', {
+                                value: students_list[i].id,
+                                text: display_text
+                            });
+                            $('SELECT#student_not_assigned').append(opt);
+                        }
+                    }
+                }
+            });
+        };
+
+        var render_student_of_class = function render_student_of_class(students, class_id) {
+            var table = $('DIV.modal#modal-list-student-class TABLE#table-student-of-class');
+            $(table).find('tbody').empty();
+
+            if (students.length == 0) {
+                $(table).find('tbody').append($('<tr><td colspan="4" style="text-align:center">Không có học sinh trong lớp</td></tr>'));
+                return;
+            }
+
+            for (var i = 0; i < students.length; i++) {
+                var tr = $('<tr></tr>', {
+                    'data-student-id': students[i].id
+                });
+                var td_stt = $('<td></td>', {
+                    text: i + 1
+                });
+                var td_name = $('<td></td>', {
+                    text: students[i].name
+                });
+                var td_birthday = $('<td></td>', {
+                    text: students[i].birthday != '' ? students[i].birthday : students[i].birthyear
+                });
+
+                var button = $('<button></button>', {
+                    type: 'button',
+                    title: 'Xoá khỏi danh sách lớp',
+                    class: 'btn btn-sm btn-danger',
+                    'data-student': students[i].id,
+                    'data-class': class_id
+                }).append($('<i class="fa fa-trash-o" aria-hidden="true"></i>'));
+                var td_act = $('<td></td>', {
+                    text: ''
+                }).append(button);
+
+                $(button).bind('click', function (e) {
+                    console.log(e.currentTarget);
+                    var student_id = $(e.currentTarget).data('student');
+                    var class_id = $(e.currentTarget).data('class');
+                    remove_student_class(class_id, student_id);
+                });
+
+                $(tr).append(td_stt, td_name, td_birthday, td_act);
+                $(table).find('tbody').append(tr);
+            }
+        };
+
+        var remove_student_class = function remove_student_class(class_id, student_id) {
+            $.ajax({
+                dataType: 'json',
+                type: 'get',
+                url: 'api/delete-student-class',
+                data: {
+                    class_id: class_id,
+                    student_id: student_id
+                },
+                success: function success(response) {
+                    var table = $('DIV.modal#modal-list-student-class TABLE#table-student-of-class');
+                    var tr = $(table).find('tbody tr td button[data-student="' + student_id + '"]').parent().parent().remove();
+
+                    if ($(table).find('tbody tr').length == 0) {
+                        $(table).find('tbody').append($('<tr><td colspan="4" style="text-align:center">Không có học sinh trong lớp</td></tr>'));
+                    }
+                }
+            });
+        };
+
+        var calc_time_table = function calc_time_table(class_id, start_date, end_date, callback) {
+            data = {
+                'class_id': class_id,
+                'start_date': start_date,
+                'end_date': end_date
+            };
+
+            $.ajax({
+                url: 'api/calc_time_table',
+                dataType: 'json',
+                data: data,
+                type: 'GET',
+                success: function success(response) {
+                    time_table_init(response.data);
+                }
+            }).done(function () {
+                callback();
+            });
+        };
+
+        var time_table_init = function time_table_init(list) {
+            var my_lang = datatable_language;
+            my_lang.emptyTable = 'Chưa có thời khoá biểu';
+            var buttons = '<button type="button" title="Điểm danh" class="btn btn-warning attendance"><i class="fa fa-check-square-o"></i></button>\
+            <button type="button" title="Nhật ký" class="btn btn-info teaching-diary"><i class="fa fa-sticky-note"></i></button>\
+            <button type="button" title="Chỉnh sửa" class="btn bg-olive edit"><i class="fa fa-pencil-square-o"></i></button>';
+
+            var table_timetable = null;
+            if ($.fn.dataTable.isDataTable('DIV#modal-time-table TABLE#table-timetable')) {
+                table_timetable = $('DIV#modal-time-table TABLE#table-timetable').DataTable();
+                table_timetable.clear();
+                table_timetable.rows.add(list);
+                table_timetable.draw();
+            } else {
+                var table_timetable = $('DIV#modal-time-table TABLE#table-timetable').DataTable({
+                    data: list,
+                    language: my_lang,
+                    'autoWidth': false,
+                    "ordering": false,
+                    "searching": false,
+                    "bPaginate": true,
+                    "columnDefs": [{
+                        "searchable": false,
+                        "orderable": false
+                    }, {
+                        targets: [4],
+                        "data": null,
+                        "visible": true,
+                        "defaultContent": buttons
+                    }],
+                    columns: [{
+                        data: null
+                    }, {
+                        data: "date",
+                        name: "date",
+                        render: function render(data, type, row) {
+                            var wd = '<span> (' + vietnamese_weekday_full[row.week_day] + ')</span>';
+                            if (row.week_day == 'sun') wd = '<span style="color:red"> (' + vietnamese_weekday_full[row.week_day] + ')</span>';
+                            return data + wd;
+                        }
+                    }, {
+                        render: function render(data, type, row) {
+                            return row.start + ' - ' + row.finish;
+                        }
+                    }, {
+                        data: "teacher_name",
+                        name: "teacher_name"
+                    }, {
+                        data: null
+                    }]
+                });
+
+                table_timetable.on('draw.dt order.dt search.dt', function () {
+                    table_timetable.column(0, {}).nodes().each(function (cell, i) {
+                        cell.innerHTML = i + 1;
+                    });
+                }).draw();
+
+                table_timetable.on('click', 'button.attendance', function () {
+                    var data = table_timetable.row($(this).parents('tr')).data();
+                    console.log('rollcall', data);
+                });
+
+                table_timetable.on('click', 'button.teaching-diary', function () {
+                    var data = table_timetable.row($(this).parents('tr')).data();
+                    console.log('teaching-diary', data);
+                });
+
+                table_timetable.on('click', 'button.edit', function () {
+                    var data = table_timetable.row($(this).parents('tr')).data();
+                    console.log('edit', data);
+                });
+            }
+        };
+
+        $('DIV#modal-class BUTTON#create-class').on('click', function (e) {
+            var is_valid = form.valid();
+            var id = $(form).find('INPUT#id').val();
+            var data = {};
+            var endpoint = id != '' ? "api/edit-class" : "api/create-class";
+            if (is_valid) {
+                data = {
+                    'name': $(form).find('INPUT#class_name').val(),
+                    'class_code': $(form).find('INPUT#class_code').val(),
+                    'teacher_id': $(form).find('SELECT#teacher_id').val(),
+                    'course_name': $(form).find('INPUT#course_name').val(),
+                    'start_date': $(form).find('INPUT#start_date').val(),
+                    'max_seat': $(form).find('INPUT#max_seat').val(),
+                    'status': $(form).find('INPUT#status').val(),
+                    'schedule': render_schedule()
+                };
+
+                if (id != '') data.id = id;
+
+                $.ajax({
+                    url: endpoint,
+                    method: "POST",
+                    data: data,
+                    success: function success(response) {
+                        table_classes.ajax.reload();
+                        $('DIV#modal-class').modal("hide");
+                    }
+                });
+            }
+        });
+
+        $('DIV#modal-time-table DIV.modal-footer BUTTON#btnSave').on('click', function (e) {
+            if ($.fn.dataTable.isDataTable('DIV#modal-time-table TABLE#table-timetable')) {
+                $(e.target).prop('disabled', true);
+                $(e.target).button('loading');
+
+                var table_timetable = $('DIV#modal-time-table TABLE#table-timetable').DataTable();
+                var data = {
+                    'class_id': $('DIV#modal-time-table DIV.modal-body INPUT#class_id').val(),
+                    'start_date': $('DIV#modal-time-table DIV.modal-body INPUT#start_date').val(),
+                    'end_date': $('DIV#modal-time-table DIV.modal-body INPUT#end_date').val(),
+                    'time_table': []
+                };
+                var time_table = [];
+                table_timetable.data().each(function (d) {
+                    time_table.push(d);
+                });
+
+                data.time_table = time_table;
+
+                var url = 'api/save-time-table';
+                $.ajax({
+                    url: url,
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    method: 'POST',
+                    success: function success(response) {
+                        $(e.target).prop('disabled', false);
+                        $(e.target).button('reset');
+                        $('DIV#modal-time-table').modal('hide');
+                    }
+                });
+            }
+        });
+
+        $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').on('click', function (e) {
+            var class_id = $('DIV#modal-time-table DIV.modal-body INPUT#class_id').val();
+            var start_date = $('DIV#modal-time-table DIV.modal-body INPUT#start_date').val();
+            var end_date = $('DIV#modal-time-table DIV.modal-body INPUT#end_date').val();
+
+            $(e.target).button('loading');
+            $(e.target).prop('disabled', true);
+
+            calc_time_table(class_id, start_date, end_date, function () {
+                $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').prop('disabled', false);
+                $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').button('reset');
+            });
+        });
+
+        $('DIV#modal-list-student-class').on('show.bs.modal', function (e) {
+            var class_id = $('DIV#modal-list-student-class DIV.modal-body INPUT#class_id').val();
+            get_student_not_assign(class_id);
+            get_student_of_class(class_id);
+        });
+
+        $('DIV#modal-list-student-class').on('hide.bs.modal', function (e) {
+            var table = $('DIV.modal#modal-list-student-class TABLE#table-student-of-class');
+            $(table).find('tbody').empty();
+            $(table).find('tbody').append($('<tr><td colspan="4" style="text-align:center">Không có học sinh trong lớp</td></tr>'));
+        });
+
+        $('DIV#modal-class').on('show.bs.modal', function (e) {
+            create_class_validator.resetForm();
+            form.find(".has-error").removeClass("has-error");
+            form.find(".has-error").removeClass("has-error");
+        });
+
+        $('DIV#modal-time-table').on('hide.bs.modal', function (e) {
+            if ($.fn.dataTable.isDataTable('DIV#modal-time-table TABLE#table-timetable')) {
+                var table_timetable = $('DIV#modal-time-table TABLE#table-timetable').DataTable();
+                table_timetable.clear();
+                table_timetable.rows.add([]);
+                table_timetable.draw();
+            }
+        });
+
+        $('DIV#modal-time-table').on('show.bs.modal', function (e) {
+            var start_date = $('DIV#modal-time-table DIV.modal-body INPUT#start_date').val();
+            var end_date = $('DIV#modal-time-table DIV.modal-body INPUT#end_date').val();
+            var class_id = $('DIV#modal-time-table DIV.modal-body INPUT#class_id').val();
+
+            if ($('DIV#modal-time-table DIV.modal-body INPUT#start_date').val() != '') $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').prop('disabled', false);else $('DIV#modal-time-table DIV.modal-body BUTTON#btnCalc').prop('disabled', true);
+
+            $.ajax({
+                url: 'api/get-list-timetable',
+                method: 'GET',
+                data: {
+                    'class_id': class_id
+                },
+                success: function success(response) {
+                    time_table_init(response.data);
+                }
+            });
+        });
+
+        $('DIV#modal-list-student-class BUTTON#btnAssignClass').on('click', function (e) {
+            var students = $("SELECT#student_not_assigned").val();
+            var class_id = $('DIV#modal-list-student-class DIV.modal-body INPUT#class_id').val();
+            if (students.length > 0) {
+                assign_to_class(class_id, students);
+            }
+        });
+
+        var render_schedule = function render_schedule() {
+            var form = $('DIV#modal-class FORM#form-class');
+            var container = $(form).find('DIV.row#schedule_row');
+
+            var weekday_check_prefix = 'schedule_';
+            var weekday_time_start_prefix = 'time_start_';
+            var weekday_time_end_prefix = 'time_end_';
+
+            var schedule = {
+                'mon': {},
+                'tue': {},
+                'wed': {},
+                'thu': {},
+                'fri': {},
+                'sat': {},
+                'sun': {}
+            };
+            for (var wd in schedule) {
+                if ($(container).find('INPUT#' + weekday_check_prefix + wd)[0].checked) {
+                    var start_time = $(container).find('INPUT#' + weekday_time_start_prefix + wd).val();
+                    var end_time = $(container).find('INPUT#' + weekday_time_end_prefix + wd).val();
+                    schedule[wd] = {
+                        'start': moment(start_time, "h:mm A").format("HH:mm"),
+                        'finish': moment(end_time, "h:mm A").format("HH:mm")
+                    };
+                } else {
+                    schedule[wd] = {};
+                }
+            }
+
+            return schedule;
+        };
+
+        var assign_to_class = function assign_to_class(class_id, students) {
+            var data = {
+                class_id: class_id,
+                students: students
+            };
+            $.ajax({
+                url: "api/add-student-to-class",
+                method: "POST",
+                data: data,
+                success: function success(response) {
+                    if (response.code == 0) {
+                        get_student_not_assign(class_id);
+                        get_student_of_class(class_id);
+                    } else {
+                        get_student_not_assign(class_id);
+                        get_student_of_class(class_id);
+                    }
+                }
+            });
+        };
+
+        $("SELECT#teacher_id").empty();
+
+        $("SELECT#student_not_assigned").select2({
+            placeholder: "Chọn học sinh",
+            minimumInputLength: 3
+        });
+
+        var contaner = $('DIV#attendance-modal');
+
+        var attendanceCheck = function attendanceCheck(timetable_id, student_id, status, callback) {
+            var data = {
+                'timetable_id': timetable_id,
+                'student_id': student_id,
+                'status': status
+            };
+
+            $.ajax({
+                url: '/api/class/attendance/check',
+                dataType: 'json',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function success(response) {
+                    if (callback != undefined && response.code == 1) {
+                        callback(response.data);
+                    }
+                    console.log('response', response);
+                }
+            });
+        };
+
+        var get_attendance_list = function get_attendance_list(class_id, callback) {
+            $.ajax({
+                url: '/api/class/attendance?class_id=' + class_id,
+                dataType: 'json',
+                method: 'GET',
+                contentType: 'application/json',
+                success: function success(response) {
+                    if (callback != undefined && response.code == 1) {
+                        callback(response.data);
+                    }
+                    console.log('response', response);
+                }
+            });
+        };
+
+        var get_attendance_by_timetable = function get_attendance_by_timetable(timetable_id, callback) {
+            $.ajax({
+                url: '/api/class/attendance/by-date?timetable_id=' + timetable_id,
+                dataType: 'json',
+                method: 'GET',
+                contentType: 'application/json',
+                success: function success(response) {
+                    if (callback != undefined && response.code == 1) {
+                        callback(response.data);
+                    }
+                    console.log('response', response);
+                }
+            });
+        };
+
+        var get_timetable = function get_timetable(class_id, callback) {
+            $.ajax({
+                url: '/api/get-list-timetable?class_id=' + class_id,
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function success(response) {
+                    if (callback != undefined && response.code == 1) {
+                        callback(response.data, class_id);
+                    }
+                    console.log('response', response);
+                }
+            });
+        };
+
+        var render_attendance_table = function render_attendance_table(list) {
+            var list_container = $(contaner).find('TABLE#attendance-table tbody');
+            list_container.empty();
+            if (list.length > 0) {
+                for (var i = 0; i < list.length; i++) {
+                    var tr = $('<tr></tr>');
+                    var item = list[i];
+                    var td_no = $('<th></th>', { text: i + 1, 'style': 'text-align:center' });
+                    $(tr).append(td_no);
+                    for (var attr in item) {
+                        if (attr == 'id' || attr == 'status') continue;
+                        var style = '';
+                        if (attr == 'present' || attr == 'absent' || attr == 'late') {
+                            style = 'text-align:center';
+                        }
+                        var td = $('<td></td>', { text: item[attr], 'style': style });
+                        $(tr).append(td);
+                    }
+
+                    var td_input_present = $('<td></td>', { 'style': 'text-align:center', html: '<input type="radio" data-student="' + item.id + '" value="1" name="' + item.id + '_status">' });
+                    var td_input_absent = $('<td></td>', { 'style': 'text-align:center', html: '<input type="radio" data-student="' + item.id + '" value="-1" name="' + item.id + '_status">' });
+                    var td_input_late = $('<td></td>', { 'style': 'text-align:center', html: '<input type="radio" data-student="' + item.id + '" value="-2" name="' + item.id + '_status">' });
+
+                    $(tr).append(td_input_present, td_input_absent, td_input_late);
+                    $(list_container).append(tr);
+
+                    var radio_present = $(td_input_present).find('INPUT[name="' + item.id + '_status"]');
+                    var radio_absent = $(td_input_absent).find('INPUT[name="' + item.id + '_status"]');
+                    var radio_late = $(td_input_late).find('INPUT[name="' + item.id + '_status"]');
+
+                    $(radio_present).on('click', function (e) {
+                        var timetable_id = $(attendance_modal).find('SELECT#timetable_id').val();
+                        var student_id = $(e.target).data('student');
+                        var status = $(e.target).val();
+                        attendanceCheck(timetable_id, student_id, status);
+                    });
+
+                    $(radio_absent).on('click', function (e) {
+                        var timetable_id = $(attendance_modal).find('SELECT#timetable_id').val();
+                        var student_id = $(e.target).data('student');
+                        var status = $(e.target).val();
+                        attendanceCheck(timetable_id, student_id, status);
+                    });
+
+                    $(radio_late).on('click', function (e) {
+                        var timetable_id = $(attendance_modal).find('SELECT#timetable_id').val();
+                        var student_id = $(e.target).data('student');
+                        var status = $(e.target).val();
+                        attendanceCheck(timetable_id, student_id, status);
+                    });
+                }
+            }
+        };
+
+        var open_attendance = function open_attendance(class_id) {
+            get_timetable(class_id, function (timetables, class_id) {
+                if (timetables.length > 0) {
+                    var timetable_id = $(attendance_modal).find('SELECT#timetable_id');
+                    $(timetable_id).empty();
+                    for (var i = 0; i < timetables.length; i++) {
+                        var timetable_opt = $('<option></option>', { value: timetables[i].id, text: timetables[i].date + ' (' + timetables[i].start + ' - ' + timetables[i].finish + ')' });
+                        $(timetable_id).append(timetable_opt);
+                    }
+
+                    get_attendance_list(class_id, function (list) {
+                        render_attendance_table(list);
+                        $(attendance_modal).modal('show');
+                    });
+                } else {
+                    var msg = 'Lớp ' + $(attendance_modal).find('input#current-class-name').val() + ' chưa thiết lập thời khoá biểu!';
+                    alert(msg);
+                    return;
+                }
+            });
+        };
+
+        var fill_attendance = function fill_attendance(data) {
+            $(attendance_modal).find('TABLE#attendance-table TBODY INPUT[type="radio"]').prop('checked', false);
+            if (data.length > 0) {
+                for (var i = 0; i < data.length; i++) {
+                    var attendance = data[i];
+                    $(attendance_modal).find('TABLE#attendance-table TBODY INPUT[type="radio"][data-student="' + attendance.student_id + '"][value="' + attendance.status + '"]').prop('checked', true);
+                }
+            }
+        };
+
+        $(attendance_modal).on('show.bs.modal', function (e) {
+            $(attendance_modal).find('SELECT#timetable_id').trigger('change');
+        });
+
+        $(attendance_modal).find('SELECT#timetable_id').change(function (e) {
+            var timetable_id = $(attendance_modal).find('SELECT#timetable_id').val();
+            get_attendance_by_timetable(timetable_id, function (data) {
+                fill_attendance(data);
+            });
+        });
+
+        $.ajax({
+            dataType: 'json',
+            type: 'get',
+            url: 'api/get-name-teacher',
+            success: function success(response) {
+                $.each(response.data, function () {
+                    $("DIV#modal-class SELECT#teacher_id").append("<option value=" + this.id + ">" + this.name + "</option>");
+                });
+            }
+        });
+
+        $(form).find('INPUT[type="text"][id^="time_start_"],INPUT[type="text"][id^="time_end_"]').timepicker({
+            showInputs: false,
+            template: 'dropdown'
+        }).on('show.timepicker', function (e) {
+            if ($(e.target).val() != '') {
+                $(e.target).timepicker('setTime', $(e.target).val());
+            } else {
+                $(e.target).val(e.time.value);
+            }
+        }).on('changeTime.timepicker', function (e) {
+            $(e.target).parent().find('label').remove();
+        });
+    }
+});
+
+/***/ }),
+/* 174 */
+/***/ (function(module, exports) {
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+$(function () {
+	if ($('#list-exam').length == 0) return false;
+	var url_string = window.location.href;
+	var url = new URL(url_string);
+	var classid = url.searchParams.get("classid");
+	var Table = $('#list-exam').DataTable({
+		"columnDefs": [{
+			"searchable": false,
+			"orderable": false,
+			"targets": 0
+		}],
+		"order": [[1, 'asc']],
+		paging: true,
+		searching: true,
+		"bDestroy": true,
+		ajax: {
+			url: 'api/get-list-exam',
+			data: { classid: classid },
+			dataSrc: 'data'
+		},
+		"columns": [{ "data": null }, { "data": "name" }, { "data": "name_class" }, { "data": "start_day" }, { "data": "duration" }, { "data": "note" }, {
+			"data": function data(_data, type, full) {
+				return ' <button type="button" examid="' + _data.id + '"  class="button-set-point btn btn-success">\
+					<i class="fa fa-tasks"  aria-hidden="true" title="Thêm điểm kỳ thi"></i></button>\
+					<button type="button" examid="' + _data.id + '"  class="button-get-point btn btn-info">\
+					<i class="fa fa-eye"  aria-hidden="true" title="Xem điểm kỳ thi"></i></button>\
+					<button id="edit" type="button" class="button-edit-exam btn btn-warning"  examid="' + _data.id + '">\
+					<i class="fa fa-pencil-square" aria-hidden="true" title="Sửa kỳ thi"></i></button>\
+					<button type="button" examid="' + _data.id + '" class="button-del-exam btn btn-danger">\
+					<i class="fa fa-trash-o"  aria-hidden="true" title="Xóa kỳ thi"></i></button>';
+			}
+		}]
+
+	});
+	Table.on('order.dt search.dt', function () {
+		Table.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+			cell.innerHTML = i + 1;
+		});
+	}).draw();
+	jQuery.datetimepicker.setLocale('vi');
+	$('#start_day').datetimepicker({
+		format: 'Y-m-d H:i',
+		minDate: '-1970-01-1'
+	});
+});
+$(document).on('click', '.button-add', function (e) {
+	e.preventDefault();
+	$('#model-add').modal('show');
+	$("#name-class").empty();
+	$.ajax({
+		dataType: 'json',
+		type: 'get',
+		url: 'api/get-nameclass',
+		success: function success(response) {
+			$.each(response.data, function () {
+				$("#name-class").append("<option id='class_id' value=" + this.id + ">" + this.name + "</option>");
+			});
+		}
+	});
+	//validate form    
+	$('#form-add-exam').validate(_defineProperty({
+		rules: {
+			name: {
+				required: true,
+				minlength: 10
+
+			},
+			start_day: {
+				required: true
+				//	min : "date('Y-m-d')",
+
+			},
+			duration: {
+				required: true,
+				number: true
+
+			},
+			note: {
+				required: true,
+				minlength: 10
+			}
+		},
+		messages: {
+			name: {
+				required: "Không được đế trống",
+				minlength: "Không đủ 10 ký tự"
+			},
+			start_day: {
+				required: "Không được đế trống"
+				//	min : "Ngày phải lớn hơn ngày hiện tại"
+			},
+			duration: {
+				required: "Không được đế trống",
+				number: "Phải là số"
+			},
+			note: {
+				required: "Không được đế trống",
+				minlength: "Không đủ 10 ký tự"
+			}
+		},
+		highlight: function highlight(element, errorClass) {
+			$(element).closest(".form-group").addClass("has-error");
+		},
+		unhighlight: function unhighlight(element, errorClass) {
+			$(element).closest(".form-group").removeClass("has-error");
+		},
+		errorPlacement: function errorPlacement(error, element) {
+			error.appendTo(element.parent().next());
+		}
+	}, 'errorPlacement', function errorPlacement(error, element) {
+		if (element.attr("type") == "checkbox") {
+			element.closest(".form-group").children(0).prepend(error);
+		} else error.insertAfter(element);
+	}));
+});
+//add exam
+
+//add exam      
+$('#add-exam').click(function (event) {
+	event.preventDefault();
+	var name = $('#name').val();
+	var start_day = $('#start_day').val();
+	var duration = $('#duration').val();
+	var note = $('#note').val();
+	var class_id = $('#class_id').val();
+	if ($('#form-add-exam').valid()) {
+		$.ajax({
+			url: "api/create-exam",
+			method: "POST",
+			data: { name: name, start_day: start_day, duration: duration, note: note, class_id: class_id },
+			dataType: "json",
+			success: function success(response) {
+				$("#model-add").modal("hide");
+				//$('#form-add-exam').dialog("close")
+				$('#list-exam').DataTable().ajax.reload();
+				$("#form-add-exam")[0].reset();
+			}
+		});
+	}
+});
+//del exam
+$(document).on('click', '.button-del-exam', function () {
+	var _this = this;
+
+	swal({
+		title: "Bạn có chắc muốn xóa?",
+		text: "Bạn sẽ không thể khôi phục lại bản ghi này!",
+		icon: "warning",
+		buttons: true,
+		dangerMode: true
+	}).then(function (willDelete) {
+		if (willDelete) {
+			var id = $(_this).attr("examid");
+			console.log(id);
+			$.ajax({
+				dataType: 'json',
+				method: "POST",
+				url: 'api/delete-exam',
+				data: { id: id },
+				success: function success(response) {
+					if (response.code == 1) {
+						$('#list-exam').DataTable().ajax.reload();
+					}
+				}
+			});
+		}
+	});
+});
+//edit exam edit-exam
+$(document).on('click', '.button-edit-exam', function (e) {
+	e.preventDefault();
+	$('#edit-exam').modal('show');
+	var id = $(this).attr("examid");
+	$("#ename_class").empty();
+	jQuery.datetimepicker.setLocale('vi');
+	$('#estart_day').datetimepicker({
+		format: 'Y-m-d H:i',
+		minDate: '-1970-01-1'
+	});
+	$.ajax({
+		dataType: 'json',
+		method: "POST",
+		url: 'api/edit-exam',
+		data: { id: id },
+		resetForm: true,
+		success: function success(response) {
+			$('#update-exam-hd').val(id);
+			var classid = response.data['class_id'];
+			$('#ename').val(response.data['name']);
+			$('#estart_day').val(response.data['start_day']);
+			$('#eduration').val(response.data['duration']);
+			$('#enote').val(response.data['note']);
+			$.ajax({
+				dataType: 'json',
+				type: 'get',
+				url: 'api/get-nameclass',
+				success: function success(response) {
+					$.each(response.data, function () {
+						if (this.id == classid) {
+							$("#ename_class").append("<option id='class_id' value=" + this.id + " selected>" + this.name + "</option>");
+						} else {
+							$("#ename_class").append("<option id='class_id' value=" + this.id + ">" + this.name + "</option>");
+						}
+					});
+				}
+			});
+		}
+	});
+	//validate form exam
+	$('#form-edit-exam').validate(_defineProperty({
+		rules: {
+			name: {
+				required: true,
+				minlength: 10
+
+			},
+			start_day: {
+				required: true
+				//	min : "date('Y-m-d')",
+
+			},
+			duration: {
+				required: true,
+				number: true
+
+			},
+			note: {
+				required: true,
+				minlength: 10
+			}
+		},
+		messages: {
+			name: {
+				required: "Không được đế trống",
+				minlength: "Không đủ 10 ký tự"
+			},
+			start_day: {
+				required: "Không được đế trống"
+				//	min : "Ngày phải lớn hơn ngày hiện tại"
+			},
+			duration: {
+				required: "Không được đế trống",
+				number: "Phải là số"
+			},
+			note: {
+				required: "Không được đế trống",
+				minlength: "Không đủ 10 ký tự"
+			}
+		},
+		highlight: function highlight(element, errorClass) {
+			$(element).closest(".form-group").addClass("has-error");
+		},
+		unhighlight: function unhighlight(element, errorClass) {
+			$(element).closest(".form-group").removeClass("has-error");
+		},
+		errorPlacement: function errorPlacement(error, element) {
+			error.appendTo(element.parent().next());
+		}
+	}, 'errorPlacement', function errorPlacement(error, element) {
+		if (element.attr("type") == "checkbox") {
+			element.closest(".form-group").children(0).prepend(error);
+		} else error.insertAfter(element);
+	}));
+});
+
+//update exam   
+// Update      
+$('#update-exam').click(function (event) {
+	event.preventDefault();
+	var id = $('#update-exam-hd').val();
+	var name = $('#ename').val();
+	var start_day = $('#estart_day').val();
+	var duration = $('#eduration').val();
+	var note = $('#enote').val();
+	var class_id = $('#ename_class').val();
+	if ($('#form-edit-exam').valid()) {
+		$.ajax({
+			url: "api/update-exam",
+			method: "POST",
+			data: { id: id, name: name, start_day: start_day, duration: duration, note: note, class_id: class_id },
+			dataType: "json",
+			success: function success(response) {
+				$("#edit-exam").modal("hide");
+				$('#list-exam').DataTable().ajax.reload();
+				if (response.code == 1) {
+					$('#form-edit-exam').trigger("reset");
+				}
+				document.getElementById("form-edit-exam").reset();
+			}
+		});
+	}
+});
+//set-Point
+$(document).on('click', '.button-set-point', function () {
+	$('#model-add-setPoint').modal('show');
+	var examid = $(this).attr("examid");
+	var aTable = $('#set-point').DataTable({
+		"columnDefs": [{
+			"searchable": false,
+			"orderable": false,
+			"targets": 0
+		}],
+		"order": [[1, 'asc']],
+		paging: false,
+		searching: false,
+		"bDestroy": true,
+		"autoWidth": false,
+
+		ajax: {
+			url: 'api/get-liststudent',
+			data: { examid: examid },
+			dataSrc: 'data'
+		},
+		"columns": [{ "data": "id" }, { "data": "student_code" }, { "data": "name" }, {
+			"data": function data(_data2, type, full) {
+				return "<input min='1' max='10' value='' id='ip-set-point' class='set-point' type='number'>\
+					<input type='hidden' name='' value='" + _data2.exams_id + "' id='get_examid'>";
+			}
+		}]
+	});
+	aTable.on('order.dt search.dt', function () {
+		aTable.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+			cell.innerHTML = i + 1;
+		});
+	}).draw();
+});
+
+// Thêm điểm
+
+$('#setPoint').on('click', function () {
+	var student_id = [];
+	var point = [];
+	var exams_id = [];
+	var pointnull = 0;
+
+	for ($i = 0; $i < $('#set-point').DataTable().data().count(); $i++) {
+		student_id.push($('#set-point').DataTable().cell($i, 0).data());
+		point.push($('#set-point').DataTable().cell($i, 3).nodes().to$().find('input').val());
+		exams_id.push($('#get_examid').val());
+		if ($('#set-point').DataTable().cell($i, 3).nodes().to$().find('input').val() == "") {
+			pointnull++;
+		}
+	}
+	if (pointnull == 0) {
+		$.ajax({
+			url: "api/add-pointexam",
+			method: "POST",
+			data: { student_id: student_id, point: point, exams_id: exams_id },
+			dataType: "json",
+			success: function success(response) {
+
+				$("#model-add-setPoint").modal("hide");
+				//		 $('#model-add-setPoint').DataTable().ajax.reload();
+				if (response.code == 1) {
+					$('#ip-set-point').prop('readonly', true);
+				}
+			}
+		});
+	}
+});
+
+// Xem Điểm
+$(document).on('click', '.button-get-point', function () {
+	$('#model-get-Point').modal('show');
+	var examid = $(this).attr("examid");
+	var tablesetpoint = $('#get-point').DataTable({
+		paging: false,
+		searching: false,
+		"bDestroy": true,
+		"autoWidth": false,
+		ajax: {
+			url: 'api/get-pointexam',
+			data: { examid: examid },
+			dataSrc: 'data'
+		},
+		"columns": [{ "data": "student_code" }, { "data": "student_name" }, {
+			"data": function data(_data3, type, full) {
+				return "<input min='1' max='10' value='" + _data3.point + "' id='" + _data3.student_id + "' class='set-point-update'  type='number'>\
+					<input type='hidden' name='' value='" + examid + "' id='get_examid'>";
+			}
+		}, {
+			"data": function data(_data4, type, full) {
+				return '<button type="button" student_id="' + _data4.student_id + '"  class="button-update-point btn btn-info">\
+					<i class="fa fa-check-square" aria-hidden="true"></i></button>';
+			}
+		}]
+	});
+});
+//update điểm
+
+$(document).on('click', '.button-update-point', function () {
+	var student_id = $(this).attr("student_id");
+	var examination_id = $('#get_examid').val();
+	var point = $('#' + student_id).val();
+	$('#form-add-exam').validate(_defineProperty({
+		rules: {
+			point: {
+				required: true
+			}
+		},
+		messages: {
+			point: {
+				required: "Không được đế trống"
+			}
+		},
+		highlight: function highlight(element, errorClass) {
+			$(element).closest(".form-group").addClass("has-error");
+		},
+		unhighlight: function unhighlight(element, errorClass) {
+			$(element).closest(".form-group").removeClass("has-error");
+		},
+		errorPlacement: function errorPlacement(error, element) {
+			error.appendTo(element.parent().next());
+		}
+	}, 'errorPlacement', function errorPlacement(error, element) {
+		if (element.attr("type") == "checkbox") {
+			element.closest(".form-group").children(0).prepend(error);
+		} else error.insertAfter(element);
+	}));
+	if ($('#form-edit-exam').valid()) {
+
+		$.ajax({
+			url: "api/update-point",
+			method: "POST",
+			data: { examination_id: examination_id, student_id: student_id, point: point },
+			dataType: "json",
+			success: function success(response) {
+				$('#get-point').DataTable().ajax.reload();
+			}
+		});
+	}
+});
+
+/***/ }),
+/* 175 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_stream__ = __webpack_require__(176);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_stream___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_stream__);
+
+
+$(document).ready(function () {
+
+	/**
+ *validate form add
+ */
+	function validateEmail(email) {
+		var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		return re.test(email);
+	}
+
+	function getBranchList(currentBranchId) {
+		if ($('FORM#frmStaff').length == 0) return;
+
+		$.ajax('/api/branch/list', {
+			type: 'GET',
+			success: function success(response) {
+				var select = $('SELECT#branch_id');
+				$(select).find('OPTION').not(':first').remove();
+				if (response.data.length > 0) {
+					for (var i = 0; i < response.data.length; i++) {
+						var branch = response.data[i];
+						var opt = $('<option></option>', { value: branch.id, text: branch.branch_name });
+						if (currentBranchId == branch.id) $(opt).prop('selected', 'selected');
+						$(select).append(opt);
+					}
+				}
+			},
+			error: function error(e) {
+				console.log(e);
+			}
+		});
+	}
+
+	function validate() {
+		var isValid = false;
+		var $result = $("#errorEmail");
+		var email = $("#inputEmail").val();
+		var password = $('#inputPassword').val();
+		var password_1 = $('#inputPassword_1').val();
+		var name = $('#inputName').val();
+		var phoneNumber = $('#inputPhone').val();
+
+		$('SPAN.bell [id^="error"]').addClass('hidden');
+		var emailValid = validateEmail(email);
+		if (emailValid) {
+			isValid = true;
+			$result.addClass('hidden');
+		} else {
+			$result.removeClass('hidden');
+			isValid = false;
+		}
+		if (password.length <= 8 || password == "") {
+			$('#errorPassword').addClass('hidden');
+			isValid = true;
+		} else {
+			$('#errorPassword').removeClass('hidden');
+			isValid = false;
+		}
+
+		if (password != password_1) {
+			$('#errorPassword_1').removeClass('hidden');
+			isValid = true;
+		} else {
+			$('#errorPassword_1').addClass('hidden');
+			isValid = false;
+		}
+
+		if (name) {
+			$('#errorName').addClass('hidden');
+			isValid = true;
+		} else {
+			$('#errorName').removeClass('hidden');
+			isValid = false;
+		}
+
+		if (phoneNumber.length >= 15 || phoneNumber == "") {
+			$('#errorPhone').removeClass('hidden');
+			isValid = false;
+		} else {
+			$('#errorPhone').addClass('hidden');
+			isValid = true;
+		}
+
+		return isValid;
+	}
+
+	/*
+ * validate form edit password
+ **/
+	function validateForm() {
+		var password = $("#newPassword").val();
+		var newPassword1 = $('#newPassword1').val();
+		if (!password || password.length < 8) {
+			$("#errorPassword").css("display", "block");
+		} else {
+			$("#errorPassword").css("display", "none");
+		}
+		if (password == newPassword1) {
+			$("#q1").css("display", "none");
+		} else {
+			$("#errorPass_1").css("display", "block");
+		}
+	}
+
+	$("#submit").bind("click", validateForm);
+
+	/*
+ * ajax add staff
+ */
+	$('BUTTON#addStaff').click(function (event) {
+
+		var isValided = validate();
+		if (!isValided) {
+			return false;
+		}
+
+		var email = $('#inputEmail').val();
+		var password = $('#inputPassword').val();
+		var password_1 = $('#inputPassword_1').val();
+		var name = $('#inputName').val();
+		var gender = $('#inputGender').val();
+		var birthDate = $('#inputBirthDate').val();
+		var address = $('#inputAddress').val();
+		var phone = $('#inputPhone').val();
+		var branch_id = $('SELECT#branch_id').val();
+
+		var formData = new FormData();
+		formData.append('email', email);
+		formData.append('password', password);
+		formData.append('name', name);
+		formData.append('gender', gender);
+		formData.append('birth_date', birthDate);
+		formData.append('address', address);
+		formData.append('phone_number', phone);
+		formData.append('branch_id', branch_id);
+
+		$.ajax({
+			url: '/api/add-staff',
+			method: "POST",
+			contentType: false,
+			processData: false,
+			data: formData,
+			success: function success(response) {
+				//location.reload();
+				alert(response.message);
+			},
+			error: function error(e) {
+				alert("Can not add staff !!");
+			}
+		});
+	});
+
+	getBranchList(null);
+
+	if ($('TABLE#staff_list').length == 0) {
+		return false;
+	}
+
+	/*
+ * ajax get list staff
+ */
+	var t = $('TABLE#staff_list').DataTable({
+		"ajax": 'api/get-list-staff',
+		"responsive": true,
+		"columns": [{ "data": null }, { "data": "name" }, { "data": "email" }, {
+			"data": "gender",
+			render: function render(data, type, row) {
+				var gender;
+				switch (row.gender) {
+					case 0:
+						gender = "Nữ";
+						break;
+					case 1:
+						gender = "Nam";
+						break;
+					case 2:
+						gender = "Khác";
+						break;
+					default:
+						gender = "";
+						break;
+				}
+				return gender;
+			}
+
+		}, {
+			"render": function render(data, type, row, meta) {
+				return row.image ? '<img style=\"width:200px;\" src="' + img + row.image + '">' : '';
+			}
+		}, { "data": "birth_date" }, { "data": "address" }, { "data": "phone_number" }, { "data": null }],
+		// "columnDefs": [ ],
+		// "order": [[ 1, 'asc' ]],
+		"columnDefs": [{
+			"searchable": false,
+			"orderable": false,
+			"targets": 0
+		}, {
+			"targets": -1,
+			"data": null,
+			"defaultContent": "<button type='button' href=" + asset + "staff/edit" + " class=\"btn btn-warning _action fa fa-pencil-square-o\" title=\"Chỉnh sửa\" id=\"edit_staff\"></button>" + "<a href=\"#\" class=\"btn btn-danger _action fa fa-trash\" title=\"Xoa\" type=\"button\" id=\"delete\" ></a>" + "<a href=\"#\" title=\"Đôi mật khẩu\" class=\"btn btn-info _action fa fa-key\" data-toggle=\"modal\" data-target=\"#myModal\" id=\"change_password\"></a>"
+		}]
+	});
+	// var t = $('#example').DataTable()
+	t.on('order.dt search.dt', function () {
+		t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+			cell.innerHTML = i + 1;
+		});
+	}).draw();
+
+	$('TABLE#staff_list tbody').on('click', '#delete', function () {
+		var table = $('TABLE#staff_list').DataTable();
+		var data = table.row($(this).parents('tr')).data();
+		data = data.id;
+		var formData = new FormData();
+		formData.append('id', data);
+		swal({
+			title: "Bạn có chắc muốn xóa?",
+			text: "Bạn sẽ không thể khôi phục lại bản ghi này!",
+			icon: "warning",
+			buttons: true,
+			dangerMode: true
+		}).then(function (willDelete, data) {
+			if (willDelete) {
+				$.ajax({
+					url: '/api/delete-staff',
+					method: "POST",
+					contentType: false,
+					processData: false,
+					data: formData,
+					success: function success(response) {
+						location.reload();
+					}
+				});
+			}
+		});
+	});
+	$('TABLE#staff_list').on('click', '#change_password', function () {
+		var table = $('#example').DataTable();
+		var data = table.row($(this).parents('tr')).data();
+		data = data.id;
+		editPassword(data);
+	});
+
+	function editPassword(data) {
+		$('#formm').on('click', '#submit', function () {
+			var current_password_input = $('#currentPassword').val();
+			var new_password = $('#newPassword').val();
+			var new_password_1 = $('#newPassword1').val();
+			if (new_password == new_password_1 && new_password.length >= 8) {
+				var formData = new FormData();
+				formData.append('id', data);
+				formData.append('currentPassword', current_password_input);
+				formData.append('newPassword', new_password);
+				$.ajax({
+					url: '/api/edit-password-staff',
+					method: "POST",
+					contentType: false,
+					processData: false,
+					data: formData,
+					success: function success(response) {
+						alert(response.message);
+						location.reload();
+					},
+					error: function error(response) {
+						alert('Can not edit info this !!');
+						location.reload();
+					}
+				});
+			}
+		});
+	}
+
+	/*
+ * ajax edit staff
+ */
+	$('TABLE#staff_list').on('click', '#edit_staff', function () {
+		var table = $('TABLE#staff_list').DataTable();
+		var data = table.row($(this).parents('tr')).data();
+		//data = data.id;
+		if (typeof Storage !== "undefined") {
+			//localStorage.setItem("id", data);
+		} else {
+				//alert('Trình duyệt của bạn không hỗ trợ');
+			}
+	});
+});
+
+$('#editStaff_1').click(function (event) {
+	var id = localStorage.getItem("id");
+	var email = $('#inputEmail3').val();
+	var password = $('#inputPassword').val();
+	var password_1 = $('#inputPassword_1').val();
+	var name = $('#inputName').val();
+	var gender = $('#inputGender').val();
+	var birthDate = $('#inputBirthDate').val();
+	var address = $('#inputAddress').val();
+	var phone = $('#inputPhone').val();
+	if (email != "" && password != "" && name != "" && gender != "" && birthDate != "" && address != "" && password.length >= 8 && password == password_1 && $('#inputFile')[0].files[0]) {
+		var formData = new FormData();
+		formData.append('id', id);
+		formData.append('email', email);
+		formData.append('password', password);
+		formData.append('name', name);
+		formData.append('gender', gender);
+		formData.append('birth_date', birthDate);
+		formData.append('address', address);
+		formData.append('phone_number', phone);
+		formData.append("file", $('#inputFile')[0].files[0]);
+		$.ajax({
+			url: '/api/edit-staff',
+			method: "POST",
+			contentType: false,
+			processData: false,
+			data: formData,
+			success: function success(response) {
+				location.reload();
+				alert(response.message);
+			},
+			error: function error(e) {
+				alert("Can not edit staff !!");
+			}
+		});
+	} else {
+		alert('Thong tin dien vao khong hop le !!!');
+	}
+});
+
+/***/ }),
+/* 176 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+module.exports = Stream;
+
+var EE = __webpack_require__(9).EventEmitter;
+var inherits = __webpack_require__(3);
+
+inherits(Stream, EE);
+Stream.Readable = __webpack_require__(10);
+Stream.Writable = __webpack_require__(186);
+Stream.Duplex = __webpack_require__(187);
+Stream.Transform = __webpack_require__(188);
+Stream.PassThrough = __webpack_require__(189);
+
+// Backwards-compat with node 0.4.x
+Stream.Stream = Stream;
+
+
+
+// old-style streams.  Note that the pipe method (the only relevant
+// part of this class) is overridden in the Readable class.
+
+function Stream() {
+  EE.call(this);
+}
+
+Stream.prototype.pipe = function(dest, options) {
+  var source = this;
+
+  function ondata(chunk) {
+    if (dest.writable) {
+      if (false === dest.write(chunk) && source.pause) {
+        source.pause();
+      }
+    }
+  }
+
+  source.on('data', ondata);
+
+  function ondrain() {
+    if (source.readable && source.resume) {
+      source.resume();
+    }
+  }
+
+  dest.on('drain', ondrain);
+
+  // If the 'end' option is not supplied, dest.end() will be called when
+  // source gets the 'end' or 'close' events.  Only dest.end() once.
+  if (!dest._isStdio && (!options || options.end !== false)) {
+    source.on('end', onend);
+    source.on('close', onclose);
+  }
+
+  var didOnEnd = false;
+  function onend() {
+    if (didOnEnd) return;
+    didOnEnd = true;
+
+    dest.end();
+  }
+
+
+  function onclose() {
+    if (didOnEnd) return;
+    didOnEnd = true;
+
+    if (typeof dest.destroy === 'function') dest.destroy();
+  }
+
+  // don't leave dangling pipes when there are errors.
+  function onerror(er) {
+    cleanup();
+    if (EE.listenerCount(this, 'error') === 0) {
+      throw er; // Unhandled stream error in pipe.
+    }
+  }
+
+  source.on('error', onerror);
+  dest.on('error', onerror);
+
+  // remove all the event listeners that were added.
+  function cleanup() {
+    source.removeListener('data', ondata);
+    dest.removeListener('drain', ondrain);
+
+    source.removeListener('end', onend);
+    source.removeListener('close', onclose);
+
+    source.removeListener('error', onerror);
+    dest.removeListener('error', onerror);
+
+    source.removeListener('end', cleanup);
+    source.removeListener('close', cleanup);
+
+    dest.removeListener('close', cleanup);
+  }
+
+  source.on('end', cleanup);
+  source.on('close', cleanup);
+
+  dest.on('close', cleanup);
+
+  dest.emit('pipe', source);
+
+  // Allow for unix-like usage: A.pipe(B).pipe(C)
+  return dest;
+};
+
+
+/***/ }),
+/* 177 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+exports.byteLength = byteLength
+exports.toByteArray = toByteArray
+exports.fromByteArray = fromByteArray
+
+var lookup = []
+var revLookup = []
+var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
+
+var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+for (var i = 0, len = code.length; i < len; ++i) {
+  lookup[i] = code[i]
+  revLookup[code.charCodeAt(i)] = i
+}
+
+// Support decoding URL-safe base64 strings, as Node.js does.
+// See: https://en.wikipedia.org/wiki/Base64#URL_applications
+revLookup['-'.charCodeAt(0)] = 62
+revLookup['_'.charCodeAt(0)] = 63
+
+function getLens (b64) {
+  var len = b64.length
+
+  if (len % 4 > 0) {
+    throw new Error('Invalid string. Length must be a multiple of 4')
+  }
+
+  // Trim off extra bytes after placeholder bytes are found
+  // See: https://github.com/beatgammit/base64-js/issues/42
+  var validLen = b64.indexOf('=')
+  if (validLen === -1) validLen = len
+
+  var placeHoldersLen = validLen === len
+    ? 0
+    : 4 - (validLen % 4)
+
+  return [validLen, placeHoldersLen]
+}
+
+// base64 is 4/3 + up to two characters of the original data
+function byteLength (b64) {
+  var lens = getLens(b64)
+  var validLen = lens[0]
+  var placeHoldersLen = lens[1]
+  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
+}
+
+function _byteLength (b64, validLen, placeHoldersLen) {
+  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
+}
+
+function toByteArray (b64) {
+  var tmp
+  var lens = getLens(b64)
+  var validLen = lens[0]
+  var placeHoldersLen = lens[1]
+
+  var arr = new Arr(_byteLength(b64, validLen, placeHoldersLen))
+
+  var curByte = 0
+
+  // if there are placeholders, only get up to the last complete 4 chars
+  var len = placeHoldersLen > 0
+    ? validLen - 4
+    : validLen
+
+  for (var i = 0; i < len; i += 4) {
+    tmp =
+      (revLookup[b64.charCodeAt(i)] << 18) |
+      (revLookup[b64.charCodeAt(i + 1)] << 12) |
+      (revLookup[b64.charCodeAt(i + 2)] << 6) |
+      revLookup[b64.charCodeAt(i + 3)]
+    arr[curByte++] = (tmp >> 16) & 0xFF
+    arr[curByte++] = (tmp >> 8) & 0xFF
+    arr[curByte++] = tmp & 0xFF
+  }
+
+  if (placeHoldersLen === 2) {
+    tmp =
+      (revLookup[b64.charCodeAt(i)] << 2) |
+      (revLookup[b64.charCodeAt(i + 1)] >> 4)
+    arr[curByte++] = tmp & 0xFF
+  }
+
+  if (placeHoldersLen === 1) {
+    tmp =
+      (revLookup[b64.charCodeAt(i)] << 10) |
+      (revLookup[b64.charCodeAt(i + 1)] << 4) |
+      (revLookup[b64.charCodeAt(i + 2)] >> 2)
+    arr[curByte++] = (tmp >> 8) & 0xFF
+    arr[curByte++] = tmp & 0xFF
+  }
+
+  return arr
+}
+
+function tripletToBase64 (num) {
+  return lookup[num >> 18 & 0x3F] +
+    lookup[num >> 12 & 0x3F] +
+    lookup[num >> 6 & 0x3F] +
+    lookup[num & 0x3F]
+}
+
+function encodeChunk (uint8, start, end) {
+  var tmp
+  var output = []
+  for (var i = start; i < end; i += 3) {
+    tmp =
+      ((uint8[i] << 16) & 0xFF0000) +
+      ((uint8[i + 1] << 8) & 0xFF00) +
+      (uint8[i + 2] & 0xFF)
+    output.push(tripletToBase64(tmp))
+  }
+  return output.join('')
+}
+
+function fromByteArray (uint8) {
+  var tmp
+  var len = uint8.length
+  var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
+  var parts = []
+  var maxChunkLength = 16383 // must be multiple of 3
+
+  // go through the array every three bytes, we'll deal with trailing stuff later
+  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
+    parts.push(encodeChunk(
+      uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)
+    ))
+  }
+
+  // pad the end with zeros, but make sure to not forget the extra bytes
+  if (extraBytes === 1) {
+    tmp = uint8[len - 1]
+    parts.push(
+      lookup[tmp >> 2] +
+      lookup[(tmp << 4) & 0x3F] +
+      '=='
+    )
+  } else if (extraBytes === 2) {
+    tmp = (uint8[len - 2] << 8) + uint8[len - 1]
+    parts.push(
+      lookup[tmp >> 10] +
+      lookup[(tmp >> 4) & 0x3F] +
+      lookup[(tmp << 2) & 0x3F] +
+      '='
+    )
+  }
+
+  return parts.join('')
+}
+
+
+/***/ }),
+/* 178 */
+/***/ (function(module, exports) {
+
+exports.read = function (buffer, offset, isLE, mLen, nBytes) {
+  var e, m
+  var eLen = (nBytes * 8) - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var nBits = -7
+  var i = isLE ? (nBytes - 1) : 0
+  var d = isLE ? -1 : 1
+  var s = buffer[offset + i]
+
+  i += d
+
+  e = s & ((1 << (-nBits)) - 1)
+  s >>= (-nBits)
+  nBits += eLen
+  for (; nBits > 0; e = (e * 256) + buffer[offset + i], i += d, nBits -= 8) {}
+
+  m = e & ((1 << (-nBits)) - 1)
+  e >>= (-nBits)
+  nBits += mLen
+  for (; nBits > 0; m = (m * 256) + buffer[offset + i], i += d, nBits -= 8) {}
+
+  if (e === 0) {
+    e = 1 - eBias
+  } else if (e === eMax) {
+    return m ? NaN : ((s ? -1 : 1) * Infinity)
+  } else {
+    m = m + Math.pow(2, mLen)
+    e = e - eBias
+  }
+  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
+}
+
+exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
+  var e, m, c
+  var eLen = (nBytes * 8) - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
+  var i = isLE ? 0 : (nBytes - 1)
+  var d = isLE ? 1 : -1
+  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
+
+  value = Math.abs(value)
+
+  if (isNaN(value) || value === Infinity) {
+    m = isNaN(value) ? 1 : 0
+    e = eMax
+  } else {
+    e = Math.floor(Math.log(value) / Math.LN2)
+    if (value * (c = Math.pow(2, -e)) < 1) {
+      e--
+      c *= 2
+    }
+    if (e + eBias >= 1) {
+      value += rt / c
+    } else {
+      value += rt * Math.pow(2, 1 - eBias)
+    }
+    if (value * c >= 2) {
+      e++
+      c /= 2
+    }
+
+    if (e + eBias >= eMax) {
+      m = 0
+      e = eMax
+    } else if (e + eBias >= 1) {
+      m = ((value * c) - 1) * Math.pow(2, mLen)
+      e = e + eBias
+    } else {
+      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
+      e = 0
+    }
+  }
+
+  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
+
+  e = (e << mLen) | m
+  eLen += mLen
+  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
+
+  buffer[offset + i - d] |= s * 128
+}
+
+
+/***/ }),
+/* 179 */
+/***/ (function(module, exports) {
+
+/* (ignored) */
+
+/***/ }),
+/* 180 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Buffer = __webpack_require__(8).Buffer;
+var util = __webpack_require__(181);
+
+function copyBuffer(src, target, offset) {
+  src.copy(target, offset);
+}
+
+module.exports = function () {
+  function BufferList() {
+    _classCallCheck(this, BufferList);
+
+    this.head = null;
+    this.tail = null;
+    this.length = 0;
+  }
+
+  BufferList.prototype.push = function push(v) {
+    var entry = { data: v, next: null };
+    if (this.length > 0) this.tail.next = entry;else this.head = entry;
+    this.tail = entry;
+    ++this.length;
+  };
+
+  BufferList.prototype.unshift = function unshift(v) {
+    var entry = { data: v, next: this.head };
+    if (this.length === 0) this.tail = entry;
+    this.head = entry;
+    ++this.length;
+  };
+
+  BufferList.prototype.shift = function shift() {
+    if (this.length === 0) return;
+    var ret = this.head.data;
+    if (this.length === 1) this.head = this.tail = null;else this.head = this.head.next;
+    --this.length;
+    return ret;
+  };
+
+  BufferList.prototype.clear = function clear() {
+    this.head = this.tail = null;
+    this.length = 0;
+  };
+
+  BufferList.prototype.join = function join(s) {
+    if (this.length === 0) return '';
+    var p = this.head;
+    var ret = '' + p.data;
+    while (p = p.next) {
+      ret += s + p.data;
+    }return ret;
+  };
+
+  BufferList.prototype.concat = function concat(n) {
+    if (this.length === 0) return Buffer.alloc(0);
+    if (this.length === 1) return this.head.data;
+    var ret = Buffer.allocUnsafe(n >>> 0);
+    var p = this.head;
+    var i = 0;
+    while (p) {
+      copyBuffer(p.data, ret, i);
+      i += p.data.length;
+      p = p.next;
+    }
+    return ret;
+  };
+
+  return BufferList;
+}();
+
+if (util && util.inspect && util.inspect.custom) {
+  module.exports.prototype[util.inspect.custom] = function () {
+    var obj = util.inspect({ length: this.length });
+    return this.constructor.name + ' ' + obj;
+  };
+}
+
+/***/ }),
+/* 181 */
+/***/ (function(module, exports) {
+
+/* (ignored) */
+
+/***/ }),
+/* 182 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
+            (typeof self !== "undefined" && self) ||
+            window;
+var apply = Function.prototype.apply;
+
+// DOM APIs, for completeness
+
+exports.setTimeout = function() {
+  return new Timeout(apply.call(setTimeout, scope, arguments), clearTimeout);
+};
+exports.setInterval = function() {
+  return new Timeout(apply.call(setInterval, scope, arguments), clearInterval);
+};
+exports.clearTimeout =
+exports.clearInterval = function(timeout) {
+  if (timeout) {
+    timeout.close();
+  }
+};
+
+function Timeout(id, clearFn) {
+  this._id = id;
+  this._clearFn = clearFn;
+}
+Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+Timeout.prototype.close = function() {
+  this._clearFn.call(scope, this._id);
+};
+
+// Does not start the time, just sets up the members needed.
+exports.enroll = function(item, msecs) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = msecs;
+};
+
+exports.unenroll = function(item) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = -1;
+};
+
+exports._unrefActive = exports.active = function(item) {
+  clearTimeout(item._idleTimeoutId);
+
+  var msecs = item._idleTimeout;
+  if (msecs >= 0) {
+    item._idleTimeoutId = setTimeout(function onTimeout() {
+      if (item._onTimeout)
+        item._onTimeout();
+    }, msecs);
+  }
+};
+
+// setimmediate attaches itself to the global object
+__webpack_require__(183);
+// On some exotic environments, it's not clear which object `setimmediate` was
+// able to install onto.  Search each possibility in the same order as the
+// `setimmediate` library.
+exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
+                       (typeof global !== "undefined" && global.setImmediate) ||
+                       (this && this.setImmediate);
+exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
+                         (typeof global !== "undefined" && global.clearImmediate) ||
+                         (this && this.clearImmediate);
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+
+/***/ }),
+/* 183 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
+    "use strict";
+
+    if (global.setImmediate) {
+        return;
+    }
+
+    var nextHandle = 1; // Spec says greater than zero
+    var tasksByHandle = {};
+    var currentlyRunningATask = false;
+    var doc = global.document;
+    var registerImmediate;
+
+    function setImmediate(callback) {
+      // Callback can either be a function or a string
+      if (typeof callback !== "function") {
+        callback = new Function("" + callback);
+      }
+      // Copy function arguments
+      var args = new Array(arguments.length - 1);
+      for (var i = 0; i < args.length; i++) {
+          args[i] = arguments[i + 1];
+      }
+      // Store and register the task
+      var task = { callback: callback, args: args };
+      tasksByHandle[nextHandle] = task;
+      registerImmediate(nextHandle);
+      return nextHandle++;
+    }
+
+    function clearImmediate(handle) {
+        delete tasksByHandle[handle];
+    }
+
+    function run(task) {
+        var callback = task.callback;
+        var args = task.args;
+        switch (args.length) {
+        case 0:
+            callback();
+            break;
+        case 1:
+            callback(args[0]);
+            break;
+        case 2:
+            callback(args[0], args[1]);
+            break;
+        case 3:
+            callback(args[0], args[1], args[2]);
+            break;
+        default:
+            callback.apply(undefined, args);
+            break;
+        }
+    }
+
+    function runIfPresent(handle) {
+        // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
+        // So if we're currently running a task, we'll need to delay this invocation.
+        if (currentlyRunningATask) {
+            // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
+            // "too much recursion" error.
+            setTimeout(runIfPresent, 0, handle);
+        } else {
+            var task = tasksByHandle[handle];
+            if (task) {
+                currentlyRunningATask = true;
+                try {
+                    run(task);
+                } finally {
+                    clearImmediate(handle);
+                    currentlyRunningATask = false;
+                }
+            }
+        }
+    }
+
+    function installNextTickImplementation() {
+        registerImmediate = function(handle) {
+            process.nextTick(function () { runIfPresent(handle); });
+        };
+    }
+
+    function canUsePostMessage() {
+        // The test against `importScripts` prevents this implementation from being installed inside a web worker,
+        // where `global.postMessage` means something completely different and can't be used for this purpose.
+        if (global.postMessage && !global.importScripts) {
+            var postMessageIsAsynchronous = true;
+            var oldOnMessage = global.onmessage;
+            global.onmessage = function() {
+                postMessageIsAsynchronous = false;
+            };
+            global.postMessage("", "*");
+            global.onmessage = oldOnMessage;
+            return postMessageIsAsynchronous;
+        }
+    }
+
+    function installPostMessageImplementation() {
+        // Installs an event handler on `global` for the `message` event: see
+        // * https://developer.mozilla.org/en/DOM/window.postMessage
+        // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
+
+        var messagePrefix = "setImmediate$" + Math.random() + "$";
+        var onGlobalMessage = function(event) {
+            if (event.source === global &&
+                typeof event.data === "string" &&
+                event.data.indexOf(messagePrefix) === 0) {
+                runIfPresent(+event.data.slice(messagePrefix.length));
+            }
+        };
+
+        if (global.addEventListener) {
+            global.addEventListener("message", onGlobalMessage, false);
+        } else {
+            global.attachEvent("onmessage", onGlobalMessage);
+        }
+
+        registerImmediate = function(handle) {
+            global.postMessage(messagePrefix + handle, "*");
+        };
+    }
+
+    function installMessageChannelImplementation() {
+        var channel = new MessageChannel();
+        channel.port1.onmessage = function(event) {
+            var handle = event.data;
+            runIfPresent(handle);
+        };
+
+        registerImmediate = function(handle) {
+            channel.port2.postMessage(handle);
+        };
+    }
+
+    function installReadyStateChangeImplementation() {
+        var html = doc.documentElement;
+        registerImmediate = function(handle) {
+            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
+            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
+            var script = doc.createElement("script");
+            script.onreadystatechange = function () {
+                runIfPresent(handle);
+                script.onreadystatechange = null;
+                html.removeChild(script);
+                script = null;
+            };
+            html.appendChild(script);
+        };
+    }
+
+    function installSetTimeoutImplementation() {
+        registerImmediate = function(handle) {
+            setTimeout(runIfPresent, 0, handle);
+        };
+    }
+
+    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
+    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
+    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
+
+    // Don't get fooled by e.g. browserify environments.
+    if ({}.toString.call(global.process) === "[object process]") {
+        // For Node.js before 0.9
+        installNextTickImplementation();
+
+    } else if (canUsePostMessage()) {
+        // For non-IE10 modern browsers
+        installPostMessageImplementation();
+
+    } else if (global.MessageChannel) {
+        // For web workers, where supported
+        installMessageChannelImplementation();
+
+    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
+        // For IE 6–8
+        installReadyStateChangeImplementation();
+
+    } else {
+        // For older browsers
+        installSetTimeoutImplementation();
+    }
+
+    attachTo.setImmediate = setImmediate;
+    attachTo.clearImmediate = clearImmediate;
+}(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4), __webpack_require__(6)))
+
+/***/ }),
+/* 184 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {
+/**
+ * Module exports.
+ */
+
+module.exports = deprecate;
+
+/**
+ * Mark that a method should not be used.
+ * Returns a modified function which warns once by default.
+ *
+ * If `localStorage.noDeprecation = true` is set, then it is a no-op.
+ *
+ * If `localStorage.throwDeprecation = true` is set, then deprecated functions
+ * will throw an Error when invoked.
+ *
+ * If `localStorage.traceDeprecation = true` is set, then deprecated functions
+ * will invoke `console.trace()` instead of `console.error()`.
+ *
+ * @param {Function} fn - the function to deprecate
+ * @param {String} msg - the string to print to the console when `fn` is invoked
+ * @returns {Function} a new "deprecated" version of `fn`
+ * @api public
+ */
+
+function deprecate (fn, msg) {
+  if (config('noDeprecation')) {
+    return fn;
+  }
+
+  var warned = false;
+  function deprecated() {
+    if (!warned) {
+      if (config('throwDeprecation')) {
+        throw new Error(msg);
+      } else if (config('traceDeprecation')) {
+        console.trace(msg);
+      } else {
+        console.warn(msg);
+      }
+      warned = true;
+    }
+    return fn.apply(this, arguments);
+  }
+
+  return deprecated;
+}
+
+/**
+ * Checks `localStorage` for boolean values for the given `name`.
+ *
+ * @param {String} name
+ * @returns {Boolean}
+ * @api private
+ */
+
+function config (name) {
+  // accessing global.localStorage can trigger a DOMException in sandboxed iframes
+  try {
+    if (!global.localStorage) return false;
+  } catch (_) {
+    return false;
+  }
+  var val = global.localStorage[name];
+  if (null == val) return false;
+  return String(val).toLowerCase() === 'true';
+}
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
+
+/***/ }),
+/* 185 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// a passthrough stream.
+// basically just the most minimal sort of Transform stream.
+// Every written chunk gets output as-is.
+
+
+
+module.exports = PassThrough;
+
+var Transform = __webpack_require__(142);
+
+/*<replacement>*/
+var util = __webpack_require__(5);
+util.inherits = __webpack_require__(3);
+/*</replacement>*/
+
+util.inherits(PassThrough, Transform);
+
+function PassThrough(options) {
+  if (!(this instanceof PassThrough)) return new PassThrough(options);
+
+  Transform.call(this, options);
+}
+
+PassThrough.prototype._transform = function (chunk, encoding, cb) {
+  cb(null, chunk);
+};
+
+/***/ }),
+/* 186 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(11);
+
+
+/***/ }),
+/* 187 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(1);
+
+
+/***/ }),
+/* 188 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(10).Transform
+
+
+/***/ }),
+/* 189 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(10).PassThrough
+
+
+/***/ }),
+/* 190 */
+/***/ (function(module, exports) {
+
+$(function () {
+
+    var table_teachers = $('TABLE#teacher-list');
+    var table = null;
+    var modal_teacher_schedule = $('DIV#modal-teacher-schedule');
+    var modal_add_schedule = $('DIV#modal-teacher-schedule-add');
+    var table_schedule = null;
+
+    var table_act_buttons = '<button type="button" title="Sửa thông tin giáo viên" class="edit btn btn-sm btn-warning"><i title="Sửa thông tin giáo viên" class="fa fa-pencil-square-o" aria-hidden="true"></i></button>\
+    <button type="button" title="Xoá giáo viên" class="delete btn btn-sm btn-danger"><i class="fa fa-trash-o" aria-hidden="true"></i></button>\
+    <button type="button" title="Lịch" class="schedule btn btn-sm btn-info"><i class="fa fa-calendar-times-o" aria-hidden="true"></i></button>';
+
+    var getTeacherList = function getTeacherList(mode) {
+        var url = '/api/list-teachers';
+        $.ajax(url, {
+            method: 'GET',
+            dataType: 'json',
+            success: function success(response) {
+                var list = response.data;
+                if (mode == 'load') {
+                    renderTeacherList(list);
+                } else if (mode == 'reload') {
+                    console.log(mode);
+                    table.clear();
+                    table.rows.add(list);
+                    table.draw();
+                }
+            }
+        });
+    };
+
+    var renderTeacherList = function renderTeacherList(list) {
+        table = $('TABLE#teacher-list').DataTable({
+            data: list,
+            language: datatable_language,
+            columns: [{ data: null }, { data: 'name' }, {
+                data: 'email',
+                render: function render(data, type, row) {
+                    return data != null ? '<a href="mailto:' + data + '">' + data + '</a>' : '';
+                }
+            }, { data: 'mobile' }, { data: 'address' }, { data: 'nationality' }, { data: null }],
+            "columnDefs": [{
+                "targets": -1,
+                "data": null,
+                "defaultContent": table_act_buttons
+            }]
+        });
+
+        table.on('order.dt search.dt', function () {
+            table.column(0, {
+                search: 'applied',
+                order: 'applied'
+            }).nodes().each(function (cell, i) {
+                cell.innerHTML = i + 1;
+            });
+        }).draw();
+
+        table.on('click', 'button.delete', function () {
+            var data = table.row($(this).parents('tr')).data();
+            modalConfirm(function (confirm) {
+                if (confirm) {
+                    del(data.id);
+                }
+            }, 'Bạn có muốn xoá giáo viên <strong>' + data.name + '</strong> không?');
+        });
+
+        table.on('click', 'button.edit', function () {
+            var data = table.row($(this).parents('tr')).data();
+            $('FORM#frmTeacher INPUT#id').val(data.id);
+            showTeacherModal('edit');
+        });
+
+        table.on('click', 'button.schedule', function () {
+            var data = table.row($(this).parents('tr')).data();
+            $(modal_teacher_schedule).find('.modal-title').html('Lịch của giáo viên <strong>' + data.name + '</strong>');
+
+            get_teacher_schedule(data.id, function () {
+                $(modal_teacher_schedule).find('FORM#frmTeacher INPUT#teacher_id').val(data.id);
+                $(modal_teacher_schedule).modal('show');
+            });
+        });
+    };
+
+    var getCountries = function getCountries() {
+        var nationality = $('SELECT.select2[id="nationality"]');
+        $.ajax('/api/countries', {
+            type: 'GET',
+            contentType: 'application/json',
+            success: function success(response) {
+                if (response.code == 1) {
+                    if (response.data != undefined) {
+
+                        for (var n in response.data) {
+                            var national = response.data[n];
+                            var opt = $('<option></option>', {
+                                value: national.citizenship,
+                                text: national.citizenship
+                            });
+                            $(nationality).append(opt);
+                        }
+
+                        $($(nationality).find('OPTION')[0]).attr('selected', 'selected');
+                    }
+                }
+            }
+        });
+    };
+
+    var getTeacher = function getTeacher(id, callback) {
+        var url = '/api/get-teacher/?id=' + id;
+        $.ajax(url, {
+            method: 'GET',
+            dataType: 'json',
+            success: function success(response) {
+                if (response.code == 1) {
+                    var teacher = response.data[0];
+                    $('DIV#modal-teacher-form FORM INPUT#crm_id').val(teacher.crm_id);
+                    $('DIV#modal-teacher-form FORM INPUT#name').val(teacher.name);
+                    $('DIV#modal-teacher-form FORM SELECT#nationality').val(teacher.nationality).change();
+                    $('DIV#modal-teacher-form FORM INPUT#email').val(teacher.email);
+                    $('DIV#modal-teacher-form FORM INPUT#address').val(teacher.address);
+                    $('DIV#modal-teacher-form FORM INPUT#mobile').val(teacher.mobile);
+                    $('DIV#modal-teacher-form FORM INPUT#birthdate').val(teacher.birthdate);
+                    $('DIV#modal-teacher-form FORM SELECT#gender').val(teacher.gender).change();
+                    $('DIV#modal-teacher-form FORM INPUT#experience').val(teacher.experience);
+                    $('DIV#modal-teacher-form FORM INPUT#certificate').val(teacher.certificate);
+                    $('DIV#modal-teacher-form FORM TEXTAREA#description').html(teacher.description);
+                    callback();
+                }
+            }
+        });
+    };
+
+    var save = function save(mode) {
+        var data = {
+            'id': $('FORM#frmTeacher INPUT#id').val().trim(),
+            'crm_id': $('FORM#frmTeacher INPUT#crm_id').val().trim(),
+            'name': $('FORM#frmTeacher INPUT#name').val().trim(),
+            'nationality': $('FORM#frmTeacher SELECT#nationality').val().trim(),
+            'email': $('FORM#frmTeacher INPUT#email').val().trim(),
+            'address': $('FORM#frmTeacher INPUT#address').val().trim(),
+            'mobile': $('FORM#frmTeacher INPUT#mobile').val().trim(),
+            'birthdate': $('FORM#frmTeacher INPUT#birthdate').val().trim(),
+            'gender': $('FORM#frmTeacher SELECT#gender').val().trim(),
+            'experience': $('FORM#frmTeacher INPUT#experience').val().trim(),
+            'certificate': $('FORM#frmTeacher INPUT#certificate').val().trim(),
+            'description': $('FORM#frmTeacher TEXTAREA#description').val().trim()
+        };
+
+        var url = mode == 'new' ? '/api/add-teacher' : '/api/edit-teacher';
+
+        $.ajax(url, {
+            method: "POST",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function success(response) {
+                if (response.code == 1) {
+                    $('DIV#modal-teacher-form').modal('hide');
+                    getTeacherList('reload');
+                }
+            }
+        });
+    };
+
+    var del = function del(id) {
+        var url = '/api/delete-teacher';
+        $.ajax(url, {
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                "id": id
+            },
+            success: function success(response) {
+                getTeacherList('reload');
+            }
+        });
+    };
+
+    var showTeacherModal = function showTeacherModal(mode) {
+        if (mode == 'new') {
+            $('DIV#modal-teacher-form DIV.modal-header H2.modal-title').text('Thêm giáo viên');
+            $('DIV#modal-teacher-form FORM')[0].reset();
+            $('DIV#modal-teacher-form').modal('show');
+        } else if (mode == 'edit') {
+            $('DIV#modal-teacher-form DIV.modal-header H2.modal-title').text('Thay đổi thông tin giáo viên');
+            getTeacher($('FORM#frmTeacher INPUT#id').val().trim(), function () {
+                $('DIV#modal-teacher-form').modal('show');
+            });
+        }
+    };
+
+    var get_teacher_schedule = function get_teacher_schedule(teacher_id, callback) {
+        var data = {
+            id: teacher_id
+        };
+        $.ajax({
+            url: 'api/get-teacher-schedule',
+            method: 'GET',
+            data: data,
+            success: function success(response) {
+                render_teacher_schedule(response.data, callback);
+            }
+        });
+    };
+
+    var render_teacher_schedule = function render_teacher_schedule(data, calllback) {
+        if ($.fn.dataTable.isDataTable('DIV#modal-teacher-schedule TABLE#table-schedule')) {
+            table_schedule = $('DIV#modal-teacher-schedule TABLE#table-schedule').DataTable();
+            table_schedule.clear();
+            table_schedule.rows.add(data);
+            table_schedule.draw();
+        } else {
+            table_schedule = $('DIV#modal-teacher-schedule TABLE#table-schedule').DataTable({
+                data: data,
+                language: datatable_language,
+                'autoWidth': false,
+                "ordering": false,
+                "searching": false,
+                "bPaginate": true,
+                "columnDefs": [{
+                    "searchable": false,
+                    "orderable": false
+                }],
+                columns: [{ data: null }, {
+                    data: null,
+                    render: function render(data, type, row) {
+                        return 'Từ: ' + row.start_time + '<br />' + 'Đến: ' + row.end_time;
+                    }
+                }, {
+                    data: 'appoinment_type',
+                    render: function render(data, type, row) {
+                        return schedule_type[data];
+                    }
+                }, {
+                    data: 'desc'
+                }]
+            });
+            table_schedule.on('draw.dt order.dt search.dt', function () {
+                table_schedule.column(0, {}).nodes().each(function (cell, i) {
+                    cell.innerHTML = i + 1;
+                });
+            }).draw();
+        }
+        if (calllback != undefined) calllback();
+    };
+
+    var show_add_schedule_modal = function show_add_schedule_modal() {
+        if ($(modal_teacher_schedule).is(':visible')) {
+            var teacher_id = $(modal_teacher_schedule).find('FORM#frmTeacher INPUT#teacher_id').val();
+            $(modal_teacher_schedule).removeClass("fade").modal("hide");
+            $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val(teacher_id);
+            $(modal_add_schedule).modal("show").addClass("fade");
+        }
+    };
+
+    $(modal_teacher_schedule).find('BUTTON#btnAddSchedule').on('click', function (e) {
+        show_add_schedule_modal();
+    });
+
+    var schedule_type_select = function schedule_type_select(selected) {
+        var appoinment_type = $(modal_add_schedule).find('SELECT#appoinment_type');
+        $(appoinment_type).empty();
+        for (var i in schedule_type) {
+            if (i == 1) continue;
+            var opt = $('<option></option>', {
+                value: i,
+                text: schedule_type[i]
+            });
+            if (selected == i) opt.prop('selected', 'selected');
+            appoinment_type.append(opt);
+        }
+        if (selected == undefined) $($(appoinment_type).find('OPTION')[0]).attr('selected', 'selected');
+    };
+
+    var get_class_list = function get_class_list(selected) {
+        var class_id = $('SELECT.select2[id="class_id"]');
+        $(class_id).empty();
+        $(class_id).append($('<option></option>', { value: '0', text: '[Chọn lớp]' }));
+        $.ajax('api/get-list-class', {
+            type: 'GET',
+            contentType: 'application/json',
+            success: function success(response) {
+                if (response.code == 1) {
+                    if (response.data.length > 0) {
+                        for (var i = 0; i < response.data.length; i++) {
+                            var cls = response.data[i];
+                            var opt = $('<option></option>', { value: cls.id, text: cls.name });
+                            if (selected == cls.id) opt.prop('selected', 'selected');
+                            $(class_id).append(opt);
+                        }
+                        if (selected == undefined) $($(class_id).find('OPTION')[0]).attr('selected', 'selected');
+                    }
+                }
+            }
+        });
+    };
+
+    var get_student_list = function get_student_list(callback) {
+        $(student_id).empty();
+        $.ajax('/invoice/student-list', {
+            type: 'GET',
+            contentType: 'application/json',
+            success: function success(response) {
+                var student_target = $(modal_add_schedule).find('SELECT#student_id');
+                if (response.code == 0) {
+                    var first_val = null;
+                    if (response.data.list.length > 0) {
+                        for (var i = 0; i < response.data.list.length; i++) {
+                            var student = response.data.list[i];
+
+                            first_val = first_val == null ? student.id : first_val;
+
+                            var display_text = (student.student_code ? 'Code: <span class="text-bold">' + student.student_code + '</span> - ' : 'NO CODE - ') + student.name;
+                            var opt = $('<option></option>', {
+                                value: student.id,
+                                html: display_text
+                            });
+                            $(student_target).append(opt);
+                        }
+                        if (callback != undefined) {
+                            callback();
+                        }
+                    }
+                    $(modal_add_schedule).find('SELECT#appoinment_type').change();
+                }
+            }
+        });
+    };
+
+    var add_teacher_schedule = function add_teacher_schedule(callback) {
+        var data = {};
+        var form = $(modal_add_schedule).find('FORM#frmTeacherSchedule');
+        var inputs = $(form).find('input,select,textarea');
+        $(inputs).each(function (index, el) {
+            data[el.id] = $(el).val();
+        });
+
+        $.ajax({
+            url: 'api/add_teacher_schedule',
+            method: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            success: function success(response) {
+                var teacher_id = $(form).find('INPUT#teacher_id').val();
+                get_teacher_schedule(teacher_id, function () {
+                    if ($(modal_add_schedule).is(':visible')) {
+                        $(modal_add_schedule).removeClass("fade").modal("hide");
+                        $(modal_teacher_schedule).modal("show").addClass("fade");
+                    }
+                });
+            }
+        });
+    };
+
+    if ($(modal_add_schedule).length > 0) {
+        $(modal_add_schedule).find('SELECT#appoinment_type').on('change', function (e) {
+            var selected_type = $(e.target).children("option:selected").val();
+            if (selected_type == 2) {
+                $('DIV#related_class').addClass('hidden');
+                $('DIV#related_student').removeClass('hidden');
+            } else {
+                $('DIV#related_student').addClass('hidden');
+                $('DIV#related_class').removeClass('hidden');
+            }
+        });
+    }
+
+    if (table_teachers.length > 0) {
+        getTeacherList('load');
+        $('#btnOpenModalTeacher').on('click', function (e) {
+            showTeacherModal('new');
+            e.preventDefault();
+        });
+
+        var modalConfirm = function modalConfirm(callback, message) {
+            if (message != undefined) {
+                $("#confirm-delete DIV.modal-header H5.modal-title").html(message);
+            }
+            $("#confirm-delete").modal('show');
+
+            $("#modal-btn-yes").unbind('click').bind("click", function () {
+                callback(true);
+                $("#confirm-delete").modal('hide');
+            });
+
+            $("#modal-btn-no").unbind('click').bind("click", function () {
+                callback(false);
+                $("#confirm-delete").modal('hide');
+            });
+        };
+    }
+
+    if ($('FORM#frmTeacher').length > 0) {
+        getCountries();
+
+        $('FORM#frmTeacher input#birthdate').datetimepicker({
+            format: 'Y-m-d'
+        });
+
+        $('DIV#modal-teacher-form DIV.modal-footer BUTTON#btnSave').on('click', function (e) {
+            var mode = $('FORM#frmTeacher INPUT#id').val().trim() !== '' ? 'edit' : 'new';
+            save(mode);
+        });
+
+        $(modal_add_schedule).on('show.bs.modal', function (e) {
+            var teacher_id = $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val();
+            $(modal_add_schedule).find('FORM#frmTeacherSchedule')[0].reset();
+            $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val(teacher_id);
+            schedule_type_select();
+            get_class_list();
+            get_student_list();
+        });
+    }
+
+    if ($(modal_add_schedule).find('FORM#frmTeacherSchedule').length > 0) {
+        $(modal_add_schedule).find('DIV.modal-footer BUTTON#btnSave').on('click', function (e) {
+            add_teacher_schedule();
+        });
+
+        $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#start_time').datetimepicker({
+            format: 'Y-m-d H:i'
+        });
+
+        $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#end_time').datetimepicker({
+            format: 'Y-m-d H:i'
+        });
+    }
+});
+
+/***/ }),
+/* 191 */
+/***/ (function(module, exports) {
+
+$(function () {
+    if ($('UL#invoice_tabs').length == 0) return false;
+
+    var frmTutorFee = $('FORM#frmTutorFee');
+    var frmOtherFee = $('FORM#frmOtherFee');
+
+    var select2_tutor_studentid = null;
+    var select2_tutor_classid = null;
+
+    var select2_other_studentid = null;
+    var select2_other_classid = null;
+
+    var tab_headers = $('UL.nav#invoice_tabs');
+    var tab_contents = $('DIV.tab-content');
+    var tab_col = $(tab_headers).find('LI');
+    var actived_tab = $(tab_contents).find("DIV[role='tabpanel'].active");
+    var invoice_list_table = null;
+    var students = {};
+
+    var student_id = $('FORM#frmTutorFee SELECT.select2[id="student_id"]');
+    var class_id = $('FORM#frmTutorFee SELECT.select2[id="class_id"]').select2();
+
+    var student_other_id = $('FORM#frmOtherFee SELECT.select2[id="student_id"]').select2();
+    var class_other_id = $('FORM#frmOtherFee SELECT.select2[id="class_id"]').select2();
+
+    var tab_activate = function tab_activate(target) {
+        $(tab_col).removeClass('active');
+        $(target).parent().addClass('active');
+        $(tab_contents).find("DIV[role='tabpanel']").removeClass('active');
+        actived_tab = $(tab_contents).find("DIV[role='tabpanel']#" + $(target).data('tab')).addClass('active');
+
+        if ($(actived_tab).prop('id') == 'invoicelist-tab') {
+            $('BUTTON#btnSaveInvoice').css('display', 'none');
+            $('BUTTON#btnPrintInvoice').css('display', 'none');
+            $('BUTTON#btnCreateInvoice').css('display', 'inline');
+            $(frmTutorFee)[0].reset();
+            $(frmOtherFee)[0].reset();
+            $(tab_headers).find('LI').addClass('disabled');
+            $(tab_headers).find('A[data-tab="invoicelist-tab"]').parent().removeClass('disabled');
+        } else {
+            $('BUTTON#btnSaveInvoice').css('display', 'inline');
+            $('BUTTON#btnPrintInvoice').css('display', 'inline');
+            $('BUTTON#btnCreateInvoice').css('display', 'none');
+        }
+    };
+
+    $(tab_headers).find('A').bind('click', function (e) {
+        if ($(e.target).parent().hasClass('disabled')) {
+            return;
+        }
+        tab_activate(e.target);
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    var get_student_list = function get_student_list(callback, student_target, class_target) {
+        $(student_id).empty();
+        $(class_id).empty();
+
+        $(student_other_id).empty();
+        $(class_other_id).empty();
+
+        $.ajax('/invoice/student-list', {
+            type: 'GET',
+            contentType: 'application/json',
+            success: function success(response) {
+                if (response.code == 0) {
+                    var first_val = null;
+                    if (response.data.list.length > 0) {
+                        for (var i = 0; i < response.data.list.length; i++) {
+                            var student = response.data.list[i];
+
+                            first_val = first_val == null ? student.id : first_val;
+
+                            students[student.id] = student;
+
+                            var display_text = (student.student_code ? 'Code: <span class="text-bold">' + student.student_code + '</span> - ' : 'NO CODE - ') + student.name;
+                            var opt = $('<option></option>', {
+                                value: student.id,
+                                html: display_text
+                            });
+                            $(student_target).append(opt);
+                        }
+                        if (callback != undefined) {
+                            callback(first_val, class_target);
+                        }
+                    }
+                }
+            }
+        });
+    };
+
+    var get_class_list = function get_class_list(std_id, target, callback) {
+        $(target).empty();
+        $.ajax('/invoice/class-list?student_id=' + std_id, {
+            type: 'GET',
+            contentType: 'application/json',
+            success: function success(response) {
+                if (response.code == 0) {
+                    if (response.data.list.length > 0) {
+                        for (var i = 0; i < response.data.list.length; i++) {
+                            var cls = response.data.list[i];
+                            var opt = $('<option></option>', {
+                                value: cls.id,
+                                html: cls.name
+                            });
+                            $(target).append(opt);
+                        }
+                        $(frmTutorFee).find('INPUT#price').val(numeral(response.data.list[0].price).format('0,0'));
+                        toggle_tuition_frmTutorFee(true);
+                    } else {
+                        var opt = $('<option></option>', {
+                            value: 0,
+                            html: 'Chưa có lớp'
+                        });
+                        $(target).append(opt);
+                        toggle_tuition_frmTutorFee(false);
+                    }
+                    $($(target).find('OPTION')[0]).attr('selected', 'selected');
+                    if (callback != undefined) {
+                        callback();
+                    }
+                }
+            }
+        });
+    };
+
+    var get_parent_list = function get_parent_list(student_id, callback) {
+        $(frmTutorFee).find('INPUT#payer').val('');
+        $.get('/api/parent/list', {
+            student_id: student_id
+        }, function (response) {
+            for (var i = 0; i < response.data.length; i++) {
+                if (response.data[i].id === students[student_id].parent_id) {
+                    $(frmTutorFee).find('INPUT#payer').val(response.data[i].fullname);
+                    $(frmTutorFee).find('INPUT#payer').trigger("change");
+                }
+            }
+            if (callback != undefined) callback();
+        });
+    };
+
+    var tuition_fee_calculate = function tuition_fee_calculate() {
+
+        var data = {
+            'class_id': $(frmTutorFee).find('SELECT#class_id').val(),
+            'start_date': $(frmTutorFee).find('INPUT#start_date').val(),
+            'end_date': $(frmTutorFee).find('INPUT#end_date').val(),
+            'duration': $(frmTutorFee).find('INPUT#duration').val(),
+            'price': numeral($(frmTutorFee).find('INPUT#price').val()).value(),
+            'discount': $(frmTutorFee).find('INPUT#discount').val(),
+            'prepaid': numeral($(frmTutorFee).find('INPUT#prepaid').val()).value()
+        };
+
+        if (data.class_id != '' && data.start_date != '' && (data.end_date != '' || data.duration != '') && data.price) {
+            $.ajax('/invoice/tuition_fee_calculate', {
+                method: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function success(response) {
+                    if (response.code == 0) {
+                        var res_data = response.data;
+                        if (data.duration == '') {
+                            $(frmTutorFee).find('INPUT#duration').val(res_data.duration);
+                        } else if (data.end_date == '') {
+                            $(frmTutorFee).find('INPUT#end_date').val(res_data.end_date);
+                        }
+                        $(amount).val(numeral(res_data.amount).format('0,0'));
+                        $(amount).change();
+                    } else {
+                        alert(response.message);
+                    }
+                }
+            });
+        }
+    };
+
+    var toggle_tuition_frmTutorFee = function toggle_tuition_frmTutorFee(toggle) {
+        $(frmTutorFee).find('INPUT#reservation').prop('disabled', !toggle);
+        $(frmTutorFee).find('INPUT#duration').prop('disabled', !toggle);
+        $(frmTutorFee).find('INPUT#discount').prop('disabled', !toggle);
+        $(frmTutorFee).find('INPUT#discount-desc').prop('disabled', !toggle);
+        $(frmTutorFee).find('INPUT#prepaid').prop('disabled', !toggle);
+        $(frmTutorFee).find('INPUT#amount').prop('disabled', !toggle);
+    };
+
+    var save_invoice = function save_invoice(callback, form_activated, data) {
+        $(form_activated).find('.help-block').hide();
+        $(form_activated).find('.has-error').removeClass('has-error');
+
+        if ($(form_activated).prop('id') == 'frmTutorFee') {
+            if (!tutorfee_validate(data)) return;
+        } else if ($(form_activated).prop('id') == 'frmOtherFee') {
+            if (!otherfee_validate(data)) return;
+        }
+
+        $.ajax('/invoice/save', {
+            method: "POST",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function success(response) {
+                $(form_activated).find('input#iid').val(response.id);
+                if (callback != undefined) {
+                    callback(response.id);
+                }
+            },
+            error: function error(xhr, status, err) {
+                alert(err);
+            }
+        });
+    };
+
+    var print_invoice = function print_invoice(invoice_id, callback) {
+        $.ajax({
+            url: '/invoice/print/' + invoice_id + '/print',
+            type: 'GET',
+            dataType: 'html',
+            success: function success(response) {
+                var w = window.open();
+                w.document.write(response);
+                setTimeout(function () {
+                    w.print();
+                    w.close();
+                }, 1000);
+                if (callback != undefined) {
+                    callback();
+                }
+            },
+            error: function error(jqXHR, textStatus, errorThrown) {
+                var response = JSON.parse(jqXHR.responseText);
+                alert(response.message);
+            }
+        });
+    };
+
+    var view_invoice = function view_invoice(invoice_id) {
+        $.ajax({
+            url: '/invoice/print/' + invoice_id + '/view',
+            type: 'GET',
+            dataType: 'html',
+            success: function success(response) {
+                $('DIV.modal#view-invoice').find('DIV.modal-body').empty();
+                $('DIV.modal#view-invoice').find('DIV.modal-body').append(response);
+                $('DIV.modal#view-invoice').modal('show');
+            }
+        });
+    };
+
+    var tutorfee_validate = function tutorfee_validate(data) {
+        $(frmTutorFee).find('.has-error').removeClass('has-error');
+        $(frmTutorFee).find('.help-block').hide();
+
+        var is_valided = true;
+        var container = null;
+        if (data.payer == '') {
+            container = $(frmTutorFee).find('INPUT#payer').parent();
+            $(container).addClass('has-error');
+            $(container).find('.help-block').html('Hãy nhập Người đóng tiền').show();
+            is_valided = false;
+        }
+
+        if (data.price != '' && isNaN(data.price)) {
+            container = $(frmTutorFee).find('INPUT#price').parent().parent();
+            $(container).addClass('has-error');
+            $(container).find('.help-block').html('Hãy nhập giá trị là số cho Học phí mỗi buổi học').show();
+            is_valided = false;
+        }
+
+        if (data.discount != '' && isNaN(data.discount)) {
+            container = $(frmTutorFee).find('INPUT#discount').parent();
+            $(container).addClass('has-error');
+            $(container).find('.help-block').html('Hãy nhập giá trị là số nhỏ hơn hoặc bằng 100').show();
+            is_valided = false;
+        }
+
+        if (data.discount != '' && !isNaN(data.discount)) {
+            if (data.discount_desc == '') {
+                container = $(frmTutorFee).find('INPUT#discount-desc').parent();
+                $(container).addClass('has-error');
+                $(container).find('.help-block').html('Hãy nhập Lý do chiết khấu').show();
+                is_valided = false;
+            }
+        }
+
+        return is_valided;
+    };
+
+    var otherfee_validate = function otherfee_validate(data) {
+        $(frmOtherFee).find('.has-error').removeClass('has-error');
+        $(frmOtherFee).find('.help-block').hide();
+
+        var is_valided = true;
+        var container = null;
+        if (data.payer == '') {
+            container = $(frmOtherFee).find('INPUT#payer').parent();
+            $(container).addClass('has-error');
+            $(container).find('.help-block').html('Hãy nhập Người đóng tiền').show();
+            is_valided = false;
+        }
+
+        if (data.reason == '') {
+            container = $(frmOtherFee).find('textarea#reason').parent();
+            $(container).addClass('has-error');
+            $(container).find('.help-block').html('Hãy nhập Lý do nộp').show();
+            is_valided = false;
+        }
+
+        if (data.amount == '' || data.amount == null) {
+            container = $(frmOtherFee).find('INPUT#amount').parent().parent();
+            $(container).addClass('has-error');
+            $(container).find('.help-block').html('Hãy nhập Tổng số tiền').show();
+            is_valided = false;
+        }
+
+        return is_valided;
+    };
+
+    var get_last_tutor_invoice_duration = function get_last_tutor_invoice_duration(student_id, class_id, callback) {
+        $.ajax({
+            url: '/invoice/get-last-invoice/' + student_id + '/' + class_id
+        });
+    };
+
+    var invoice_list_init = function invoice_list_init() {
+        if ($.fn.dataTable.isDataTable('TABLE#invoice-list')) {
+            invoice_list_table = $('TABLE#invoice-list').DataTable();
+        } else {
+
+            $.fn.dataTable.ext.buttons.reload = {
+                text: 'Làm mới dữ liệu',
+                action: function action(e, dt, node, config) {
+                    dt.ajax.reload();
+                }
+            };
+
+            invoice_list_table = $('TABLE#invoice-list').DataTable({
+                language: datatable_language,
+                "columnDefs": [{
+                    targets: [7],
+                    "data": null,
+                    "visible": true,
+                    "defaultContent": ''
+                }],
+                ajax: {
+                    url: 'invoice/list',
+                    dataSrc: 'data.list'
+                },
+                "order": [[1, 'asc']],
+                columns: [{
+                    data: 'invoice_number',
+                    name: 'invoice_number'
+                }, {
+                    data: 'created_at',
+                    name: 'created_at',
+                    render: function render(data, type, row, meta) {
+                        return moment(data).format("YYYY-MM-DD kk:mm");
+                    }
+                }, {
+                    data: 'type',
+                    name: 'type',
+                    render: function render(data, type, row, meta) {
+                        return data == 1 ? 'Học phí' : 'Thu khác';
+                    }
+                }, {
+                    data: 'std_name',
+                    name: 'std_name'
+                }, {
+                    data: 'c_name',
+                    name: 'c_name'
+                }, {
+                    data: 'payer',
+                    name: 'payer'
+                }, {
+                    data: 'invoice_status',
+                    name: 'invoice_status',
+                    render: function render(data, type, row, meta) {
+                        var status = '';
+                        switch (data) {
+                            case 0:
+                                status = '<span class="label label-info">Lưu (chưa in)</span>';
+                                break;
+                            case 1:
+                                status = '<span class="label label-warning">Đã in lần 1</span>';
+                                break;
+                            case 2:
+                                status = '<span class="label label-warning">Đã in lần 2</span>';
+                                break;
+                            case 3:
+                                status = '<span class="label label-success">Đã duyệt</span>';
+                                break;
+                            case 4:
+                                status = '<span class="label label-danger">Đã huỷ</span>';
+                                break;
+                            default:
+                                break;
+                        }
+
+                        return status;
+                    }
+                }, {
+                    data: null,
+                    name: 'buttons',
+                    render: function render(data, type, row, meta) {
+                        var user_info = {
+                            id: $('meta[name="user-id"]').attr('content'),
+                            name: btoa($('meta[name="user-name"]').attr('content')),
+                            email: $('meta[name="user-email"]').attr('content'),
+                            branch: $('meta[name="user-branch_id"]').attr('content'),
+                            role: $('meta[name="user-role"]').attr('content')
+                        };
+
+                        var b_print = $('<button title="In phiếu thu" class="btn btn-primary print-invoice" style="margin-right: 2px;"><i class="fa fa-print" aria-hidden="true"></i></button>');
+                        var b_view = $('<button title="Xem" class="btn btn-info view-invoice" style="margin-right: 2px;"><i class="fa fa-eye" aria-hidden="true"></i></button>');
+                        var b_trash = $('<button title="Huỷ" class="btn btn-danger del-invoice"><i class="fa fa-trash" aria-hidden="true"></i></button>');
+                        var b_accountant_locked = $('<button title="Duyệt" class="btn btn-success approve-invoice" style="margin-right: 2px;"><i class="fa fa-check-square-o" aria-hidden="true"></i></button>');
+
+                        var content = $('<span></span>');
+                        content.append(b_view, b_print, b_accountant_locked, b_trash);
+
+                        if (row.invoice_status >= 2) {
+                            $(b_print).prop('disabled', true);
+                        }
+
+                        if (row.invoice_status > 2) {
+                            $(b_trash).prop('disabled', true);
+                        }
+
+                        if (user_info.role != 4) {
+                            $(b_accountant_locked).css('display', 'none');
+                            $('TABLE#invoice-list tbody tr td:nth-child(8)').css('width', '8%');
+                        } else if (row.invoice_status > 2) {
+                            $(b_accountant_locked).prop('disabled', true);
+                        }
+
+                        return content.html();
+                    }
+                }],
+                initComplete: function initComplete() {
+                    var filter_bar = filter_bar_render();
+
+                    $('DIV#invoice-list_wrapper').prepend(filter_bar, $('<div></div>', { class: 'row', style: 'height:20px' }));
+                }
+            });
+
+            invoice_list_table.on('draw.dt', function () {
+                var user_role = $('meta[name="user-role"]').attr('content');
+                if (user_role != 4) {
+                    $('TABLE#invoice-list tbody tr td:nth-child(8)').css('width', '8%');
+                }
+            });
+
+            invoice_list_table.on('click', 'button.print-invoice', function () {
+                var data = invoice_list_table.row($(this).parents('tr')).data();
+                print_invoice(data.id, function () {
+                    setTimeout(function () {
+                        invoice_list_table.ajax.reload();
+                    }, 500);
+                });
+            });
+
+            invoice_list_table.on('click', 'button.view-invoice', function () {
+                var data = invoice_list_table.row($(this).parents('tr')).data();
+                view_invoice(data.id);
+            });
+
+            invoice_list_table.on('click', 'button.del-invoice', function () {
+                var data = invoice_list_table.row($(this).parents('tr')).data();
+                if (confirm('Bạn có chắc muốn huỷ hoá đơn sô ' + data.invoice_number + ' không?')) {
+                    $.ajax('/invoice/delete', {
+                        method: "POST",
+                        contentType: 'application/json',
+                        data: JSON.stringify({ "id": data.id }),
+                        success: function success(response) {
+                            alert('Đã huỷ!');
+                            invoice_list_table.ajax.reload();
+                        },
+                        error: function error(xhr, status, err) {
+                            alert(err);
+                        }
+                    });
+                }
+            });
+
+            invoice_list_table.on('click', 'button.approve-invoice', function () {
+                var data = invoice_list_table.row($(this).parents('tr')).data();
+                if (confirm('Bạn có chắc muốn duyệt hoá đơn sô ' + data.invoice_number + ' không?')) {
+                    $.ajax('/invoice/approve', {
+                        method: "POST",
+                        contentType: 'application/json',
+                        data: JSON.stringify({ "id": data.id }),
+                        success: function success(response) {
+                            alert('Đã duyệt!');
+                            invoice_list_table.ajax.reload();
+                        },
+                        error: function error(xhr, status, err) {
+                            alert(err);
+                        }
+                    });
+                }
+            });
+        }
+    };
+
+    var invoice_list_event_binding = function invoice_list_event_binding() {
+        $('BUTTON#btnCreateInvoice').on('click', function () {
+            frmTutorFee[0].reset();
+            $(tab_headers).find('LI').removeClass('disabled');
+            tab_activate($(tab_headers).find('A[data-tab="tutorfee-tab"]')[0]);
+        });
+    };
+
+    var invoice_tutor_form_event_binding = function invoice_tutor_form_event_binding() {
+
+        $(frmTutorFee).find('INPUT#reservation').daterangepicker({
+            opens: 'right',
+            locale: daterange_locale
+        }, function (start, end) {
+            $(frmTutorFee).find('INPUT#start_date').val(start.format('YYYY-MM-DD'));
+            $(frmTutorFee).find('INPUT#end_date').val(end.format('YYYY-MM-DD'));
+            tuition_fee_calculate();
+        });
+
+        $(frmTutorFee).find('input#price,input#duration,input#discount,input#prepaid').on('blur', function (e) {
+            var value = $(e.target).val().trim();
+            if (e.target.id == 'price' || e.target.id == 'prepaid') {
+                $(e.target).val(numeral(value).format('0,0'));
+            }
+            tuition_fee_calculate();
+        });
+
+        $(frmTutorFee).find('input#amount').on('change', function (e) {
+            if ($(e.target).val() != '') {
+                $('BUTTON#btnSaveInvoice').prop('disabled', false);
+                $('BUTTON#btnPrintInvoice').prop('disabled', false);
+            }
+        });
+
+        select2_tutor_studentid.on('change', function (e) {
+            get_parent_list($(e.target).val(), function () {
+                get_class_list($(e.target).val(), $(class_id));
+            });
+        });
+
+        $(frmTutorFee).on('keyup change paste', 'input, select, textarea', function (e) {
+            $(e.target).closest('.has-error').find('.help-block').hide();
+            $(e.target).closest('.has-error').removeClass('has-error');
+        });
+    };
+
+    var invoice_other_form_event_binding = function invoice_other_form_event_binding() {
+        $(frmOtherFee).find('input#amount').on('blur', function (e) {
+            var value = $(e.target).val().trim();
+            if (value != '') {
+                $(e.target).val(numeral(value).format('0,0'));
+                var container = $(e.target).parent().parent();
+                $(container).removeClass('has-error');
+                $(container).find('.help-block').html('Hãy nhập Tổng số tiền').hide();
+            }
+        });
+
+        $(frmOtherFee).on('keyup change paste', 'input, select, textarea', function (e) {
+            $(e.target).closest('.has-error').find('.help-block').hide();
+            $(e.target).closest('.has-error').removeClass('has-error');
+        });
+    };
+
+    var filter_bar_render = function filter_bar_render() {
+        var wrapper = $('<div></div>', { id: 'invoice_filter_bar', class: 'row' });
+
+        var wrapper_title = $('<div></div>', { text: '' });
+
+        var status_filter = $('<select></select>', { id: 'invoice-list-status-filter', class: 'form-control' });
+        var date_filter = $('<input>', { id: 'invoice-list-date-filter', class: 'form-control', type: 'text', style: 'width:100px' });
+        var type_filter = $('<select></select>', { id: 'invoice-list-type-filter', class: 'form-control' });
+
+        $(status_filter).append($('<option></option>', { 'value': -1, html: '[ Tất cả trạng thái ]' }));
+        var status = ['Lưu (chưa in)', 'Đã in lần 1', 'Đã in lần 2', 'Đã duyệt', 'Đã huỷ'];
+        for (var i = 0; i < status.length; i++) {
+            $(status_filter).append($('<option></option>', { 'value': status[i], html: status[i] }));
+        }
+
+        $(status_filter).on('change', function (e) {
+            var search_value = $(e.target).val() == -1 ? '' : $(e.target).val();
+            invoice_list_table.column(6).search(search_value).draw();
+        });
+
+        $(type_filter).append($('<option></option>', { 'value': -1, html: '[ Tất cả ]' }));
+        var type = ['Học phí', 'Thu khác'];
+        for (var i = 0; i < type.length; i++) {
+            $(type_filter).append($('<option></option>', { 'value': type[i], html: type[i] }));
+        }
+
+        $(type_filter).on('change', function (e) {
+            var search_value = $(e.target).val() == -1 ? '' : $(e.target).val();
+            invoice_list_table.column(2).search(search_value).draw();
+        });
+
+        wrapper.append($('<div></div>', { class: 'col-sm-3' }).append(wrapper_title), $('<div></div>', { class: 'col-sm-3' }).append($('<label>Loại hoá đơn: </label>').append(type_filter)), $('<div></div>', { class: 'col-sm-3' }).append($('<label>Trạng thái hoá đơn: </label>').append(status_filter)), $('<div></div>', { class: 'col-sm-3' }).append($('<label>Thời gian lập: </label>').append(date_filter)));
+
+        $(date_filter).datepicker({
+            autoclose: true,
+            format: 'yyyy-mm-dd'
+        });
+
+        $(date_filter).on('change', function (e) {
+            var search_value = $.fn.dataTable.util.escapeRegex($(e.target).val());
+            console.log(search_value);
+            invoice_list_table.column(1).search(search_value ? '^' + search_value : '', true, false).draw();
+        });
+
+        return wrapper;
+    };
+
+    var init = function init() {
+        invoice_list_init();
+        invoice_list_event_binding();
+
+        $('.help-block').hide();
+        $('.has-error').removeClass('has-error');
+        toggle_tuition_frmTutorFee(false);
+
+        tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
+
+        select2_tutor_studentid = $(student_id).select2();
+        select2_tutor_classid = $(class_id).select2();
+
+        select2_other_studentid = $(student_other_id).select2();
+        select2_other_classid = $(class_other_id).select2();
+
+        toggle_tuition_frmTutorFee(false);
+
+        get_student_list(function (std_id, class_target) {
+            get_class_list(std_id, class_target);
+        }, $('SELECT.select2[id="student_id"]'), $('SELECT.select2[id="class_id"]'));
+
+        invoice_tutor_form_event_binding();
+        invoice_other_form_event_binding();
+
+        $('BUTTON#btnSaveInvoice, BUTTON#btnPrintInvoice').on('click', function (e) {
+            var save_callback = null;
+            var data = null;
+            var actived_tab_id = $(actived_tab).prop('id');
+            var invoice_type = actived_tab_id == 'tutorfee-tab' ? 'tutorfee' : actived_tab_id == 'otherfee-tab' ? 'otherfee' : '';
+            var form = actived_tab_id == 'tutorfee-tab' ? frmTutorFee : actived_tab_id == 'otherfee-tab' ? frmOtherFee : null;
+            if (invoice_type == 'tutorfee') {
+                data = {
+                    "type": 1,
+                    "student_id": $(form).find('SELECT#student_id').val(),
+                    "class_id": $(form).find('SELECT#class_id').val(),
+                    "price": numeral($(form).find('INPUT#price').val()).value(),
+                    "start_date": $(form).find('INPUT#start_date').val(),
+                    "end_date": $(form).find('INPUT#end_date').val(),
+                    "duration": $(form).find('INPUT#duration').val(),
+                    "payer": $(form).find('INPUT#payer').val(),
+                    "prepaid": numeral($(form).find('INPUT#prepaid').val()).value(),
+                    "amount": numeral($(form).find('INPUT#amount').val()).value(),
+                    "discount": $(form).find('INPUT#discount').val(),
+                    "discount_desc": $(form).find('INPUT#discount_desc').val(),
+                    "payment_method": $(form).find('INPUT[name="payment_method"]:checked').val(),
+                    "invoice_status": 0,
+                    "currency": 'VND'
+                };
+            } else if (invoice_type == 'otherfee') {
+                data = {
+                    "type": 2,
+                    "student_id": $(form).find('SELECT#student_id').val(),
+                    "class_id": $(form).find('SELECT#class_id').val(),
+                    "payer": $(form).find('INPUT#payer').val(),
+                    "reason": $(form).find('TEXTAREA#reason').val(),
+                    "amount": numeral($(form).find('INPUT#amount').val()).value(),
+                    "payment_method": $(form).find('INPUT[name="payment_method"]:checked').val(),
+                    "invoice_status": 0,
+                    "currency": 'VND'
+                };
+            }
+
+            if (!eval(invoice_type + '_validate(data)')) {
+                return false;
+            } else {
+                if ($(e.target).prop('id') == 'btnSaveInvoice') {
+                    save_callback = function save_callback() {
+                        tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
+                        invoice_list_table.ajax.reload();
+                    };
+                } else if ($(e.target).prop('id') == 'btnPrintInvoice') {
+                    save_callback = function save_callback(invoce_id) {
+                        print_invoice(invoce_id, function () {
+                            invoice_list_table.ajax.reload();
+                        });
+                        tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
+                    };
+                }
+
+                save_invoice(save_callback, form, data);
+            }
+        });
+    };
+
+    init();
+});
+
+/***/ }),
+/* 192 */
+/***/ (function(module, exports) {
+
+$(function () {
+    if ($('#branch-list').length == 0) return false;
+    var tableBranch = $('#branch-list').DataTable({
+        language: datatable_language,
+        ajax: {
+            url: 'api/branch/list'
+        },
+        columns: [{
+            data: null
+        }, {
+            data: 'branch_name'
+        }, {
+            data: 'address'
+        }, {
+            data: 'email',
+            render: function render(data, type, row) {
+                return data != '' ? '<a href="mailto:' + data + '">' + data + '</a>' : '';
+            }
+        }, {
+            data: 'phone_1'
+        }, {
+            data: null
+        }],
+        "columnDefs": [{
+            "targets": -1,
+            "data": null,
+            //"defaultContent": '<a class="edit">Sửa</a>&nbsp;&nbsp;<a class="delete">Xoá</a>'
+            "defaultContent": ''
+        }]
+    });
+
+    tableBranch.on('order.dt search.dt', function () {
+        tableBranch.column(0, {
+            search: 'applied',
+            order: 'applied'
+        }).nodes().each(function (cell, i) {
+            cell.innerHTML = i + 1;
+        });
+    }).draw();
+});
+
+/***/ }),
+/* 193 */
+/***/ (function(module, exports) {
+
+$(function () {
+    var table_schedule = $('TABLE#teacher-weekly-schedule');
+    if (table_schedule.length > 0) {
+        var form = $('FORM#frmReport');
+        var teacher_list = null;
+        var curr_page = 1;
+        var total_page = 1;
+        var teacher_per_page = 2;
+        var offset = 0;
+        var curr_teachers = [];
+        var classes = [];
+        var start = '2018-11-01';
+        var end = '2018-11-30';
+        var bootpag = null;
+        var appointment_durations = [];
+        var minute_inteval = 30;
+
+        var init = function init() {
+            get_teacher_list(function (data) {
+                paginate(data);
+            });
+        };
+
+        var render_table = function render_table(list) {
+            $(table_schedule).find('thead tr#weekdays th:not(:first-child)').prop('colspan', curr_teachers.length);
+            $(table_schedule).find('thead tr#teacher_header').remove();
+            $(table_schedule).find('tbody').empty();
+
+            var teachers_row = $('<tr></tr>', {
+                id: 'teacher_header'
+            }).append($('<td></td>'));
+
+            for (var wd = 1; wd <= 7; wd++) {
+                for (var t = 0; t < curr_teachers.length; t++) {
+                    var td = $('<td></td>', {
+                        text: curr_teachers[t].name,
+                        'style': 'text-align:center'
+                    });
+                    $(teachers_row).append(td);
+                }
+            }
+
+            for (var hour in list) {
+                var tr = $('<tr></tr>');
+                var hour_cell = $('<th></th>', {
+                    class: 'schedule_hour',
+                    'style': 'text-align:center',
+                    text: hour
+                });
+
+                $(tr).append(hour_cell);
+                var schedule_obj = list[hour];
+                for (var wd in schedule_obj) {
+                    for (var tid in schedule_obj[wd]) {
+                        var content = '';
+                        var class_schedule = null;
+                        var style = '';
+                        finish_hour = '';
+                        start_hour = '';
+                        last_time = '';
+                        finish_hour = '';
+
+                        if (schedule_obj[wd][tid] != '') {
+                            for (var c in classes) {
+                                if (classes[c].id == schedule_obj[wd][tid]) {
+                                    content = classes[c].name;
+                                    class_schedule = JSON.parse(classes[c].schedule);
+                                    var diff = diff_minutes(class_schedule[wd.toLowerCase()].start, class_schedule[wd.toLowerCase()].finish);
+                                    var finish_hour = add_minutes(class_schedule[wd.toLowerCase()].start, diff - 30);
+                                    last_time = (finish_hour.getHours() + '').length == 1 ? '0' + finish_hour.getHours() + '_' + finish_hour.getMinutes() : finish_hour.getHours() + '_' + finish_hour.getMinutes();
+                                    style = 'background-color:yellow;text-align:center';
+                                    break;
+                                }
+                            }
+                        }
+
+                        var cell_id = wd + '_' + hour.replace(':', '_') + '_' + tid;
+                        var last_cell_id = wd + '_' + last_time + '_' + tid;
+                        if (last_time != '') {
+                            appointment_durations.push({
+                                'wd': wd,
+                                'tid': tid,
+                                'start': cell_id,
+                                'start_time': hour,
+                                'end': last_cell_id,
+                                'end_time': finish_hour.getHours() + ':' + finish_hour.getMinutes()
+                            });
+                            console.log(appointment_durations);
+                        }
+
+                        var td = $('<td></td>', {
+                            id: cell_id,
+                            class: 'schedule_content',
+                            text: content,
+                            'style': style
+                        });
+
+                        $(tr).append(td);
+                    }
+                }
+                $(table_schedule).find('tbody').append(tr);
+            }
+
+            $(table_schedule).find('thead').append(teachers_row);
+
+            var style = 'background-color:yellow;text-align:center';
+
+            for (var cell = 0; cell < appointment_durations.length; cell++) {
+                var diff_time = diff_minutes(appointment_durations[cell].start_time, appointment_durations[cell].end_time);
+                if (diff_time > minute_inteval) {
+                    var next_hour = new Date(start + ' ' + appointment_durations[cell].start_time);
+                    for (var i = 1; i <= diff_time / minute_inteval; i++) {
+                        next_hour = add_minutes(next_hour.getHours() + ':' + next_hour.getMinutes(), minute_inteval);
+                        var h = (next_hour.getHours() + '').length == 1 ? '0' + next_hour.getHours() : next_hour.getHours();
+                        var m = (next_hour.getMinutes() + '').length == 1 ? '0' + next_hour.getMinutes() : next_hour.getMinutes();
+                        tmp_time = h + '_' + m;
+                        var next_cell = appointment_durations[cell].wd + '_' + tmp_time + '_' + appointment_durations[cell].tid;
+                        $(table_schedule).find('tbody td#' + next_cell).prop('style', style);
+                        next_hour = new Date(start + ' ' + tmp_time.replace('_', ':'));
+                    }
+                }
+                $(table_schedule).find('tbody td#' + appointment_durations[cell].end).prop('style', style);
+            }
+        };
+
+        var get_schedule_list = function get_schedule_list(ids, callback) {
+            var params = ids.join('&teachers[]=');
+            var end_point = 'api/teacher_weekly_time_table?start=' + start + '&end=' + end + '&teachers[]=' + params;
+
+            $.ajax({
+                url: end_point,
+                method: 'GET',
+                contentType: 'application/json',
+                dataType: 'json',
+                success: function success(response) {
+                    if (response.code == 1) {
+                        classes = response.classes;
+                        callback(response.data);
+                    }
+                }
+            });
+        };
+
+        var get_teacher_list = function get_teacher_list(callback) {
+            $.ajax({
+                url: '/api/list-teachers',
+                method: 'GET',
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function success(response) {
+                    if (response.code == 1) {
+                        teacher_list = response.data;
+                        if (callback != undefined) callback(teacher_list);
+                    }
+                }
+            });
+        };
+
+        var paginate = function paginate(teacher_list) {
+            if (teacher_list == null) return '';
+            total_page = Math.ceil(teacher_list.length / teacher_per_page);
+
+            if (curr_page == 1) {
+                offset = 0;
+            }
+
+            bootpag = $('.paginate').bootpag({
+                total: total_page,
+                next: 'Sau',
+                prev: 'Trước'
+            }).on("page", function (event, num) {
+                curr_page = num;
+                if (num == 1) {
+                    offset = 0;
+                } else {
+                    offset = teacher_per_page * (num - 1);
+                }
+
+                curr_teachers = teacher_list.slice(offset, offset + teacher_per_page);
+                var ids = [];
+
+                for (var i = 0; i < curr_teachers.length; i++) {
+                    ids[i] = curr_teachers[i].id;
+                }
+                get_schedule_list(ids, render_table);
+            });
+
+            bootpag.trigger('page', curr_page);
+        };
+
+        var refresh_schedule = function refresh_schedule() {
+            start = $(form).find('INPUT#start').val();
+            end = $(form).find('INPUT#end').val();
+            if (start != '' && end != '') {
+                bootpag.unbind('page');
+                init();
+            }
+        };
+
+        var add_minutes = function add_minutes(start_time, minutes) {
+            var date = new Date(start + ' ' + start_time);
+            return new Date(date.getTime() + minutes * 60000);
+        };
+
+        var diff_minutes = function diff_minutes(start_time, end_time) {
+            var date_start = new Date(start + ' ' + start_time);
+            var date_end = new Date(start + ' ' + end_time);
+
+            var diff = (date_end.getTime() - date_start.getTime()) / 1000;
+            diff /= 60;
+            return Math.abs(Math.round(diff));
+        };
+
+        $(form).find('BUTTON#btnRefresh').on('click', function (e) {
+            refresh_schedule();
+        });
+
+        init();
+    }
+});
+
+/***/ }),
+/* 194 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
 
 /***/ })
 /******/ ]);
