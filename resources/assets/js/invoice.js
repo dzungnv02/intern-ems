@@ -720,9 +720,10 @@ $(function () {
                 }
                 else if ($(e.target).prop('id') == 'btnPrintInvoice') {
                     save_callback = (invoce_id) => {
-                        print_invoice(invoce_id);
+                        print_invoice(invoce_id, () => {
+                            invoice_list_table.ajax.reload();
+                        });
                         tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
-                        invoice_list_table.ajax.reload();
                     };
                 }
 
