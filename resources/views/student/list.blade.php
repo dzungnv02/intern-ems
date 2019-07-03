@@ -13,10 +13,11 @@
 				<tr>
 					<th style="width:5%">#</th>
 					<th style="width:10%">Mã học sinh</th>
-					<th style="width:25%">Tên học sinh</th>
-					<th style="width:15%">Lớp đang học</th>
+					<th style="width:20%">Tên học sinh</th>
+					<th style="width:10%">Ngày sinh</th>
+					<th style="width:10%">Lớp đang học</th>
 					<th style="width:20%">Phụ huynh</th>
-					<th style="width:10%">Năm sinh</th>
+					<th style="width:10%">Trạng thái CRM</th>
 					<th style="width:10%"></th>
 				</tr>
 			</thead>
