@@ -64,6 +64,6 @@ return [
         0 => 'Tiền mặt',
         1 => 'Chuyển khoản',
         2 => 'Thẻ thanh toán'
-    ]
-    
+    ],
+    'invoice_print_max_attemp' => 2,
 ];

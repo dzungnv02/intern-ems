@@ -108,7 +108,7 @@
                     <div class="form-group row" id="discount">
                         <label class="col-sm-2 col-form-label">Lý do: </label>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" id="discount-desc" placeholder="lý do chiết khấu" style="height:34px;width:100%">
+                            <input type="text" class="form-control" id="discount_desc" placeholder="lý do chiết khấu" style="height:34px;width:100%">
                             <span class="help-block"></span>
                         </div>
                     </div>

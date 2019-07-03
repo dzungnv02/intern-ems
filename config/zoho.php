@@ -76,6 +76,7 @@ return [
             'deposit_amount' => 'deposit_amount',
             'withdrawal_date' => 'withdrawal_date',
             'Contact_Name' => 'crm_contact', //json_encode
+            'Stage' => 'stage',
             'assessment' => [
                 'assessment_status' => '',
                 'assessment_date' => 'assessment_date',
