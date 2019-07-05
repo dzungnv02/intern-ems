@@ -145,7 +145,7 @@ $(document).ready(function () {
 			data: formData,
 			success: function (response) {
 				//location.reload();
-				location.href = '/staff-list';
+				localion.href = '/staff-list';
 				alert(response.message);
 			},
 			error: function (e) {
