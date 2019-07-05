@@ -52,9 +52,8 @@ $(document).ready(function () {
 			$result.removeClass('hidden');
 			isValid = false;
 		}
-		if (password.length <= 8 || password == "") {
+		if (password.length >= 8) {
 			$('#errorPassword').addClass('hidden');
-			isValid = true;
 		}
 		else {
 			$('#errorPassword').removeClass('hidden');
@@ -63,15 +62,13 @@ $(document).ready(function () {
 
 		if (password != password_1) {
 			$('#errorPassword_1').removeClass('hidden');
-			isValid = true;
+			isValid = false;
 		} else {
 			$('#errorPassword_1').addClass('hidden');
-			isValid = false;
 		}
 
 		if (name) {
 			$('#errorName').addClass('hidden');
-			isValid = true;
 		} else {
 			$('#errorName').removeClass('hidden');
 			isValid = false;
@@ -83,7 +80,6 @@ $(document).ready(function () {
 		}
 		else {
 			$('#errorPhone').addClass('hidden');
-			isValid = true;
 		}
 
 		return isValid;
@@ -149,6 +145,7 @@ $(document).ready(function () {
 			data: formData,
 			success: function (response) {
 				//location.reload();
+				localion.href = '/staff-list';
 				alert(response.message);
 			},
 			error: function (e) {
