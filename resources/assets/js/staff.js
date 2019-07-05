@@ -35,7 +35,7 @@ $(document).ready(function () {
 	}
 
 	function validate() {
-		var isValid = false;
+		var isValid = true;
 		var $result = $("#errorEmail");
 		var email = $("#inputEmail").val();
 		var password = $('#inputPassword').val();
@@ -46,32 +46,28 @@ $(document).ready(function () {
 		$('SPAN.bell [id^="error"]').addClass('hidden');
 		var emailValid = validateEmail(email);
 		if (emailValid) {
-			isValid = true;
 			$result.addClass('hidden');
 		} else {
 			$result.removeClass('hidden');
 			isValid = false;
 		}
-		if (password.length <= 8 || password == "") {
-			$('#errorPassword').addClass('hidden');
-			isValid = true;
-		}
-		else {
+		if (password.length < 8) {
 			$('#errorPassword').removeClass('hidden');
 			isValid = false;
+		}
+		else {
+			$('#errorPassword').addClass('hidden');
 		}
 
 		if (password != password_1) {
 			$('#errorPassword_1').removeClass('hidden');
-			isValid = true;
+			isValid = false;
 		} else {
 			$('#errorPassword_1').addClass('hidden');
-			isValid = false;
 		}
 
 		if (name) {
 			$('#errorName').addClass('hidden');
-			isValid = true;
 		} else {
 			$('#errorName').removeClass('hidden');
 			isValid = false;
@@ -83,7 +79,6 @@ $(document).ready(function () {
 		}
 		else {
 			$('#errorPhone').addClass('hidden');
-			isValid = true;
 		}
 
 		return isValid;
@@ -150,6 +145,7 @@ $(document).ready(function () {
 			success: function (response) {
 				//location.reload();
 				alert(response.message);
+				location.href = '/staff-list';
 			},
 			error: function (e) {
 				alert("Can not add staff !!");
