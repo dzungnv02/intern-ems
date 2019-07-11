@@ -113,7 +113,6 @@ Route::group(['middleware' => 'api.headers'], function () {
 
     Route::post('/delete-staff', 'StaffController@deleteStaff')->name('deleteStaff');
     Route::post('/edit-password-staff', 'StaffController@editPasswordStaff');
-    Route::post('/edit-staff', 'StaffController@editStaff');
 
     Route::post('/add-teacher', 'TeacherController@store');
     Route::get('/get-teacher', 'TeacherController@edit');

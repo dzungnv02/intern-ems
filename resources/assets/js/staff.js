@@ -1,7 +1,7 @@
 import { finished } from "stream";
 
 $(document).ready(function () {
-	
+
 
 	/**
 	*validate form add
@@ -12,18 +12,22 @@ $(document).ready(function () {
 	}
 
 	function getBranchList(currentBranchId) {
-		if ($('FORM#frmStaff').length == 0) return;
-		
-		$.ajax('/api/branch/list',{
+		if ($('FORM#frmStaff').length == 0 && $('FORM#frmEditStaff').length == 0) return;
+
+		$.ajax('/api/branch/list', {
 			type: 'GET',
 			success: function (response) {
 				var select = $('SELECT#branch_id');
 				$(select).find('OPTION').not(':first').remove();
+				var current_staff = localStorage.getItem('current_staff');
+				if (current_staff != undefined) {
+					currentBranchId = JSON.parse(current_staff).branch_id;
+				}
 				if (response.data.length > 0) {
 					for (var i = 0; i < response.data.length; i++) {
 						var branch = response.data[i];
-						var opt = $('<option></option>', {value:branch.id, text:branch.branch_name});
-						if (currentBranchId == branch.id) $(opt).prop('selected','selected');
+						var opt = $('<option></option>', { value: branch.id, text: branch.branch_name });
+						if (currentBranchId == branch.id) $(opt).prop('selected', 'selected');
 						$(select).append(opt);
 					}
 				}
@@ -52,19 +56,21 @@ $(document).ready(function () {
 			$result.removeClass('hidden');
 			isValid = false;
 		}
-		if (password.length >= 8) {
-			$('#errorPassword').addClass('hidden');
-		}
-		else {
-			$('#errorPassword').removeClass('hidden');
-			isValid = false;
-		}
+		if ($('FORM#frmEditStaff').length == 0) {
+			if (password.length >= 8) {
+				$('#errorPassword').addClass('hidden');
+			}
+			else {
+				$('#errorPassword').removeClass('hidden');
+				isValid = false;
+			}
 
-		if (password != password_1) {
-			$('#errorPassword_1').removeClass('hidden');
-			isValid = false;
-		} else {
-			$('#errorPassword_1').addClass('hidden');
+			if (password != password_1) {
+				$('#errorPassword_1').removeClass('hidden');
+				isValid = false;
+			} else {
+				$('#errorPassword_1').addClass('hidden');
+			}
 		}
 
 		if (name) {
@@ -121,16 +127,18 @@ $(document).ready(function () {
 		var password = $('#inputPassword').val();
 		var password_1 = $('#inputPassword_1').val();
 		var name = $('#inputName').val();
+		var role = $('#role').val();
 		var gender = $('#inputGender').val();
 		var birthDate = $('#inputBirthDate').val();
 		var address = $('#inputAddress').val();
 		var phone = $('#inputPhone').val();
 		var branch_id = $('SELECT#branch_id').val();
-		
+
 		var formData = new FormData();
 		formData.append('email', email);
 		formData.append('password', password);
 		formData.append('name', name);
+		formData.append('role', role);
 		formData.append('gender', gender);
 		formData.append('birth_date', birthDate);
 		formData.append('address', address);
@@ -139,7 +147,7 @@ $(document).ready(function () {
 
 		$.ajax({
 			url: '/api/add-staff',
-			method:"POST",
+			method: "POST",
 			contentType: false,
 			processData: false,
 			data: formData,
@@ -156,9 +164,72 @@ $(document).ready(function () {
 
 	getBranchList(null);
 
+	if ($('FORM#frmEditStaff').length > 0) {
+		var form = $('FORM#frmEditStaff');
+
+		var load_edit = () => {
+			var data = JSON.parse(localStorage.getItem('current_staff'));
+			$(form).find('INPUT#id').val(data.id);
+			$(form).find('INPUT#inputEmail').val(data.email);
+			$(form).find('SELECT#role').val(data.role);
+			$(form).find('INPUT#inputName').val(data.name);
+			$(form).find('INPUT#inputPhone').val(data.phone_number);
+			$(form).find('SELECT#inputGender').val(data.gender);
+			$(form).find('INPUT#inputBirthDate').val(data.birth_date);
+			$(form).find('INPUT#inputAddress').val(data.address);
+		}
+
+		$(form).find('BUTTON#btnSave').on('click', (e) => {
+			var isValided = validate();
+			if (!isValided) {
+				return false;
+			}
+
+			var id = $(form).find('INPUT#id').val();
+			var email = $('#inputEmail').val();
+			var name = $('#inputName').val();
+			var role = $('#role').val();
+			var gender = $('#inputGender').val();
+			var birthDate = $('#inputBirthDate').val();
+			var address = $('#inputAddress').val();
+			var phone = $('#inputPhone').val();
+			var branch_id = $('SELECT#branch_id').val();
+
+			var data = {
+				'id' : id,
+				'email': email,
+				'name': name,
+				'role': role,
+				'gender': gender,
+				'birth_date': birthDate,
+				'address': address,
+				'phone_number': phone,
+				'branch_id': branch_id
+			}
+
+			$.ajax({
+				url: '/update-staff',
+				method: "PATCH",
+				contentType: 'application/json',
+				data: JSON.stringify(data),
+				success: function (response) {
+					localStorage.removeItem('current_staff');
+					location.href = '/staff-list';
+				},
+				error: function (e) {
+					alert("Can not save staff !!");
+				}
+			})
+		});
+
+		load_edit();
+	}
+
 	if ($('TABLE#staff_list').length == 0) {
 		return false;
 	}
+
+	localStorage.removeItem('current_staff');
 
 	/*
 	* ajax get list staff
@@ -212,16 +283,31 @@ $(document).ready(function () {
 			"targets": -1,
 			"data": null,
 			"defaultContent": "<button type='button' href=" + asset + "staff/edit" + " class=\"btn btn-warning _action fa fa-pencil-square-o\" title=\"Chỉnh sửa\" id=\"edit_staff\"></button>"
-				+ "<a href=\"#\" class=\"btn btn-danger _action fa fa-trash\" title=\"Xoa\" type=\"button\" id=\"delete\" ></a>"
-				+ "<a href=\"#\" title=\"Đôi mật khẩu\" class=\"btn btn-info _action fa fa-key\" data-toggle=\"modal\" data-target=\"#myModal\" id=\"change_password\"></a>"
+				+ "&nbsp;<button title=\"Đôi mật khẩu\" class=\"btn btn-info _action fa fa-key\" data-toggle=\"modal\" data-target=\"#changePasswdModal\" id=\"change_password\"></button>"
+				+ "&nbsp;<button class=\"btn btn-danger _action fa fa-trash\" title=\"Xoa\" type=\"button\" id=\"delete\" ></button>"
+				
 		}]
 	});
-	// var t = $('#example').DataTable()
+
 	t.on('order.dt search.dt', function () {
 		t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
 			cell.innerHTML = i + 1;
 		});
 	}).draw();
+
+	t.on('click', 'button#change_password', function () {
+		var data = t.row($(this).parents('tr')).data();
+		$('#changePasswdModal FORM#frmChangePasswd INPUT#staff_id').val(data.id);
+		$('#changePasswdModal DIV.modal-header SPAN#staff-name').text(data.name);
+		
+	});
+
+	$('TABLE#staff_list').on('click', '#edit_staff', function () {
+		var table = $('TABLE#staff_list').DataTable();
+		var data = table.row($(this).parents('tr')).data();
+		localStorage.setItem('current_staff', JSON.stringify(data));
+		location.href = '/staff-edit';
+	});
 
 	$('TABLE#staff_list tbody').on('click', '#delete', function () {
 		var table = $('TABLE#staff_list').DataTable();
@@ -240,7 +326,7 @@ $(document).ready(function () {
 				if (willDelete) {
 					$.ajax({
 						url: '/api/delete-staff',
-						method:"POST",
+						method: "POST",
 						contentType: false,
 						processData: false,
 						data: formData,
@@ -250,100 +336,57 @@ $(document).ready(function () {
 					});
 				}
 			})
-	})
-	$('TABLE#staff_list').on('click', '#change_password', function () {
-		var table = $('#example').DataTable();
-		var data = table.row($(this).parents('tr')).data();
-		data = data.id;
-		editPassword(data);
 	});
 
-	function editPassword(data) {
-		$('#formm').on('click', '#submit', function () {
-			var current_password_input = $('#currentPassword').val();
-			var new_password = $('#newPassword').val();
-			var new_password_1 = $('#newPassword1').val();
-			if (new_password == new_password_1 && new_password.length >= 8) {
-				var formData = new FormData();
-				formData.append('id', data);
-				formData.append('currentPassword', current_password_input);
-				formData.append('newPassword', new_password);
-				$.ajax({
-					url: '/api/edit-password-staff',
-					method:"POST",
-					contentType: false,
-					processData: false,
-					data: formData,
-					success: function (response) {
-						alert(response.message);
-						location.reload();
-					},
-					error: function (response) {
-						alert('Can not edit info this !!');
-						location.reload();
-					}
-				})
-			}
-		})
-	}
+	$('#changePasswdModal').on('show.bs.modal', (e) => {
+		$('#changePasswdModal').find('SPAN.bell').hide();
+	});
 
-	/*
-	* ajax edit staff
-	*/
-	$('TABLE#staff_list').on('click', '#edit_staff', function () {
-		var table = $('TABLE#staff_list').DataTable();
-		var data = table.row($(this).parents('tr')).data();
-		//data = data.id;
-		if (typeof (Storage) !== "undefined") {
-			//localStorage.setItem("id", data);
-		} else {
-			//alert('Trình duyệt của bạn không hỗ trợ');
+	$('#changePasswdModal').on('hide.bs.modal', (e) => {
+		$('#changePasswdModal FORM#frmChangePasswd')[0].reset();
+	});
+
+	$('#frmChangePasswd BUTTON#submit').on('click', function () {
+		var id = $('#changePasswdModal FORM#frmChangePasswd INPUT#staff_id').val();
+		var new_password = $('#changePasswdModal FORM#frmChangePasswd #newPassword').val();
+		var new_password_1 = $('#changePasswdModal FORM#frmChangePasswd #newPassword1').val();
+		if (new_password == new_password_1 && new_password.length >= 8) {
+			var formData = new FormData();
+			formData.append('id', id);
+			formData.append('newPassword', new_password);
+			$.ajax({
+				url: '/api/edit-password-staff',
+				method: "POST",
+				contentType: false,
+				processData: false,
+				data: formData,
+				success: function (response) {
+					$('#changePasswdModal').modal('hide');
+				},
+				error: function (response) {
+					alert('Can not edit info this !!');
+					location.reload();
+				}
+			})
 		}
-	});
-
-	
-});
-
-$('#editStaff_1').click(function (event) {
-	var id = localStorage.getItem("id");
-	var email = $('#inputEmail3').val();
-	var password = $('#inputPassword').val();
-	var password_1 = $('#inputPassword_1').val();
-	var name = $('#inputName').val();
-	var gender = $('#inputGender').val();
-	var birthDate = $('#inputBirthDate').val();
-	var address = $('#inputAddress').val();
-	var phone = $('#inputPhone').val();
-	if (email != "" && password != "" && name != "" && gender != "" && birthDate != "" &&
-		address != "" && password.length >= 8 && password == password_1 && $('#inputFile')[0].files[0]
-	) {
-		var formData = new FormData();
-		formData.append('id', id);
-		formData.append('email', email);
-		formData.append('password', password);
-		formData.append('name', name);
-		formData.append('gender', gender);
-		formData.append('birth_date', birthDate);
-		formData.append('address', address);
-		formData.append('phone_number', phone);
-		formData.append("file", $('#inputFile')[0].files[0]);
-		$.ajax({
-			url: '/api/edit-staff',
-			method:"POST",
-			contentType: false,
-			processData: false,
-			data: formData,
-			success: function (response) {
-				location.reload();
-				alert(response.message);
-			},
-			error: function (e) {
-				alert("Can not edit staff !!");
+		else {
+			if (new_password.length < 8) {
+				$('#changePasswdModal').find('SPAN.bell#q1').show();
 			}
-		})
-	} else {
-		alert('Thong tin dien vao khong hop le !!!');
-	}
+			else {
+				$('#changePasswdModal').find('SPAN.bell#q1').hide();
+			}
+
+			if (new_password != new_password_1) {
+				$('#changePasswdModal').find('SPAN.bell#q2').show();
+			}
+			else {
+				$('#changePasswdModal').find('SPAN.bell#q2').hide();
+			}
+		}
+	})
+
+
 });
 
 
