@@ -57,6 +57,7 @@ class StaffController extends Controller
             'email' => $request->email,
             'password' => $request->password,
             'name' => $request->name,
+            'role' => $request->role,
             'gender' => $request->gender,
             'birth_date' => $request->birth_date,
             'address' => $request->address,
@@ -74,9 +75,8 @@ class StaffController extends Controller
     public function editPasswordStaff(Request $request)
     {
         $id = $request->id;
-        $currentPassword = $request->currentPassword;
         $newPassword = $request->newPassword;
-        $editStaff = Staff::editPasswordStaff($id, $currentPassword, $newPassword);
+        $editStaff = Staff::editPasswordStaff($id, $newPassword);
         return response()->json(['code' => 1, 'message' => 'Cap nhat thanh cong'], 200);
     }
     /*
@@ -85,27 +85,17 @@ class StaffController extends Controller
     public function editStaff(Request $request)
     {
         $id = $request->id;
-
-        if (($request->hasFile('file'))) {
-            $destinationPath = 'storage/files';
-            $extension = $request->file('file')->getClientOriginalExtension();
-            $tempName = $request->file("file")->getClientOriginalName();
-            $fileName = uniqid("MW") . '.' . $extension;
-            $request->file('file')->move($destinationPath, $fileName);
-            $imagepath = $destinationPath . '/' . $fileName;
-        }
         $data = array(
             'email' => $request->email,
-            'password' => $request->password,
             'name' => $request->name,
             'gender' => $request->gender,
-            'birthDate' => $request->birthDate,
+            'birth_date' => $request->birth_date,
             'address' => $request->address,
             'phone_number' => $request->phone_number,
-            'images' => $fileName,
-            'updated_at' => date("Y-m-d"),
+            'updated_at' => date("Y-m-d H:i:s"),
         );
-        $data = Staff::editStaff($data, $id);
-        return response()->json(['code' => 1, 'message' => 'Cap nhat thanh cong'], 200);
+
+        $result = Staff::editStaff($data, $id);
+        return response()->json(['code' => 1, 'message' => 'Cap nhat thanh cong', 'data' => $result], 200);
     }
 }

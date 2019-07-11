@@ -64,7 +64,7 @@ Route::get('teacher-weekly-schedule', function(){
     return view('teacher/weekly-schedule');
 })->middleware('auth');
 
-Route::get('staff-list', function(){
+Route::get('staff-list/', function(){
     return view('staff/list');
 })->middleware('auth');
 
@@ -75,6 +75,8 @@ Route::get('staff-add', function(){
 Route::get('staff-edit', function(){
     return view('staff/edit');
 })->middleware('auth');
+
+Route::patch('/update-staff', 'StaffController@editStaff')->middleware('auth');
 
 Route::get('branch', 'BranchController@index')->middleware('auth');
 Route::get('branch/add', 'BranchController@add')->middleware('auth');
