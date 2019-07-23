@@ -112,7 +112,8 @@
             <address>
               <strong>Tô Hiến Thành</strong>: 0961 305 885<br>
               <strong>Nguyễn Trãi</strong>: 0914 698 000<br>
-              <strong>Hoàng Quốc Việt</strong>: 0961 205 550
+              <strong>Hoàng Quốc Việt</strong>: 0961 205 550<br>
+              <strong>Minh Khai</strong>: 0966 055 905 
             </address>
           </div>
       <!-- /.col -->

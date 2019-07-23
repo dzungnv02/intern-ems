@@ -13,8 +13,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\InvoicePrinted;
 use App\Branch;
+use Illuminate\Support\Facades\Log;
+
 
 use PDF;
+use function GuzzleHttp\json_decode;
 
 class InvoiceController extends Controller
 {
@@ -140,8 +143,12 @@ class InvoiceController extends Controller
 
     public function print_invoice($id, $act)
     {
+        
+        Log::debug('PRINTED');
+        
         $payment_methods = config('constant.payment_method');
         $invoice = Invoice::findOrfail($id);
+        Log::debug(var_export($invoice,true));
 
         $invoice_data = $invoice->toArray();
 

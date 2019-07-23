@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use App\Branch;
 use Illuminate\Support\Facades\Log;
+use function GuzzleHttp\json_encode;
 
 class GetApiHeader
 {
@@ -22,6 +23,7 @@ class GetApiHeader
         $branch = Branch::findOrfail(data_get($user_info,'branch'));
         $user_info->crm_owner = $branch->crm_owner;
         $request->request->add(['logged_user' => $user_info]);
+        
         return $next($request);
     }
 }

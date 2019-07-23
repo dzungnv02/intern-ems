@@ -21,14 +21,14 @@ $(function () {
     var class_id = $('FORM#frmTutorFee SELECT.select2[id="class_id"]').select2();
 
     var student_other_id = $('FORM#frmOtherFee SELECT.select2[id="student_id"]').select2();
-    var class_other_id =$('FORM#frmOtherFee SELECT.select2[id="class_id"]').select2();
+    var class_other_id = $('FORM#frmOtherFee SELECT.select2[id="class_id"]').select2();
 
     var tab_activate = (target) => {
         $(tab_col).removeClass('active');
         $(target).parent().addClass('active');
         $(tab_contents).find("DIV[role='tabpanel']").removeClass('active');
         actived_tab = $(tab_contents).find("DIV[role='tabpanel']#" + $(target).data('tab')).addClass('active');
-        
+
         if ($(actived_tab).prop('id') == 'invoicelist-tab') {
             $('BUTTON#btnSaveInvoice').css('display', 'none');
             $('BUTTON#btnPrintInvoice').css('display', 'none');
@@ -69,11 +69,11 @@ $(function () {
                     if (response.data.list.length > 0) {
                         for (var i = 0; i < response.data.list.length; i++) {
                             var student = response.data.list[i];
-                            
+
                             first_val = (first_val == null) ? student.id : first_val;
-                            
+
                             students[student.id] = student;
-                            
+
                             var display_text = (student.student_code ? 'Code: <span class="text-bold">' + student.student_code + '</span> - ' : 'NO CODE - ') + student.name;
                             var opt = $('<option></option>', {
                                 value: student.id,
@@ -90,7 +90,8 @@ $(function () {
         });
     }
 
-    var get_class_list = (std_id, target, callback) => {
+    var get_class_list = (std_id, target, callback, form) => {
+        if (form === undefined) form = frmTutorFee;
         $(target).empty();
         $.ajax('/invoice/class-list?student_id=' + std_id, {
             type: 'GET',
@@ -106,15 +107,20 @@ $(function () {
                             });
                             $(target).append(opt);
                         }
-                        $(frmTutorFee).find('INPUT#price').val(numeral(response.data.list[0].price).format('0,0'));
-                        toggle_tuition_frmTutorFee(true);
+                        if (form === frmTutorFee) {
+                            $(form).find('INPUT#price').val(numeral(response.data.list[0].price).format('0,0'));
+                            toggle_tuition_frmTutorFee(true);
+                        }
+
                     } else {
                         var opt = $('<option></option>', {
                             value: 0,
                             html: 'Chưa có lớp'
                         });
                         $(target).append(opt);
-                        toggle_tuition_frmTutorFee(false);
+                        if (form === frmTutorFee) {
+                            toggle_tuition_frmTutorFee(false);
+                        }
                     }
                     $($(target).find('OPTION')[0]).attr('selected', 'selected');
                     if (callback != undefined) {
@@ -125,15 +131,16 @@ $(function () {
         });
     }
 
-    var get_parent_list = (student_id, callback) => {
-        $(frmTutorFee).find('INPUT#payer').val('');
+    var get_parent_list = (student_id, callback, form) => {
+        if (form === undefined) form = frmTutorFee;
+        $(form).find('INPUT#payer').val('');
         $.get('/api/parent/list', {
             student_id: student_id
         }, (response) => {
-            for(var i = 0; i < response.data.length; i++) {
+            for (var i = 0; i < response.data.length; i++) {
                 if (response.data[i].id === students[student_id].parent_id) {
-                    $(frmTutorFee).find('INPUT#payer').val(response.data[i].fullname);
-                    $(frmTutorFee).find('INPUT#payer').trigger( "change" );
+                    $(form).find('INPUT#payer').val(response.data[i].fullname);
+                    $(form).find('INPUT#payer').trigger("change");
                 }
             }
             if (callback != undefined) callback();
@@ -154,7 +161,7 @@ $(function () {
 
         if (data.class_id != '' && (data.start_date != '' && (data.end_date != '' || data.duration != '')) && data.price) {
             $.ajax('/invoice/tuition_fee_calculate', {
-                method:"POST",
+                method: "POST",
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: function (response) {
@@ -197,7 +204,7 @@ $(function () {
         }
 
         $.ajax('/invoice/save', {
-            method:"POST",
+            method: "POST",
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function (response) {
@@ -241,7 +248,7 @@ $(function () {
             type: 'GET',
             dataType: 'html',
             success: function (response) {
-                $('DIV.modal#view-invoice').find('DIV.modal-body').empty(); 
+                $('DIV.modal#view-invoice').find('DIV.modal-body').empty();
                 $('DIV.modal#view-invoice').find('DIV.modal-body').append(response);
                 $('DIV.modal#view-invoice').modal('show');
             }
@@ -330,7 +337,7 @@ $(function () {
 
             $.fn.dataTable.ext.buttons.reload = {
                 text: 'Làm mới dữ liệu',
-                action: function ( e, dt, node, config ) {
+                action: function (e, dt, node, config) {
                     dt.ajax.reload();
                 }
             };
@@ -359,14 +366,14 @@ $(function () {
                         data: 'created_at',
                         name: 'created_at',
                         render: (data, type, row, meta) => {
-                           return moment(data).format("YYYY-MM-DD kk:mm");
+                            return moment(data).format("YYYY-MM-DD kk:mm");
                         }
                     },
                     {
                         data: 'type',
                         name: 'type',
                         render: (data, type, row, meta) => {
-                           return data == 1 ? 'Học phí':'Thu khác';
+                            return data == 1 ? 'Học phí' : 'Thu khác';
                         }
                     },
                     {
@@ -389,23 +396,23 @@ $(function () {
                             switch (data) {
                                 case 0:
                                     status = '<span class="label label-info">Lưu (chưa in)</span>';
-                                break;
+                                    break;
                                 case 1:
                                     status = '<span class="label label-warning">Đã in lần 1</span>';
-                                break;
+                                    break;
                                 case 2:
                                     status = '<span class="label label-warning">Đã in lần 2</span>';
-                                break;
+                                    break;
                                 case 3:
                                     status = '<span class="label label-success">Đã duyệt</span>';
-                                break;
+                                    break;
                                 case 4:
                                     status = '<span class="label label-danger">Đã huỷ</span>';
-                                break;
+                                    break;
                                 default:
-                                break;
+                                    break;
                             }
-                            
+
                             return status;
                         }
                     },
@@ -421,7 +428,7 @@ $(function () {
                                 role: $('meta[name="user-role"]').attr('content')
                             }
 
-                            var b_print =  $('<button title="In phiếu thu" class="btn btn-primary print-invoice" style="margin-right: 2px;"><i class="fa fa-print" aria-hidden="true"></i></button>');
+                            var b_print = $('<button title="In phiếu thu" class="btn btn-primary print-invoice" style="margin-right: 2px;"><i class="fa fa-print" aria-hidden="true"></i></button>');
                             var b_view = $('<button title="Xem" class="btn btn-info view-invoice" style="margin-right: 2px;"><i class="fa fa-eye" aria-hidden="true"></i></button>');
                             var b_trash = $('<button title="Huỷ" class="btn btn-danger del-invoice"><i class="fa fa-trash" aria-hidden="true"></i></button>');
                             var b_accountant_locked = $('<button title="Duyệt" class="btn btn-success approve-invoice" style="margin-right: 2px;"><i class="fa fa-check-square-o" aria-hidden="true"></i></button>');
@@ -435,7 +442,7 @@ $(function () {
 
                             if (row.invoice_status > 2) {
                                 $(b_trash).prop('disabled', true);
-                            } 
+                            }
 
                             if (user_info.role != 4) {
                                 $(b_accountant_locked).css('display', 'none');
@@ -454,7 +461,7 @@ $(function () {
 
                     $('DIV#invoice-list_wrapper').prepend(
                         filter_bar,
-                        $('<div></div>', {class:'row',style:'height:20px'})
+                        $('<div></div>', { class: 'row', style: 'height:20px' })
                     );
                 }
             });
@@ -484,9 +491,9 @@ $(function () {
                 var data = invoice_list_table.row($(this).parents('tr')).data();
                 if (confirm('Bạn có chắc muốn huỷ hoá đơn sô ' + data.invoice_number + ' không?')) {
                     $.ajax('/invoice/delete', {
-                        method:"POST",
+                        method: "POST",
                         contentType: 'application/json',
-                        data: JSON.stringify({"id":data.id}),
+                        data: JSON.stringify({ "id": data.id }),
                         success: function (response) {
                             alert('Đã huỷ!');
                             invoice_list_table.ajax.reload();
@@ -502,9 +509,9 @@ $(function () {
                 var data = invoice_list_table.row($(this).parents('tr')).data();
                 if (confirm('Bạn có chắc muốn duyệt hoá đơn sô ' + data.invoice_number + ' không?')) {
                     $.ajax('/invoice/approve', {
-                        method:"POST",
+                        method: "POST",
                         contentType: 'application/json',
-                        data: JSON.stringify({"id":data.id}),
+                        data: JSON.stringify({ "id": data.id }),
                         success: function (response) {
                             alert('Đã duyệt!');
                             invoice_list_table.ajax.reload();
@@ -513,10 +520,10 @@ $(function () {
                             alert(err);
                         }
                     });
-                    
+
                 }
             });
-            
+
         }
     };
 
@@ -549,7 +556,7 @@ $(function () {
             tuition_fee_calculate();
         });
 
-        $(frmTutorFee).find('input#amount').on('change', (e) => {            
+        $(frmTutorFee).find('input#amount').on('change', (e) => {
             if ($(e.target).val() != '') {
                 $('BUTTON#btnSaveInvoice').prop('disabled', false);
                 $('BUTTON#btnPrintInvoice').prop('disabled', false);
@@ -580,6 +587,12 @@ $(function () {
             }
         });
 
+        select2_other_studentid.on('change', (e) => {
+            get_parent_list($(e.target).val(), () => {
+                get_class_list($(e.target).val(), $(class_other_id));
+            }, frmOtherFee);
+        });
+
         $(frmOtherFee).on('keyup change paste', 'input, select, textarea', (e) => {
             $(e.target).closest('.has-error').find('.help-block').hide();
             $(e.target).closest('.has-error').removeClass('has-error');
@@ -587,19 +600,19 @@ $(function () {
     }
 
     var filter_bar_render = () => {
-        var wrapper = $('<div></div>', {id:'invoice_filter_bar', class:'row'});
+        var wrapper = $('<div></div>', { id: 'invoice_filter_bar', class: 'row' });
 
-        var wrapper_title = $('<div></div>', {text:''});
+        var wrapper_title = $('<div></div>', { text: '' });
 
-        var status_filter = $('<select></select>', {id:'invoice-list-status-filter', class:'form-control'});
-        var date_filter = $('<input>', {id:'invoice-list-date-filter', class:'form-control', type:'text',style:'width:100px'});
-        var type_filter = $('<select></select>', {id:'invoice-list-type-filter', class:'form-control'});
+        var status_filter = $('<select></select>', { id: 'invoice-list-status-filter', class: 'form-control' });
+        var date_filter = $('<input>', { id: 'invoice-list-date-filter', class: 'form-control', type: 'text', style: 'width:100px' });
+        var type_filter = $('<select></select>', { id: 'invoice-list-type-filter', class: 'form-control' });
 
-        $(status_filter).append( $('<option></option>', {'value':-1, html: '[ Tất cả trạng thái ]'}));
-        var status = ['Lưu (chưa in)','Đã in lần 1','Đã in lần 2','Đã duyệt', 'Đã huỷ'];
-        for(var i = 0; i < status.length; i++) {
-            $(status_filter).append(  
-                $('<option></option>', {'value':status[i], html: status[i]})
+        $(status_filter).append($('<option></option>', { 'value': -1, html: '[ Tất cả trạng thái ]' }));
+        var status = ['Lưu (chưa in)', 'Đã in lần 1', 'Đã in lần 2', 'Đã duyệt', 'Đã huỷ'];
+        for (var i = 0; i < status.length; i++) {
+            $(status_filter).append(
+                $('<option></option>', { 'value': status[i], html: status[i] })
             );
         }
 
@@ -608,11 +621,11 @@ $(function () {
             invoice_list_table.column(6).search(search_value).draw();
         })
 
-        $(type_filter).append( $('<option></option>', {'value':-1, html: '[ Tất cả ]'}));
-        var type = ['Học phí','Thu khác'];
-        for(var i = 0; i < type.length; i++) {
-            $(type_filter).append(  
-                $('<option></option>', {'value':type[i], html: type[i]})
+        $(type_filter).append($('<option></option>', { 'value': -1, html: '[ Tất cả ]' }));
+        var type = ['Học phí', 'Thu khác'];
+        for (var i = 0; i < type.length; i++) {
+            $(type_filter).append(
+                $('<option></option>', { 'value': type[i], html: type[i] })
             );
         }
 
@@ -622,10 +635,10 @@ $(function () {
         });
 
         wrapper.append(
-            $('<div></div>', {class:'col-sm-3'}).append(wrapper_title),
-            $('<div></div>', {class:'col-sm-3'}).append($('<label>Loại hoá đơn: </label>').append(type_filter)),
-            $('<div></div>', {class:'col-sm-3'}).append($('<label>Trạng thái hoá đơn: </label>').append(status_filter)),
-            $('<div></div>', {class:'col-sm-3'}).append($('<label>Thời gian lập: </label>').append(date_filter))
+            $('<div></div>', { class: 'col-sm-3' }).append(wrapper_title),
+            $('<div></div>', { class: 'col-sm-3' }).append($('<label>Loại hoá đơn: </label>').append(type_filter)),
+            $('<div></div>', { class: 'col-sm-3' }).append($('<label>Trạng thái hoá đơn: </label>').append(status_filter)),
+            $('<div></div>', { class: 'col-sm-3' }).append($('<label>Thời gian lập: </label>').append(date_filter))
         );
 
         $(date_filter).datepicker({
@@ -633,12 +646,12 @@ $(function () {
             format: 'yyyy-mm-dd'
         });
 
-        $(date_filter).on('change',(e) => {
+        $(date_filter).on('change', (e) => {
             var search_value = $.fn.dataTable.util.escapeRegex(
                 $(e.target).val()
             );
             console.log(search_value);
-            invoice_list_table.column(1).search( search_value ? '^'+search_value : '', true, false ).draw();
+            invoice_list_table.column(1).search(search_value ? '^' + search_value : '', true, false).draw();
         });
 
         return wrapper;
@@ -656,7 +669,7 @@ $(function () {
 
         select2_tutor_studentid = $(student_id).select2();
         select2_tutor_classid = $(class_id).select2();
-    
+
         select2_other_studentid = $(student_other_id).select2();
         select2_other_classid = $(class_other_id).select2();
 
@@ -664,7 +677,7 @@ $(function () {
 
         get_student_list((std_id, class_target) => {
             get_class_list(std_id, class_target);
-        }, $('SELECT.select2[id="student_id"]') ,$('SELECT.select2[id="class_id"]'));
+        }, $('SELECT.select2[id="student_id"]'), $('SELECT.select2[id="class_id"]'));
 
         invoice_tutor_form_event_binding();
         invoice_other_form_event_binding();
@@ -673,8 +686,8 @@ $(function () {
             var save_callback = null;
             var data = null;
             var actived_tab_id = $(actived_tab).prop('id');
-            var invoice_type = actived_tab_id == 'tutorfee-tab' ? 'tutorfee' : (actived_tab_id == 'otherfee-tab' ? 'otherfee':'' );
-            var form = actived_tab_id == 'tutorfee-tab' ? frmTutorFee : (actived_tab_id == 'otherfee-tab' ? frmOtherFee:null );
+            var invoice_type = actived_tab_id == 'tutorfee-tab' ? 'tutorfee' : (actived_tab_id == 'otherfee-tab' ? 'otherfee' : '');
+            var form = actived_tab_id == 'tutorfee-tab' ? frmTutorFee : (actived_tab_id == 'otherfee-tab' ? frmOtherFee : null);
             if (invoice_type == 'tutorfee') {
                 data = {
                     "type": 1,
@@ -694,7 +707,7 @@ $(function () {
                     "currency": 'VND',
                 };
             }
-            else if (invoice_type == 'otherfee'){
+            else if (invoice_type == 'otherfee') {
                 data = {
                     "type": 2,
                     "student_id": $(form).find('SELECT#student_id').val(),
