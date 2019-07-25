@@ -337,11 +337,23 @@ $(function () {
                 if (data.schedule != '') {
                     var class_schedule = JSON.parse(data.schedule);
                     for (var wd in class_schedule) {
-                        class_schedule[wd].start = class_schedule[wd].start.length < 5 ? '0' + class_schedule[wd].start : class_schedule[wd].start;
-                        class_schedule[wd].finish = class_schedule[wd].finish.length < 5 ? '0' + class_schedule[wd].finish : class_schedule[wd].finish;
+                        console.log(class_schedule[wd]);
+                        class_schedule[wd].start = class_schedule[wd].start.length > 0 ? (class_schedule[wd].start.length < 5 ? '0' + class_schedule[wd].start : class_schedule[wd].start) : '';
+                        class_schedule[wd].finish = class_schedule[wd].finish.length > 0  ? (class_schedule[wd].finish.length < 5 ? '0' + class_schedule[wd].finish : class_schedule[wd].finish) : '';
                         $(form).find('INPUT#schedule_' + wd).prop('checked', true);
-                        $(form).find('INPUT#time_start_' + wd).val(moment('1900-01-01 ' + class_schedule[wd].start).format("LT"));
-                        $(form).find('INPUT#time_end_' + wd).val(moment('1900-01-01 ' +class_schedule[wd].finish).format("LT"));
+                        if (class_schedule[wd].start.length > 0) {
+                            $(form).find('INPUT#time_start_' + wd).val(moment('1900-01-01 ' + class_schedule[wd].start).format("LT"));
+                        }
+                        else {
+                            $(form).find('INPUT#time_start_' + wd).val('');
+                        }
+
+                        if (class_schedule[wd].finish.length > 0) {
+                            $(form).find('INPUT#time_end_' + wd).val(moment('1900-01-01 ' +class_schedule[wd].finish).format("LT"));
+                        }
+                        else {
+                            $(form).find('INPUT#time_end_' + wd).val('');
+                        }
                     }
 
                 }

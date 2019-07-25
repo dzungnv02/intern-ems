@@ -131,7 +131,6 @@ class Classes extends Model
     public static function getEditClass($idClass)
     {
         $infoClass = Classes::where('classes.id', $idClass)->select("classes.*")
-                    ->join('branch', 'classes.branch_id', '=', 'branch.id')
                     ->first();
         return $infoClass;
     }
