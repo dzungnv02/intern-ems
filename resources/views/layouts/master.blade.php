@@ -81,6 +81,9 @@
                 {{--  <div class="pull-left">
                   <a href="#" class="btn btn-default btn-flat">Profile</a>
                 </div>  --}}
+                <div class="pull-left">
+                  <a style="cursor:pointer" data-toggle="modal" data-target="#userchangepassword-modal">Đổi mật khẩu</a>
+                </div>
                 <div class="pull-right">
                   <a href="/logout" class="btn btn-default btn-flat">Thoát</a>
                 </div>
@@ -225,6 +228,47 @@
        immediately after the control sidebar -->
   <div class="control-sidebar-bg"></div>
 </div>
+
+<div class="modal fade" id="userchangepassword-modal" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="width:400px">
+      <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+              <h3 class="modal-title" id="userchangepassword-modal-title">Đổi mật khẩu</h3>
+          </div>
+          <div class="modal-body">
+              <div class="row"> 
+                <div class="col-sm-12">
+                  <form id="frmChangePasswd">
+                      <div class="form-group">
+                          <label for="currentPassword">Mật khẩu hiện tại</label>
+                          <input type="password" class="form-control" id="currentPassword" placeholder="Nhập mật khẩu đang sử dụng">
+                          <span class="help-block"></span>
+                      </div>
+                      <div class="form-group">
+                          <label for="newPassword">Mật khẩu mới</label>
+                          <input type="password" class="form-control" id="newPassword" placeholder="Nhập mật khẩu mới">
+                          <span class="help-block"></span>
+                      </div>
+                      <div class="form-group">
+                          <label for="newPasswordConfirm">Xác nhận mật khẩu mới</label>
+                          <input type="password" class="form-control" id="newPasswordConfirm" placeholder="Nhập lại mật khẩu mới">
+                          <span class="help-block"></span>
+                      </div>
+                  </form>
+                </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-default" id="btnClose" data-dismiss="modal">Đóng</button>
+              <button type="button" class="btn btn-primary" id="btnChangePassword" data-loading-text="<i class='fa fa-spinner fa-spin'></i> Đang lưu...">Đổi mật khẩu</button>
+          </div>
+      </div>
+  </div>
+</div>
+
 <!-- ./wrapper -->
 <!-- jQuery 3 -->
 {{--  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>  --}}
