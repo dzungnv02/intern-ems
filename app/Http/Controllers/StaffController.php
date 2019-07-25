@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Staff;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class StaffController extends Controller
 {
@@ -79,6 +80,13 @@ class StaffController extends Controller
         $editStaff = Staff::editPasswordStaff($id, $newPassword);
         return response()->json(['code' => 1, 'message' => 'Cap nhat thanh cong'], 200);
     }
+
+    public function verifyPassword($password) 
+    {
+
+        return response()->json(['code' => 1, 'matched' => Staff::checkCurrentPassword(base64_decode($password), Auth::user()->id)], 200);
+    }
+
     /*
      * edit staff_id
      */

@@ -76,6 +76,10 @@ Route::get('staff-edit', function(){
     return view('staff/edit');
 })->middleware('auth');
 
+Route::post('/change-password', 'StaffController@editPasswordStaff')->middleware('auth');
+Route::get('/verify-password/{password}', 'StaffController@verifyPassword')->middleware('auth');
+
+
 Route::patch('/update-staff', 'StaffController@editStaff')->middleware('auth');
 
 Route::get('branch', 'BranchController@index')->middleware('auth');

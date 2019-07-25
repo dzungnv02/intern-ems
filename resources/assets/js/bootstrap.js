@@ -55,6 +55,7 @@ try {
     require('./invoice');
     require('./branch');
     require('./weeklyschedule');
+    require('./main');
     
 } catch (e) {
     console.log(e);
