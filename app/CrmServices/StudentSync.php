@@ -99,11 +99,11 @@ class StudentSync
                 foreach ($ems_field as $f_crm => $f_ems) {
                     if ($f_crm == 'assessment_teacher') {
                         $t_crm = data_get($crm_student, $f_crm);
-                        $t_ems = is_object($t_crm) ? Teacher::where('crm_id', $t_crm->id)->first() : null;
+                        $t_ems = is_object($t_crm) ? Teacher::where('teachers.crm_id', $t_crm->id)->first() : null;
                         $assessment_list[$f_ems] = data_get($t_ems, 'id');
                     } else if ($f_crm == 'trial_class') {
                         $c_crm = data_get($crm_student, $f_crm);
-                        $c_ems = is_object($c_crm) ? Classes::where('crm_id', $c_crm->id)->first() : null;
+                        $c_ems = is_object($c_crm) ? Classes::where('classes.crm_id', $c_crm->id)->first() : null;
                         $assessment_list[$f_ems] = data_get($c_ems, 'id');
                     } else if ($f_crm == 'assessment_date' || $f_crm == 'trial_start_date') {
                         $tmp_date = data_get($crm_student, $f_crm) != null ? new DateTime($crm_student->$f_ems) : '';
@@ -117,7 +117,7 @@ class StudentSync
                 $value = !is_null(data_get($crm_student, $crm_field)) ? json_encode(data_get($crm_student, $crm_field), JSON_UNESCAPED_UNICODE) : '';
             } else if ($crm_field == 'current_class') {
                 $crm_class = data_get($crm_student, $crm_field);
-                $cls = $crm_class != null ? Classes::where('crm_id', data_get($crm_class, 'id'))->first() : null;
+                $cls = $crm_class != null ? Classes::where('classes.crm_id', data_get($crm_class, 'id'))->first() : null;
                 $value = $cls != null ? data_get($cls, 'id') : '';
             } else if ($crm_field == 'register_date' || $crm_field == 'branch_transfer_date') {
                 if ($crm_student->$crm_field == null) {continue;}
