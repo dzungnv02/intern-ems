@@ -108,7 +108,7 @@ class syncClasses extends Command
                     } else if ($c_field == 'teacher') {
                         $val = data_get($crm_class, $c_field);
                         if ($val != null) {
-                            $teacher = Teacher::where('crm_id', data_get($val, 'id'))->first();
+                            $teacher = Teacher::where('teachers.crm_id', data_get($val, 'id'))->first();
                             $new_class->teacher_id = $teacher != null ? $teacher->id : null;
                             $new_class->crm_teacher = json_encode($val, JSON_UNESCAPED_UNICODE);
                         }
@@ -128,7 +128,7 @@ class syncClasses extends Command
                 $branch = Branch::getBranchByCrmOwner($item->Owner->id);
 
                 $crm_class = $zoho_crm->getRecordById($crm_module, data_get($item, 'id'));
-                $old_class = Classes::where('crm_id', data_get($crm_class, 'id'))->first();
+                $old_class = Classes::where('classes.crm_id', data_get($crm_class, 'id'))->first();
                 for ($i = 0; $i < count($crm_fields); $i++) {
                     $c_field = $crm_fields[$i];
                     $e_field = $ems_fields[$i];
@@ -143,7 +143,7 @@ class syncClasses extends Command
                     } else if ($c_field == 'teacher') {
                         $val = data_get($crm_class, $c_field);
                         if ($val != null) {
-                            $teacher = Teacher::where('crm_id', data_get($val, 'id'))->first();
+                            $teacher = Teacher::where('teachers.crm_id', data_get($val, 'id'))->first();
                             $old_class->teacher_id = $teacher != null ? $teacher->id : null;
                             $old_class->crm_teacher = json_encode($val, JSON_UNESCAPED_UNICODE);
                         }
@@ -258,7 +258,7 @@ class syncClasses extends Command
 
                 if ($count) {
                     foreach($crm_students as $student) {
-                        $ems_student = Student::where('crm_id', data_get($student, 'id'))->first();
+                        $ems_student = Student::where('students.crm_id', data_get($student, 'id'))->first();
 
                         if ($ems_student != null) {
                             StudentClass::assignClass(data_get($cls, 'id'), data_get($ems_student, 'id'));
