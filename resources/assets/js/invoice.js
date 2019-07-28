@@ -155,7 +155,8 @@ $(function () {
             'end_date': $(frmTutorFee).find('INPUT#end_date').val(),
             'duration': $(frmTutorFee).find('INPUT#duration').val(),
             'price': numeral($(frmTutorFee).find('INPUT#price').val()).value(),
-            'discount': $(frmTutorFee).find('INPUT#discount').val(),
+            'discount': numeral($(frmTutorFee).find('INPUT#discount').val()).value(),
+            'discount_type': $(frmTutorFee).find('INPUT#discount-type')[0].checked === false ? 'p':'c', 
             'prepaid': numeral($(frmTutorFee).find('INPUT#prepaid').val()).value()
         }
 
@@ -188,6 +189,7 @@ $(function () {
         $(frmTutorFee).find('INPUT#duration').prop('disabled', !toggle);
         $(frmTutorFee).find('INPUT#discount').prop('disabled', !toggle);
         $(frmTutorFee).find('INPUT#discount-desc').prop('disabled', !toggle);
+        $(frmTutorFee).find('INPUT#discount-type').prop('disabled', !toggle);
         $(frmTutorFee).find('INPUT#prepaid').prop('disabled', !toggle);
         $(frmTutorFee).find('INPUT#amount').prop('disabled', !toggle);
     }
@@ -276,9 +278,14 @@ $(function () {
         }
 
         if (data.discount != '' && isNaN(data.discount)) {
-            container = $(frmTutorFee).find('INPUT#discount').parent();
+            container = $(frmTutorFee).find('INPUT#discount').parent().parent();
             $(container).addClass('has-error');
-            $(container).find('.help-block').html('Hãy nhập giá trị là số nhỏ hơn hoặc bằng 100').show();
+            if ($(frmTutorFee).find('INPUT#discount-type')[0].checked === false) {
+                $(container).find('.help-block').html('Hãy nhập giá trị là số nhỏ hơn hoặc bằng 100').show();
+            }
+            else {
+                $(container).find('.help-block').html('Hãy nhập giá trị là số tiền').show();
+            }
             is_valided = false;
         }
 
@@ -334,13 +341,6 @@ $(function () {
         if ($.fn.dataTable.isDataTable('TABLE#invoice-list')) {
             invoice_list_table = $('TABLE#invoice-list').DataTable();
         } else {
-
-            $.fn.dataTable.ext.buttons.reload = {
-                text: 'Làm mới dữ liệu',
-                action: function (e, dt, node, config) {
-                    dt.ajax.reload();
-                }
-            };
 
             invoice_list_table = $('TABLE#invoice-list').DataTable({
                 language: datatable_language,
@@ -477,7 +477,9 @@ $(function () {
                 var data = invoice_list_table.row($(this).parents('tr')).data();
                 print_invoice(data.id, () => {
                     setTimeout(() => {
-                        invoice_list_table.ajax.reload()
+                        invoice_list_table.ajax.reload(() => {
+                            invoice_list_table.column('1:visible').order( 'desc' ).draw();
+                        })
                     }, 500);
                 });
             });
@@ -496,7 +498,7 @@ $(function () {
                         data: JSON.stringify({ "id": data.id }),
                         success: function (response) {
                             alert('Đã huỷ!');
-                            invoice_list_table.ajax.reload();
+                            invoice_list_table.column('1:visible').order( 'desc' ).draw();
                         },
                         error: (xhr, status, err) => {
                             alert(err);
@@ -514,7 +516,7 @@ $(function () {
                         data: JSON.stringify({ "id": data.id }),
                         success: function (response) {
                             alert('Đã duyệt!');
-                            invoice_list_table.ajax.reload();
+                            invoice_list_table.column('1:visible').order( 'desc' ).draw();
                         },
                         error: (xhr, status, err) => {
                             alert(err);
@@ -548,13 +550,33 @@ $(function () {
             }
         );
 
-        $(frmTutorFee).find('input#price,input#duration,input#discount,input#prepaid').on('blur', (e) => {
+        $(frmTutorFee).find('input#price,input#duration,input#prepaid,input#discount').on('blur', (e) => {
             var value = $(e.target).val().trim();
-            if (e.target.id == 'price' || e.target.id == 'prepaid') {
+            if (e.target.id == 'price' ||  e.target.id == 'prepaid') {
                 $(e.target).val(numeral(value).format('0,0'));
             }
             tuition_fee_calculate();
         });
+
+        $(frmTutorFee).find('INPUT#discount-type').on('click', (e) => {
+            $(frmTutorFee).find('input#discount').val('');
+            $(frmTutorFee).find('input#discount').unbind('blur');
+            if ($(e.target)[0].checked === true) {
+                $(frmTutorFee).find('SPAN#discount-icon').text('VND');
+                $(frmTutorFee).find('input#discount').on('blur', (e) => {
+                    var value = $(e.target).val().trim();
+                    $(e.target).val(numeral(value).format('0,0'));
+                    tuition_fee_calculate();
+                });
+            }
+            else {
+                $(frmTutorFee).find('SPAN#discount-icon').text('%');
+                $(frmTutorFee).find('input#discount').on('blur', (e) => {
+                    tuition_fee_calculate();
+                });
+            }
+            tuition_fee_calculate();
+        })
 
         $(frmTutorFee).find('input#amount').on('change', (e) => {
             if ($(e.target).val() != '') {
@@ -700,7 +722,8 @@ $(function () {
                     "payer": $(form).find('INPUT#payer').val(),
                     "prepaid": numeral($(form).find('INPUT#prepaid').val()).value(),
                     "amount": numeral($(form).find('INPUT#amount').val()).value(),
-                    "discount": $(form).find('INPUT#discount').val(),
+                    "discount": numeral($(form).find('INPUT#discount').val()).value(),
+                    "discount_type": $(form).find('INPUT#discount-type')[0].checked === true ? 'c' : 'p',
                     "discount_desc": $(form).find('INPUT#discount_desc').val(),
                     "payment_method": $(form).find('INPUT[name="payment_method"]:checked').val(),
                     "invoice_status": 0,
@@ -728,13 +751,13 @@ $(function () {
                 if ($(e.target).prop('id') == 'btnSaveInvoice') {
                     save_callback = () => {
                         tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
-                        invoice_list_table.ajax.reload();
+                        invoice_list_table.column('1:visible').order( 'desc' ).draw();
                     };
                 }
                 else if ($(e.target).prop('id') == 'btnPrintInvoice') {
                     save_callback = (invoce_id) => {
                         print_invoice(invoce_id, () => {
-                            invoice_list_table.ajax.reload();
+                            invoice_list_table.column('1:visible').order( 'desc' ).draw();
                         });
                         tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
                     };

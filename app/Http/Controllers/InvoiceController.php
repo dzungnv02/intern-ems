@@ -64,6 +64,7 @@ class InvoiceController extends Controller
         $price = isset($input['price']) ? (int) $input['price'] : 0;
         $prepaid = isset($input['prepaid']) ? (int) $input['prepaid'] : 0;
         $discount = isset($input['discount']) ? (int) $input['discount'] : 0;
+        $discount_type = isset($input['discount_type']) ? $input['discount_type']: 'p';
 
         if ($start_date == '') {
             $err_msg = 'Chưa nhập ngày bắt đầu!';
@@ -85,8 +86,11 @@ class InvoiceController extends Controller
 
         $amount = ($duration * $price) - $prepaid;
 
-        if ($discount > 0) {
+        if ($discount > 0  && $discount_type === 'p') {
             $amount -= (($amount * $discount) / 100);
+        }
+        else if ($discount > 0  && $discount_type === 'c') {
+            $amount -= $discount;
         }
 
         return response()->json(['code' => 0, 'data' => ['duration' => $duration, 'end_date' => $end_date, 'amount' => $amount, 'inputs' => $input]], 200);
@@ -112,6 +116,7 @@ class InvoiceController extends Controller
             'prepaid',
             'discount',
             'discount_desc',
+            'discount_type',
             'invoice_status',
             'currency',
             'note',
@@ -172,7 +177,7 @@ class InvoiceController extends Controller
         }
 
         $last_printed_time = date('Y-m-d H:i:s');
-
+        
         $invoice_data['css'] = $css;
 
         $invoice_data['student_name'] = $student->name;
@@ -180,7 +185,7 @@ class InvoiceController extends Controller
         $invoice_data['payment_method'] =  $payment_methods[$invoice_data['payment_method']];
 
         $invoice_data['class_name'] = $class->name;
-        $invoice_data['discount'] = (int) $invoice_data['discount'];
+        $invoice_data['discount'] = $invoice_data['discount_type'] === 'p' ? (int) $invoice_data['discount'] . '%' : number_format ( $invoice_data['discount'] , 0 , '' , ',' ) . ' ' .$invoice_data['currency'];
         $invoice_data['prepaid'] = $invoice_data['prepaid'] ? $invoice_data['prepaid'] : 0;
         $invoice_data['amount_text'] = $invoice_data['amount'] ? $this->number_to_words($invoice_data['amount']) : 0;
         $invoice_data['created_by_name'] = $user->name;
@@ -203,7 +208,6 @@ class InvoiceController extends Controller
         $invoice_data['end_date'] = date('d/m/Y', strtotime($invoice_data['end_date']));
         $invoice_data['created_at'] = date('d/m/Y H:i', strtotime($invoice_data['created_at']));
         $invoice_data['act'] = $act;
-
         $view = ((int)$invoice_data['type'] == 1) ? 'invoice/detail/tutorfee_print' : 'invoice/detail/otherfee_print';
         $view_pdf = ((int)$invoice_data['type'] == 1) ? 'invoice/detail/tutorfee_print_pdf' : 'invoice/detail/otherfee_print';
 

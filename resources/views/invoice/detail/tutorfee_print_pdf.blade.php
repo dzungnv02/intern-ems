@@ -175,7 +175,7 @@
         <tr>
             <td></td>
             <td>Chiết khấu</td>
-            <th colspan="2">{{$discount}}%</th>
+            <th colspan="2">{{$discount}}</th>
             <td>Lý do chiết khấu</td>
             <th>{{$discount_desc}}</th>
         </tr>
