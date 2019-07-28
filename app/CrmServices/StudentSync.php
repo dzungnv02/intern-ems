@@ -227,10 +227,10 @@ class StudentSync
         if ($student_stages[$crm_student->Stage] == 0) {
             return;
         }
-        
 
         $owner = $crm_student->Owner->id;
 
+        //if ($is_sync_class && $crm_student->Stage !== 'Withdrawal') {
         if ($is_sync_class) {
             $is_synced = true;
             Log::info('Syncronize Classes!');
