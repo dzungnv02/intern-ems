@@ -20,6 +20,7 @@ class Invoice extends Eloquent
         return Student::select('rev_n_exp.*', 'students.name as std_name', 'students.student_code', 'classes.name as c_name')
                         ->join('rev_n_exp', 'rev_n_exp.student_id', '=', 'students.id')
                         ->join('classes', 'rev_n_exp.class_id', '=', 'classes.id')
+                        ->orderBy('created_at', 'DESC')
                         ->get();
     }
 
