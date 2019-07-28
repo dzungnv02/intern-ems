@@ -9,6 +9,7 @@ use App\Classes;
 use App\Teacher;
 use App\Classes\ClassesTimeTable;
 use App\TeacherSchedules;
+use Illuminate\Support\Facades\DB;
 
 class TimeTableController extends Controller
 {
@@ -108,17 +109,24 @@ class TimeTableController extends Controller
         $end_date = $input['end_date'];
 
 
-        $class = Classes::select('classes.*')
+        $class = DB::table('classes')->select('classes.*')
                 ->join('branch', 'classes.branch_id', '=', 'branch.id')
                 ->where('classes.id', '=', $class_id)
-                ->first()
-                ->toArray();
+                ->first();
+        
+        if ($class === null) {
+            return response()->json(['code' => 0, 'message' => 'Class ID '.$class_id. ' not found!'], 500);
+        }
+        else {
+            $class = json_decode(json_encode($class), true);
+        }
 
         $holidays = Holiday::pluckHolidays();
         $schedule = $class['schedule'] ? json_decode($class['schedule'], true) : [];
 
-        $teacher = Teacher::find($class['teacher_id'])->toArray();
-
+        $teacher = DB::table('teachers')->select('teachers.*')->where('id', $class['teacher_id'])->first();
+        $teacher = $teacher !== null ? json_decode(json_encode($teacher), true) : ['name' => ''];
+        
         $params = ['schedule' => $schedule, 'holidays' => $holidays, 'date_range' => ['start_date' => $start_date, 'end_date' => $end_date]];
         $obj_time_table = new ClassesTimeTable($params);
         $time_table = $obj_time_table->calc_time_table(['teacher_id' => $class['teacher_id'], 'teacher_name' => $teacher['name']]);
