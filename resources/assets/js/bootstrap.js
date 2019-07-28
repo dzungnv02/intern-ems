@@ -38,7 +38,8 @@ try {
     });
 
     $( document ).ajaxSuccess(function( event, xhr, settings ) {
-        if (settings.method == 'POST') {
+        var exceptions = ['/invoice/tuition_fee_calculate'];
+        if (settings.method == 'POST' && !exceptions.includes(settings.url)) {
             toastr.success('Thành công');
         }
     });
