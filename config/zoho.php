@@ -161,7 +161,7 @@ return [
         'Review sau 15d' => 1,
         'Review sau 2m' => 1,
         'Đăng kí tiếp' => 1,
-        'Withdrawal' => 1
+        'Withdrawal' => 0
     ]
 
 ];
