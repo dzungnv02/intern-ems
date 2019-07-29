@@ -279,8 +279,11 @@ class StudentSync
         } else if ($this->sync_crm_class($owner)) {
             Log::debug('mapping_classes sync_crm_class');
             $class_list = Classes::getClassByCrmOwner($owner);
+            Log::debug('owner '. $owner);
             foreach ($class_list as $ems_class) {
                 $student_list = $this->zoho_crm->getRelatedList('Products', data_get($ems_class, 'crm_id'), 'Deal');
+                Log::debug('ems_class '. $ems_class);
+                Log::debug('student_list '. json_encode($student_list));
                 if ($student_list) {
                     foreach ($student_list as $std) {
                         if (data_get($std, 'id') == $crm_student->id) {
