@@ -282,7 +282,7 @@ class StudentSync
             Log::debug('owner '. var_export($owner, true));
             foreach ($class_list as $ems_class) {
                 $student_list = $this->zoho_crm->getRelatedList('Products', data_get($ems_class, 'crm_id'), 'Deal');
-                Log::debug('ems_class '. $ems_class);
+                Log::debug('ems_class '. var_export($ems_class, true));
                 Log::debug('student_list '. var_export($student_list, true));
                 if ($student_list) {
                     foreach ($student_list as $std) {
