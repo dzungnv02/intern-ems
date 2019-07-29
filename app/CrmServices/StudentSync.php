@@ -219,6 +219,7 @@ class StudentSync
 
     protected function mapping_classes($crm_student, $is_sync_class = false)
     {
+        Log::debug('mapping_classes');
         $is_synced = false;
 
         $student_stages = config('zoho.DEAL_STAGES');
@@ -276,6 +277,7 @@ class StudentSync
             }
 
         } else if ($this->sync_crm_class($owner)) {
+            Log::debug('mapping_classes sync_crm_class');
             $class_list = Classes::getClassByCrmOwner($owner);
             foreach ($class_list as $ems_class) {
                 $student_list = $this->zoho_crm->getRelatedList('Products', data_get($ems_class, 'crm_id'), 'Deal');
@@ -293,6 +295,9 @@ class StudentSync
 
     protected function sync_crm_class($owner)
     {
+        
+        Log::debug('sync_crm_class');
+        
         Artisan::call('zoho:classes', [
             '--getlist' => true,
             '--owner' => $owner,
