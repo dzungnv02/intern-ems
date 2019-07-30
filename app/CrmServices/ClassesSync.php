@@ -51,12 +51,12 @@ class ClassesSync
 
     public function delete_class($record_id)
     {
-
+        
     }
 
     protected function save_class(EmsClass $ems_class)
     {
-
+        var_dump('save_class');
         $ems_fields = [];
         $crm_fields = [];
 
@@ -66,7 +66,7 @@ class ClassesSync
         }
 
         $crm_class = $this->zoho_crm->getRecordById($this->crm_module, data_get($ems_class, 'crm_id'));
-
+        var_dump($crm_class);
         if ($crm_class == false) {
             return;
         };
