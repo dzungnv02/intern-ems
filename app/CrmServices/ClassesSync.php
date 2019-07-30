@@ -110,8 +110,9 @@ class ClassesSync
     }
 
     protected function get_student_list($ems_class) {
+        var_dump('get_student_list');
         $list = $this->zoho_crm->getRelatedList($this->crm_module, data_get($ems_class, 'crm_id'), 'Deal');
-        dump($list);
+        var_dump($list);
         if (!$list) {
             return;
         }
