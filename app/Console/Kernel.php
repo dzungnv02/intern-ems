@@ -20,6 +20,7 @@ class Kernel extends ConsoleKernel
         Commands\syncParent::class,
         Commands\syncClasses::class,
         Commands\syncStudentClasses::class,
+        Commands\CleanClasses::class,
     ];
 
     /**
