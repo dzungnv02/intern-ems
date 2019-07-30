@@ -404,6 +404,7 @@ class ZohoCrmConnect
         if (count($crm_data) == 0) {
             return false;
         }
+        $updated_id = [];
         $insert_list = [];
         $update_list = [];
 
@@ -418,35 +419,47 @@ class ZohoCrmConnect
                 foreach ($local_data as $local_obj) {
                     if ($local_obj['crm_id'] == $crm_obj->id) {
                         $update_list[$local_obj['id']] = $crm_obj;
+                        array_push($updated_id, $crm_obj->id);
                         break;
                     }
                 }
             }
-        }
 
-        foreach ($crm_data as $crm_obj) {
-            $filltered = ($fillter_field != '') ? data_get($crm_obj, $fillter_field) : null;
-            if ($filltered != null && $filltered != $fillter_value) {
-                continue;
-            }
-
-            if ($local_exists) {
-                $updated = false;
-                foreach ($update_list as $update_obj) {
-                    if ($update_obj->id == $crm_obj->id) {
-                        $updated = true;
-                        break;
-                    }
+            foreach ($crm_data as $crm_obj) {
+                $filltered = ($fillter_field != '') ? data_get($crm_obj, $fillter_field) : null;
+                if ($filltered != null && $filltered != $fillter_value) {
+                    continue;
                 }
 
-                if (!$updated) {
+                if (!in_array($crm_obj->id, $updated_id)) {
                     array_push($insert_list, $crm_obj);
                 }
-
-            } else {
-                array_push($insert_list, $crm_obj);
             }
         }
+
+        // foreach ($crm_data as $crm_obj) {
+        //     $filltered = ($fillter_field != '') ? data_get($crm_obj, $fillter_field) : null;
+        //     if ($filltered != null && $filltered != $fillter_value) {
+        //         continue;
+        //     }
+
+        //     if ($local_exists) {
+        //         $updated = false;
+        //         foreach ($update_list as $update_obj) {
+        //             if ($update_obj->id == $crm_obj->id) {
+        //                 $updated = true;
+        //                 break;
+        //             }
+        //         }
+
+        //         if (!$updated) {
+        //             array_push($insert_list, $crm_obj);
+        //         }
+
+        //     } else {
+        //         array_push($insert_list, $crm_obj);
+        //     }
+        // }
         return true;
     }
 }

@@ -9,6 +9,7 @@ use \App\Classes\ZohoCrmConnect;
 use \App\Teacher;
 use App\Student;
 use \App\StudentClass;
+use Illuminate\Support\Facades\DB;
 
 class syncClasses extends Command
 {
@@ -66,8 +67,8 @@ class syncClasses extends Command
 
     protected function get_list($fillter_owner_id)
     {
-        $ems_list = Classes::all()->toArray();
-
+        //$ems_list = Classes::all()->toArray();
+        $ems_list = DB::table('classes')->select('*')->get()->toArray();
         $crm_module = config('zoho.MODULES.ZOHO_MODULE_EMS_CLASS');
         $ems_fields = [];
         $crm_fields = [];
