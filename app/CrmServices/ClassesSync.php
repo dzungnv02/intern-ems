@@ -66,7 +66,9 @@ class ClassesSync
         }
 
         $crm_class = $this->zoho_crm->getRecordById($this->crm_module, data_get($ems_class, 'crm_id'));
+        var_dump($ems_class);
         var_dump($crm_class);
+        
         if ($crm_class == false) {
             return;
         };
