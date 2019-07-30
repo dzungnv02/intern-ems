@@ -40,6 +40,7 @@ class ClassesSync
     {
         $ems_class = EmsClass::getClassByCrmId($record_id);
         if ($ems_class == null) {
+            dump('ADD for not exist!');
             $this->add_class($record_id);
             return;
         }
@@ -110,6 +111,7 @@ class ClassesSync
 
     protected function get_student_list($ems_class) {
         $list = $this->zoho_crm->getRelatedList($this->crm_module, data_get($ems_class, 'crm_id'), 'Deal');
+        dump($list);
         if (!$list) {
             return;
         }
@@ -117,12 +119,15 @@ class ClassesSync
         $studentSync = new StudentSync();
 
         foreach($list as $crm_student) {
-            $ems_student = EmsStudent::getStudentByCrmID(data_get($crm_student, 'id'));
+            $crm_id = data_get($crm_student, 'id');
+            $ems_student = EmsStudent::getStudentByCrmID($crm_id);
             if ($ems_student == null) {
                 $ems_student = new EmsStudent;
-                $studentSync->save_student($ems_student, $crm_student, false);
-                $ems_student = EmsStudent::getStudentByCrmID(data_get($crm_student, 'id'));
+                //$studentSync->save_student($ems_student, $crm_student, false);
+                $studentSync->add_student($crm_id, false);
+                $ems_student = EmsStudent::getStudentByCrmID($crm_id);
             }
+
             StudentClass::assignClass(data_get($ems_class, 'id'), data_get($ems_student, 'id'));
         }
 

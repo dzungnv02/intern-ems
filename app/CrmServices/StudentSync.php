@@ -30,7 +30,7 @@ class StudentSync
 
     }
 
-    public function add_student($record_id)
+    public function add_student($record_id, $assign_class = true)
     {
         Log::info('Adding student: ' . $record_id);
 
@@ -43,7 +43,7 @@ class StudentSync
 
         $new_student = new Student;
 
-        $this->save_student($new_student, $crm_student);
+        $this->save_student($new_student, $crm_student, $assign_class);
     }
 
     public function edit_student($record_id)
