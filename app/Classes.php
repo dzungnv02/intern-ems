@@ -310,7 +310,18 @@ class Classes extends Model
 
     public static function getClassByCrmId($crm_id)
     {
-        return DB::table('classes')->select('*')->where('classes.crm_id', '=', $crm_id)->first();
+        $cl = DB::table('classes')->select('*')->where('classes.crm_id', '=', $crm_id)->first();
+        if ($cl !== null) {
+            $ary_cls = get_object_vars($cl);
+            $class = new Classes;
+            foreach($ary_cls as $field => $value) {
+                $class->$field = $value;
+            }
+
+            return $class;
+        }
+        
+        return null;
     }
 
     public static function getClassByCrmOwner($crm_owner)
