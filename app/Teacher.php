@@ -77,6 +77,17 @@ class Teacher extends Model
     }
 
     /**
+     * Update.
+     *
+     * @param  array $data
+     * @return void
+     */
+    public static function updateTeacher($id, $data)
+    {
+        return DB::table('teachers')->where('id', '=', $id)->update($data);
+    }
+
+    /**
      * EDIT giáo viên.
      *
      * @param  int $id
@@ -115,6 +126,7 @@ class Teacher extends Model
 
     public static function getTeacherByCrmId($crm_id)
     {
-        return Teacher::select('*')->where('crm_id', '=', $crm_id)->first();
+        //return Teacher::select('*')->where('crm_id', '=', $crm_id)->first();
+        return DB::table('teachers')->select('*')->where('crm_id', '=', $crm_id)->first();
     }
 }

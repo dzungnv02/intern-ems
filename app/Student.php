@@ -86,12 +86,14 @@ class Student extends Eloquent
 
     public static function getStudentByCrmID($crm_id)
     {
-        $result = Student::where('crm_id', $crm_id)->get();
-        if (count($result)) {
-            return $result[0];
-        } else {
-            return null;
-        }
+        // $result = Student::where('crm_id', $crm_id)->get();
+        // if (count($result)) {
+        //     return $result[0];
+        // } else {
+        //     return null;
+        // }
+
+        return DB::table('students')->select('*')->where('crm_id', $crm_id)->first();
 
     }
 

@@ -1,6 +1,7 @@
 <?php
 namespace App\CrmServices;
 
+use Illuminate\Support\Facades\DB;
 use App\Classes\ZohoCrmConnect;
 use App\Student;
 use Artisan;
@@ -74,10 +75,11 @@ class StudentSync
         }
     }
 
-    public function save_student(Student $ems_student, $crm_student, $assign_class = true)
+    public function save_student($ems_student, $crm_student, $assign_class = true)
     {
         $ems_fields = [];
         $crm_fields = [];
+        $student_data = [];
         $branch = Branch::getBranchByCrmOwner($crm_student->Owner->id);
         $assessment_list = [];
 
@@ -133,11 +135,21 @@ class StudentSync
             } else {
                 $value = $crm_student->$crm_field;
             }
-            $ems_student->$ems_field = $value;
+
+            $student_data[$ems_field] = $value;
+            //$ems_student->$ems_field = $value;
         }
 
-        $ems_student->register_branch_id = $branch != null ? $branch->id : null;
-        $ems_student->save();
+        //$ems_student->register_branch_id = $branch != null ? $branch->id : null;
+        //$ems_student->save();
+        $student_data['register_branch_id'] = $branch != null ? $branch->id : null;
+
+        if ($ems_student->id != null) {
+            DB::table('students')->where('id', $ems_student->id)->update($student_data);
+        }
+        else {
+            Student::insert($student_data);
+        }
 
         if ($assessment_list['status']) {
             unset($assessment_list['status']);
@@ -181,36 +193,58 @@ class StudentSync
 
         $parent = null;
         $ems_student = Student::getStudentByCrmID($crm_student->id);
+        $parent_data = [];
+        $parent_id = null;
 
         if ($crm_contact->Account_Name != null) {
             $parent = Parents::getParentByCrmId($crm_contact->Account_Name->id);
-            if (!$parent) {
-                $parent = new Parents;
+            if ($parent !== null) {
+                $parent_id = $parent->id;
+                //$parent = new Parents;
             }
         } elseif ($crm_student->Contact_Name != null) {
             $parent = Parents::getParentByCrmContactId($crm_student->Contact_Name->id);
-            if (!$parent) {
-                $parent = new Parents;
+            if ($parent !== null) {
+                $parent_id = $parent->id;
+                //$parent = new Parents;
             }
-        } else {
-            $parent = new Parents;
-        }
+        } 
+        // else {
+        //     $parent = new Parents;
+        // }
 
         $contacts_fields = config('zoho.MAPPING.ZOHO_MODULE_CONTACTS');
 
         foreach ($contacts_fields as $crm_field => $ems_field) {
             $value = $crm_field != 'Owner' ? $crm_contact->$crm_field : json_encode($crm_contact->$crm_field, JSON_UNESCAPED_UNICODE);
-            $parent->$ems_field = $value;
+            //$parent->$ems_field = $value;
+            $parent_data[$ems_field] = $value;
         }
 
         if (!$parent->address) {
-            $parent->address = $ems_student->address;
+            $parent_data['address'] = $ems_student->address;
+            //$parent->address = $ems_student->address;
         }
 
-        $parent->save();
+        if ($parent_id != null) {
+            DB::table('parents')->where('id', $parent_id)->update($parent_data);
+        }
+        else {
+            DB::table('parents')->insert($parent_data);
+        }
 
-        $ems_student->parent_id = $parent->id;
-        $ems_student->save();
+        //$parent->save();
+
+        $student_data = [
+            'parent_id' => $parent_id,
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        DB::table('students')->where('id', $ems_student->id)->update($student_data);
+
+        // $ems_student->parent_id = $parent->id;
+        // $ems_student->save();
+        
 
         $ems_student_parent->parent_id = $parent->id;
         $ems_student_parent->student_id = $ems_student->id;
@@ -223,7 +257,6 @@ class StudentSync
         $is_synced = false;
 
         $student_stages = config('zoho.DEAL_STAGES');
-        var_dump($crm_student->Stage);
         
         if ($student_stages[$crm_student->Stage] == 0) {
             return;
@@ -276,14 +309,13 @@ class StudentSync
                 $this->mapping_classes($crm_student, true);
             }
 
-        } else if ($this->sync_crm_class($owner)) {
-            Log::debug('mapping_classes sync_crm_class');
+        } 
+        //else if ($this->sync_crm_class($owner)) {
+        else {
             $class_list = Classes::getClassByCrmOwner($owner);
-            Log::debug('owner '. var_export($owner, true));
             foreach ($class_list as $ems_class) {
                 $student_list = $this->zoho_crm->getRelatedList('Products', data_get($ems_class, 'crm_id'), 'Deal');
-                Log::debug('ems_class '. var_export($ems_class, true));
-                Log::debug('student_list '. var_export($student_list, true));
+                
                 if ($student_list) {
                     foreach ($student_list as $std) {
                         if (data_get($std, 'id') == $crm_student->id) {
@@ -305,6 +337,7 @@ class StudentSync
             '--getlist' => true,
             '--owner' => $owner,
         ]);
+
         $output = Artisan::output();
 
         if (strpos($output, 'end_sync_classes') !== false) {

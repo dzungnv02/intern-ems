@@ -54,11 +54,12 @@ class ClassesSync
         
     }
 
-    protected function save_class(EmsClass $ems_class)
+    protected function save_class($ems_class)
     {
-        var_dump('save_class');
         $ems_fields = [];
         $crm_fields = [];
+
+        $class_data = [];
 
         foreach ($this->mapping_fields as $crm_field => $ems_field) {
             array_push($ems_fields, $ems_field);
@@ -66,9 +67,7 @@ class ClassesSync
         }
 
         $crm_class = $this->zoho_crm->getRecordById($this->crm_module, data_get($ems_class, 'crm_id'));
-        var_dump($ems_class);
-        var_dump($crm_class);
-        
+
         if ($crm_class == false) {
             return;
         };
@@ -83,8 +82,10 @@ class ClassesSync
                 $val = data_get($crm_class, $c_field);
                 if ($val != null) {
                     $schedule = json_decode(json_encode($val, JSON_UNESCAPED_UNICODE), true);
-                    $ems_class->$e_field = $this->classes_schedule_render($schedule[0]);
-                    $ems_class->crm_schedule = json_encode($val, JSON_UNESCAPED_UNICODE);
+                    //$ems_class->$e_field = $this->classes_schedule_render($schedule[0]);
+                    //$ems_class->crm_schedule = json_encode($val, JSON_UNESCAPED_UNICODE);
+                    $class_data[$e_field] = $this->classes_schedule_render($schedule[0]);
+                    $class_data['crm_schedule'] = json_encode($val, JSON_UNESCAPED_UNICODE);
                 }
                 continue;
             } else if ($c_field == 'teacher') {
@@ -98,23 +99,31 @@ class ClassesSync
                         $teacherSync->save_teacher($teacher);
                         $teacher = Teacher::getTeacherByCrmId(data_get($val, 'id'));
                     }
-                    $ems_class->teacher_id = $teacher != null ? $teacher->id : null;
-                    $ems_class->crm_teacher = json_encode($val, JSON_UNESCAPED_UNICODE);
+                    // $ems_class->teacher_id = $teacher != null ? $teacher->id : null;
+                    // $ems_class->crm_teacher = json_encode($val, JSON_UNESCAPED_UNICODE);
+                    $class_data['teacher_id'] = $teacher != null ? $teacher->id : null;
+                    $class_data['crm_teacher'] = json_encode($val, JSON_UNESCAPED_UNICODE);
                 }
                 continue;
             } else {
-                $ems_class->$e_field = data_get($crm_class, $c_field);
+                $class_data[$e_field] = data_get($crm_class, $c_field);
+                //$ems_class->$e_field = data_get($crm_class, $c_field);
             }
         }
+
+        if ($ems_class !== null) {
+            EmsClass::updateOne($ems_class->id, $class_data);
+        }
+        else {
+            EmsClass::insertOne($class_data);
+        }
         
-        $ems_class->save();
+        //$ems_class->save();
         $this->get_student_list($ems_class);
     }
 
     protected function get_student_list($ems_class) {
-        var_dump('get_student_list');
         $list = $this->zoho_crm->getRelatedList($this->crm_module, data_get($ems_class, 'crm_id'), 'Deal');
-        var_dump($list);
         if (!$list) {
             return;
         }

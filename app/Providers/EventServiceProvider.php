@@ -19,7 +19,9 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\Webhook\Classes' => [
             'App\Listeners\Webhook\ClassesHook',
         ],
-
+        'App\Events\Webhook\Teacher' => [
+            'App\Listeners\Webhook\TeacherHook',
+        ],
         
     ];
 

@@ -35,11 +35,11 @@ class Parents extends Model
 
     public static function getParentByCrmId($crm_id)
     {
-        return Parents::where('crm_id', '=', $crm_id)->first();
+        return DB::table('parents')->select('*')->where('crm_id', '=', $crm_id)->first();
     }
 
     public static function getParentByCrmContactId($crm_contact_id)
     {
-        return Parents::where('crm_contact', '=', $crm_contact_id)->first();
+        return DB::table('parents')->select('*')->where('crm_contact', '=', $crm_contact_id)->first();
     }
 }
