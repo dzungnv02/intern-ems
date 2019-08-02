@@ -109,7 +109,7 @@ class syncClasses extends Command
                     } else if ($c_field == 'teacher') {
                         $val = data_get($crm_class, $c_field);
                         if ($val != null) {
-                            $teacher = Teacher::where('teachers.crm_id', data_get($val, 'id'))->first();
+                            $teacher = Teacher::getTeacherByCrmId(data_get($val, 'id'));  
                             $new_class->teacher_id = $teacher != null ? $teacher->id : null;
                             $new_class->crm_teacher = json_encode($val, JSON_UNESCAPED_UNICODE);
                         }
@@ -126,10 +126,11 @@ class syncClasses extends Command
 
         if (count($update_list)) {
             foreach ($update_list as $item) {
+                $class_data = [];
                 $branch = Branch::getBranchByCrmOwner($item->Owner->id);
 
                 $crm_class = $zoho_crm->getRecordById($crm_module, data_get($item, 'id'));
-                $old_class = Classes::where('classes.crm_id', data_get($crm_class, 'id'))->first();
+                $old_class = Classes::getClassByCrmId(data_get($crm_class, 'id'));
                 for ($i = 0; $i < count($crm_fields); $i++) {
                     $c_field = $crm_fields[$i];
                     $e_field = $ems_fields[$i];
@@ -137,24 +138,27 @@ class syncClasses extends Command
                         $val = data_get($crm_class, $c_field);
                         if ($val != null) {
                             $schedule = json_decode(json_encode($val, JSON_UNESCAPED_UNICODE), true);
-                            $old_class->$e_field = $this->classes_schedule_render($schedule[0]);
-                            $old_class->crm_schedule = json_encode($val, JSON_UNESCAPED_UNICODE);
+                            $class_data[$e_field] = $this->classes_schedule_render($schedule[0]);
+                            $class_data['crm_schedule'] = json_encode($val, JSON_UNESCAPED_UNICODE);
                         }
                         continue;
                     } else if ($c_field == 'teacher') {
                         $val = data_get($crm_class, $c_field);
                         if ($val != null) {
                             $teacher = Teacher::where('teachers.crm_id', data_get($val, 'id'))->first();
-                            $old_class->teacher_id = $teacher != null ? $teacher->id : null;
-                            $old_class->crm_teacher = json_encode($val, JSON_UNESCAPED_UNICODE);
+                            $class_data['teacher_id'] = $teacher != null ? $teacher->id : null;
+                            $class_data['crm_teacher'] = json_encode($val, JSON_UNESCAPED_UNICODE);
+                            
                         }
                         continue;
                     } else {
                         $value = data_get($crm_class, $c_field);
-                        $old_class->$e_field = data_get($crm_class, $c_field);
+                        $class_data[$e_field] = $value;
                     }
-                    $old_class->branch_id = data_get($branch, 'id');
-                    $old_class->save();
+                    $class_data['branch_id'] = data_get($branch, 'id');
+                    $class_data['updated_at'] = date('Y-m-d H:i:s');
+                    Classes::updateOne($old_class->id, $class_data);
+                    //$old_class->branch_id = data_get($branch, 'id');
                 }
             }
         }

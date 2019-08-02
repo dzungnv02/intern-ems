@@ -418,7 +418,7 @@ class ZohoCrmConnect
 
                 foreach ($local_data as $local_obj) {
                     if ($local_obj->crm_id == $crm_obj->id) {
-                        $update_list[$local_obj['id']] = $crm_obj;
+                        $update_list[$local_obj->id] = $crm_obj;
                         array_push($updated_id, $crm_obj->id);
                         break;
                     }
