@@ -146,15 +146,13 @@ class StudentSync
             DB::table('students')->where('id', $ems_student->id)->update($student_data);
         }
         else {
-            Student::insert($student_data);
+            $student_id = Student::insert($student_data);
         }
 
-        dump($ems_student);
         if ($assessment_list['status']) {
             unset($assessment_list['status']);
-            $assessment_list['student_id'] = $ems_student->id;
+            $assessment_list['student_id'] = $ems_student->id === null ? $student_id : $ems_student->id;
             $assessment_list['staff_id'] = 1;
-            dump($assessment_list);
             Assessment::insertAssessment($assessment_list);
         }
 
