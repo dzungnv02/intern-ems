@@ -162,6 +162,7 @@
             <li><a href="{{asset('teacher-weekly-schedule')}}"><i class="fa fa-circle-o"></i> Lịch hàng tuần</a></li>
           </ul>
         </li>
+        @if (Auth::user()->role === 1)
         <li class="treeview">
           <a href="#">
             <i class="fa fa-user" aria-hidden="true"></i>
@@ -194,6 +195,7 @@
             </li>
           </ul>
         </li>
+        @endif
       </ul>
     </section>
     <!-- /.sidebar -->

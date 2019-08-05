@@ -21,6 +21,7 @@ class Kernel extends ConsoleKernel
         Commands\syncClasses::class,
         Commands\syncStudentClasses::class,
         Commands\CleanClasses::class,
+        Commands\EncryptPass::class,
     ];
 
     /**
