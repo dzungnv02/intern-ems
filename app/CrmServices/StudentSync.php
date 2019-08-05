@@ -235,13 +235,11 @@ class StudentSync
 
         DB::table('students')->where('id', $ems_student->id)->update($student_data);
 
-        // $ems_student->parent_id = $parent->id;
-        // $ems_student->save();
-        
-
-        $ems_student_parent->parent_id = $parent->id;
-        $ems_student_parent->student_id = $ems_student->id;
-        $ems_student_parent->save();
+        if ($parent_id !== null && $ems_student !== null) {
+            $ems_student_parent->parent_id = $parent_id;
+            $ems_student_parent->student_id = $ems_student->id;
+            $ems_student_parent->save();
+        }
     }
 
     protected function mapping_classes($crm_student, $is_sync_class = false)
