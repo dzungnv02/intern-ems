@@ -232,7 +232,7 @@ class InvoiceController extends Controller
         $invoice->save();
 
         if ($act == 'print') {
-            $this->send_invoice($invoice->id);
+            //$this->send_invoice($invoice->id);
         }
         
         return $content;
