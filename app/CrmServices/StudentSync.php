@@ -198,32 +198,25 @@ class StudentSync
 
         if ($crm_contact->Account_Name != null) {
             $parent = Parents::getParentByCrmId($crm_contact->Account_Name->id);
-            if ($parent !== null) {
-                $parent_id = $parent->id;
-                //$parent = new Parents;
-            }
+            
         } elseif ($crm_student->Contact_Name != null) {
             $parent = Parents::getParentByCrmContactId($crm_student->Contact_Name->id);
-            if ($parent !== null) {
-                $parent_id = $parent->id;
-                //$parent = new Parents;
-            }
-        } 
-        // else {
-        //     $parent = new Parents;
-        // }
+        }
+
+        if ($parent !== null) {
+            $parent_id = $parent->id;
+            $parent_data['address'] = $parent->address;
+        }
 
         $contacts_fields = config('zoho.MAPPING.ZOHO_MODULE_CONTACTS');
 
         foreach ($contacts_fields as $crm_field => $ems_field) {
             $value = $crm_field != 'Owner' ? $crm_contact->$crm_field : json_encode($crm_contact->$crm_field, JSON_UNESCAPED_UNICODE);
-            //$parent->$ems_field = $value;
             $parent_data[$ems_field] = $value;
         }
 
-        if (!$parent->address) {
+        if (!$parent_data['address']) {
             $parent_data['address'] = $ems_student->address;
-            //$parent->address = $ems_student->address;
         }
 
         if ($parent_id != null) {
