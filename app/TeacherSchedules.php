@@ -53,6 +53,7 @@ class TeacherSchedules extends Model
 
     public static function update_assesment_schedule ($student_id, $teacher_id, $assessment_date) 
     {
+        if (!$student_id || !$teacher_id) return false;
         DB::table('teacher_schedules')->where('student_id', $student_id)->where('appoinment_type', 2)->delete();
         $student = Student::find($student_id);
         $note = 'Kiểm tra đầu vào cho học sinh '. $student->name;

@@ -140,8 +140,6 @@ class StudentSync
             //$ems_student->$ems_field = $value;
         }
 
-        //$ems_student->register_branch_id = $branch != null ? $branch->id : null;
-        //$ems_student->save();
         $student_data['register_branch_id'] = $branch != null ? $branch->id : null;
 
         if ($ems_student->id != null) {
@@ -151,10 +149,12 @@ class StudentSync
             Student::insert($student_data);
         }
 
+        dump($ems_student);
         if ($assessment_list['status']) {
             unset($assessment_list['status']);
             $assessment_list['student_id'] = $ems_student->id;
             $assessment_list['staff_id'] = 1;
+            dump($assessment_list);
             Assessment::insertAssessment($assessment_list);
         }
 
