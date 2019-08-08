@@ -263,6 +263,7 @@ $(function () {
 
         var is_valided = true;
         var container = null;
+
         if (data.payer == '') {
             container = $(frmTutorFee).find('INPUT#payer').parent();
             $(container).addClass('has-error');
@@ -282,14 +283,13 @@ $(function () {
             $(container).addClass('has-error');
             if ($(frmTutorFee).find('INPUT#discount-type')[0].checked === false) {
                 $(container).find('.help-block').html('Hãy nhập giá trị là số nhỏ hơn hoặc bằng 100').show();
+                is_valided = false;
             }
             else {
                 $(container).find('.help-block').html('Hãy nhập giá trị là số tiền').show();
+                is_valided = false;
             }
-            is_valided = false;
-        }
 
-        if (data.discount != '' && !isNaN(data.discount)) {
             if (data.discount_desc == '') {
                 container = $(frmTutorFee).find('INPUT#discount-desc').parent();
                 $(container).addClass('has-error');
@@ -705,6 +705,7 @@ $(function () {
         invoice_other_form_event_binding();
 
         $('BUTTON#btnSaveInvoice, BUTTON#btnPrintInvoice').on('click', (e) => {
+            console.log(e);
             var save_callback = null;
             var data = null;
             var actived_tab_id = $(actived_tab).prop('id');
@@ -745,6 +746,8 @@ $(function () {
             }
 
             if (!eval(invoice_type + '_validate(data)')) {
+                console.log('validate fail!');
+
                 return false;
             }
             else {
