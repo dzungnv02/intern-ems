@@ -727,6 +727,7 @@ $(function () {
                     "discount_type": $(form).find('INPUT#discount-type')[0].checked === true ? 'c' : 'p',
                     "discount_desc": $(form).find('INPUT#discount_desc').val(),
                     "payment_method": $(form).find('INPUT[name="payment_method"]:checked').val(),
+                    "note": $(form).find('INPUT#note').val(),
                     "invoice_status": 0,
                     "currency": 'VND',
                 };
@@ -740,6 +741,7 @@ $(function () {
                     "reason": $(form).find('TEXTAREA#reason').val(),
                     "amount": numeral($(form).find('INPUT#amount').val()).value(),
                     "payment_method": $(form).find('INPUT[name="payment_method"]:checked').val(),
+                    "note": $(form).find('INPUT#note').val(),
                     "invoice_status": 0,
                     "currency": 'VND',
                 }
