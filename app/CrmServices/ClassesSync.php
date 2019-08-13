@@ -1,14 +1,14 @@
 <?php
 namespace App\CrmServices;
 
-use App\Classes\ZohoCrmConnect;
-use App\Classes as EmsClass;
-use App\Teacher;
 use App\Branch;
-use App\Student as EmsStudent;
+use App\Classes as EmsClass;
+use App\Classes\ZohoCrmConnect;
 use App\CrmServices\StudentSync;
-use App\StudentClass;
 use App\CrmServices\TeacherSync;
+use App\Student as EmsStudent;
+use App\StudentClass;
+use App\Teacher;
 
 class ClassesSync
 {
@@ -51,7 +51,7 @@ class ClassesSync
 
     public function delete_class($record_id)
     {
-        
+
     }
 
     protected function save_class($ems_class)
@@ -82,13 +82,28 @@ class ClassesSync
                 $val = data_get($crm_class, $c_field);
                 if ($val != null) {
                     $schedule = json_decode(json_encode($val, JSON_UNESCAPED_UNICODE), true);
-                    //$ems_class->$e_field = $this->classes_schedule_render($schedule[0]);
-                    //$ems_class->crm_schedule = json_encode($val, JSON_UNESCAPED_UNICODE);
                     $class_data[$e_field] = $this->classes_schedule_render($schedule[0]);
                     $class_data['crm_schedule'] = json_encode($val, JSON_UNESCAPED_UNICODE);
                 }
                 continue;
-            } else if ($c_field == 'teacher') {
+            } 
+            else if ($c_field == 'Product_Active') {
+                $val = data_get($crm_class, $c_field);
+                $start_date =  data_get($crm_class, 'start_date');
+                $now = date('Y-m-d');
+                $status = 0;
+                if ($val  == true && $start_date <= $now) {
+                    $status = 2;
+                }
+                else if ($val  == true && $start_date > $now) {
+                    $status = 1;
+                }
+                else {
+                    $status = 3;
+                }
+                $class_data['status'] = $status;
+            }
+            else if ($c_field == 'teacher') {
                 $val = data_get($crm_class, $c_field);
                 if ($val != null) {
                     $teacher = Teacher::getTeacherByCrmId(data_get($val, 'id'));
@@ -99,30 +114,26 @@ class ClassesSync
                         $teacherSync->save_teacher($teacher);
                         $teacher = Teacher::getTeacherByCrmId(data_get($val, 'id'));
                     }
-                    // $ems_class->teacher_id = $teacher != null ? $teacher->id : null;
-                    // $ems_class->crm_teacher = json_encode($val, JSON_UNESCAPED_UNICODE);
                     $class_data['teacher_id'] = $teacher != null ? $teacher->id : null;
                     $class_data['crm_teacher'] = json_encode($val, JSON_UNESCAPED_UNICODE);
                 }
                 continue;
             } else {
                 $class_data[$e_field] = data_get($crm_class, $c_field);
-                //$ems_class->$e_field = data_get($crm_class, $c_field);
             }
         }
 
         if ($ems_class !== null) {
             EmsClass::updateOne($ems_class->id, $class_data);
-        }
-        else {
+        } else {
             EmsClass::insertOne($class_data);
         }
-        
-        //$ems_class->save();
+
         $this->get_student_list($ems_class);
     }
 
-    protected function get_student_list($ems_class) {
+    protected function get_student_list($ems_class)
+    {
         $list = $this->zoho_crm->getRelatedList($this->crm_module, data_get($ems_class, 'crm_id'), 'Deal');
         if (!$list) {
             return;
@@ -130,12 +141,11 @@ class ClassesSync
 
         $studentSync = new StudentSync();
 
-        foreach($list as $crm_student) {
+        foreach ($list as $crm_student) {
             $crm_id = data_get($crm_student, 'id');
             $ems_student = EmsStudent::getStudentByCrmID($crm_id);
             if ($ems_student == null) {
                 $ems_student = new EmsStudent;
-                //$studentSync->save_student($ems_student, $crm_student, false);
                 $studentSync->add_student($crm_id, false);
                 $ems_student = EmsStudent::getStudentByCrmID($crm_id);
             }
