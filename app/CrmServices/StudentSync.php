@@ -71,7 +71,8 @@ class StudentSync
         Log::info('Delete student: ' . $record_id);
         $ems_student = Student::getStudentByCrmID($record_id);
         if ($ems_student != null) {
-            $ems_student->delete();
+            //$ems_student->delete();
+            Student::deleteStudent($ems_student->id);
         }
     }
 
