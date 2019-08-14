@@ -21,15 +21,18 @@ class StudentClass extends Model
 
     public static function assignClass($class_id, $student_id) 
     {
-        $joined = DB::table('student_classes')->select('id')
-                ->where('class_id', $class_id)
-                ->where('student_id', $student_id)
-                ->get()->toArray();
-        if (count($joined) > 0) return false;
+        $joined = DB::table('student_classes')
+                        ->where('class_id', $class_id)
+                        ->where('student_id', $student_id)
+                        ->count();
+                        
+        if ($joined > 0) {
+            return false;
+        }
 
         DB::table('students')->where('id', '=', $student_id)->update(['current_class' => $class_id]);
         DB::table('student_classes')->where('student_id', $student_id)->delete();
-        
+
         $data = [
             'student_id' => $student_id,
             'class_id' => $class_id,

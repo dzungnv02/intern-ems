@@ -137,7 +137,6 @@ class StudentSync
             }
 
             $student_data[$ems_field] = $value;
-            //$ems_student->$ems_field = $value;
         }
 
         $student_data['register_branch_id'] = $branch != null ? $branch->id : null;
@@ -224,8 +223,6 @@ class StudentSync
             DB::table('parents')->insert($parent_data);
         }
 
-        //$parent->save();
-
         $student_data = [
             'parent_id' => $parent_id,
             'updated_at' => date('Y-m-d H:i:s')
@@ -253,7 +250,6 @@ class StudentSync
 
         $owner = $crm_student->Owner->id;
 
-        //if ($is_sync_class && $crm_student->Stage !== 'Withdrawal') {
         if ($is_sync_class) {
             $is_synced = true;
             Log::info('Syncronize Classes!');
@@ -299,22 +295,21 @@ class StudentSync
             }
 
         } 
-        //else if ($this->sync_crm_class($owner)) {
-        else {
-            $class_list = Classes::getClassByCrmOwner($owner);
-            foreach ($class_list as $ems_class) {
-                $student_list = $this->zoho_crm->getRelatedList('Products', data_get($ems_class, 'crm_id'), 'Deal');
+        // else {
+        //     $class_list = Classes::getClassByCrmOwner($owner);
+        //     foreach ($class_list as $ems_class) {
+        //         $student_list = $this->zoho_crm->getRelatedList('Products', data_get($ems_class, 'crm_id'), 'Deal');
                 
-                if ($student_list) {
-                    foreach ($student_list as $std) {
-                        if (data_get($std, 'id') == $crm_student->id) {
-                            StudentClass::assignClass(data_get($ems_class, 'id'), data_get($ems_student, 'id'));
-                            return;
-                        }
-                    }
-                }
-            }
-        }
+        //         if ($student_list) {
+        //             foreach ($student_list as $std) {
+        //                 if (data_get($std, 'id') == $crm_student->id) {
+        //                     StudentClass::assignClass(data_get($ems_class, 'id'), data_get($ems_student, 'id'));
+        //                     return;
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     protected function sync_crm_class($owner)
