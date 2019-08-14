@@ -31,8 +31,8 @@ class StudentClass extends Model
         }
 
         DB::table('students')->where('id', '=', $student_id)->update(['current_class' => $class_id]);
-        DB::table('student_classes')->where('student_id', $student_id)->delete();
-
+        $deleted = DB::table('student_classes')->where('student_id', $student_id)->delete();
+        dump($deleted);
         $data = [
             'student_id' => $student_id,
             'class_id' => $class_id,
