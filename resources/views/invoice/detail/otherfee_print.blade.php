@@ -91,7 +91,8 @@
             <address>
               <strong>Tô Hiến Thành</strong>: 0961 305 885<br>
               <strong>Nguyễn Trãi</strong>: 0914 698 000<br>
-              <strong>Hoàng Quốc Việt</strong>: 0961 205 550
+              <strong>Hoàng Quốc Việt</strong>: 0961 205 550<br>
+              <strong>Minh Khai</strong>: 0966 055 905 
             </address>
           </div>
       <!-- /.col -->
@@ -126,7 +127,10 @@
         <tr> 
             <td>4. </td>
             <td>Lý do nộp</td>
-            <th colspan="4">{{$reason}}</th>
+            <th>{{$reason}}</th>
+            <td style="width:15px;">5. </td>
+            <td style="width:100px;">Số tiền phải thu</td>
+            <th><span id="amount_num">{{$amount}}</span> {{$currency}}</th>
         </tr>
         <tr>
             <td></td>

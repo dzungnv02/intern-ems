@@ -127,7 +127,7 @@ class Invoice extends Eloquent
     {
         $prefix = date('Y/m');
         $old_numbers = DB::table('rev_n_exp')
-            ->where('invoice_number', 'like', $prefix . '-%')
+            ->where('invoice_number', 'like', $prefix . '-%-' . $branch_code)
             ->pluck('invoice_number');
 
             $postfix = $branch_code;
