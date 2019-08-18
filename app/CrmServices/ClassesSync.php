@@ -30,7 +30,7 @@ class ClassesSync
             return;
         }
 
-        $ems_class = new EmsClass;
+        $ems_class = new \stdClass;
         $ems_class->crm_id = $record_id;
         $this->save_class($ems_class);
 
@@ -67,8 +67,7 @@ class ClassesSync
         }
 
         $crm_class = $this->zoho_crm->getRecordById($this->crm_module, data_get($ems_class, 'crm_id'));
-
-        if ($crm_class == false) {
+        if ($crm_class == false || $crm_class->Owner->id == '2666159000000122009') {
             return;
         };
 
@@ -122,13 +121,13 @@ class ClassesSync
                 $class_data[$e_field] = data_get($crm_class, $c_field);
             }
         }
-
-        if ($ems_class !== null) {
+        if (isset($ems_class->id)) {
             EmsClass::updateOne($ems_class->id, $class_data);
         } else {
-            EmsClass::insertOne($class_data);
+            $ems_id = EmsClass::insertOne($class_data);
+            $ems_class->id = $ems_id;
         }
-
+        
         $this->get_student_list($ems_class);
     }
 
@@ -149,7 +148,6 @@ class ClassesSync
                 $studentSync->add_student($crm_id, false);
                 $ems_student = EmsStudent::getStudentByCrmID($crm_id);
             }
-
             StudentClass::assignClass(data_get($ems_class, 'id'), data_get($ems_student, 'id'));
         }
 
