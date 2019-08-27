@@ -127,6 +127,8 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::post('/branch/delete', 'BranchController@deleteBranch');
 
     Route::get('invoice/get-last-invoice/{student_id}/{class_id}', 'InvoiceController@calc_prepaid_tutor_fee');
+    Route::post('invoice/export', 'InvoiceController@export');
+    Route::get('invoice/clean_export/{file}', 'InvoiceController@clean_export');
 
     Route::get('/compensated/list','CompensatedClassController@index');
 });

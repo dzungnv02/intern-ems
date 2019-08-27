@@ -106,7 +106,23 @@ class syncClasses extends Command
                             $new_class->crm_schedule = json_encode($val, JSON_UNESCAPED_UNICODE);
                         }
                         continue;
-                    } else if ($c_field == 'teacher') {
+                    } else if ($c_field == 'Product_Active') {
+                        $val = data_get($crm_class, $c_field);
+                        $start_date =  data_get($crm_class, 'start_date');
+                        $now = date('Y-m-d');
+                        $status = 0;
+                        if ($val  == true && $start_date <= $now) {
+                            $status = 2;
+                        }
+                        else if ($val  == true && $start_date > $now) {
+                            $status = 1;
+                        }
+                        else {
+                            $status = 3;
+                        }
+                        $new_class->status = $status;
+                    }
+                    else if ($c_field == 'teacher') {
                         $val = data_get($crm_class, $c_field);
                         if ($val != null) {
                             $teacher = Teacher::getTeacherByCrmId(data_get($val, 'id'));  
@@ -142,7 +158,24 @@ class syncClasses extends Command
                             $class_data['crm_schedule'] = json_encode($val, JSON_UNESCAPED_UNICODE);
                         }
                         continue;
-                    } else if ($c_field == 'teacher') {
+                    
+                    } else if ($c_field == 'Product_Active') {
+                        $val = data_get($crm_class, $c_field);
+                        $start_date =  data_get($crm_class, 'start_date');
+                        $now = date('Y-m-d');
+                        $status = 0;
+                        if ($val  == true && $start_date <= $now) {
+                            $status = 2;
+                        }
+                        else if ($val  == true && $start_date > $now) {
+                            $status = 1;
+                        }
+                        else {
+                            $status = 3;
+                        }
+                        $class_data['status'] = $status;
+                    }
+                    else if ($c_field == 'teacher') {
                         $val = data_get($crm_class, $c_field);
                         if ($val != null) {
                             $teacher = Teacher::where('teachers.crm_id', data_get($val, 'id'))->first();

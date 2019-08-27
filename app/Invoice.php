@@ -149,4 +149,54 @@ class Invoice extends Eloquent
 
         return $prefix . '-' . $number . '-' . $postfix;
     }
+
+    public static function search_invoice($condition = [])
+    {
+        $query = DB::table('rev_n_exp')
+                ->select('rev_n_exp.id',
+                        'rev_n_exp.created_at',
+                        'rev_n_exp.invoice_number',
+                        'students.student_code',
+                        'students.name',
+                        'rev_n_exp.payer',
+                        'rev_n_exp.payment_method',
+                        'classes.name as class',
+                        'rev_n_exp.discount',
+                        'rev_n_exp.discount_type',
+                        'rev_n_exp.discount_desc',
+                        'rev_n_exp.amount'
+                    )   
+                ->join('staffs', 'rev_n_exp.created_by', '=', 'staffs.id')
+                ->join('branch', 'branch.id', '=', 'staffs.branch_id')
+                ->join('students', 'rev_n_exp.student_id', '=', 'students.id')
+                ->join('classes', 'rev_n_exp.class_id', '=', 'classes.id');
+        
+        if (!empty($condition['type'])) {
+            $query->where('rev_n_exp.type', '=', $condition['type']);
+        }
+
+        if (!empty($condition['invoice_status'])) {
+            $query->where('rev_n_exp.invoice_status', '=', $condition['invoice_status']);
+        }
+
+        if (!empty($condition['branch_id'])) {
+            $query->where('branch.id', '=', $condition['branch_id']);
+        }
+
+        if (!empty($condition['class_id'])) {
+            $query->where('rev_n_exp.class_id', '=', $condition['class_id']);
+        }
+
+        if (!empty($condition['created_at'])) {
+            if (!is_array($condition['created_at'])) {
+                $query->where('rev_n_exp.created_at', '=', $condition['created_at']);
+            }
+            else {
+                $query->whereBetween('rev_n_exp.created_at', $condition['created_at']);
+            }
+        }
+
+        return $query->get();
+
+    }
 }

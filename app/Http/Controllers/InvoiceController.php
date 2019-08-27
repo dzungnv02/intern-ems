@@ -2,22 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Branch;
 use App\Classes;
 use App\Invoice;
+use App\Mail\InvoicePrinted;
+use App\Parents;
 use App\Student;
 use App\StudentClass;
-use App\Parents;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\InvoicePrinted;
-use App\Branch;
 use Illuminate\Support\Facades\Log;
-
-
-use PDF;
-use function GuzzleHttp\json_decode;
+use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel as Excel;
 
 class InvoiceController extends Controller
 {
@@ -32,7 +29,7 @@ class InvoiceController extends Controller
         return view('invoice/invoice_form');
     }
 
-    public function getInvoiceList (Request $request) 
+    public function getInvoiceList(Request $request)
     {
         $invoices = Invoice::get_list_invoice();
         return response()->json(['code' => 0, 'data' => ['list' => $invoices]], 200);
@@ -64,7 +61,7 @@ class InvoiceController extends Controller
         $price = isset($input['price']) ? (int) $input['price'] : 0;
         $prepaid = isset($input['prepaid']) ? (int) $input['prepaid'] : 0;
         $discount = isset($input['discount']) ? (int) $input['discount'] : 0;
-        $discount_type = isset($input['discount_type']) ? $input['discount_type']: 'p';
+        $discount_type = isset($input['discount_type']) ? $input['discount_type'] : 'p';
 
         if ($start_date == '') {
             $err_msg = 'Chưa nhập ngày bắt đầu!';
@@ -86,10 +83,9 @@ class InvoiceController extends Controller
 
         $amount = ($duration * $price) - $prepaid;
 
-        if ($discount > 0  && $discount_type === 'p') {
+        if ($discount > 0 && $discount_type === 'p') {
             $amount -= (($amount * $discount) / 100);
-        }
-        else if ($discount > 0  && $discount_type === 'c') {
+        } else if ($discount > 0 && $discount_type === 'c') {
             $amount -= $discount;
         }
 
@@ -148,12 +144,12 @@ class InvoiceController extends Controller
 
     public function print_invoice($id, $act)
     {
-        
+
         Log::debug('PRINTED');
-        
+
         $payment_methods = config('constant.payment_method');
         $invoice = Invoice::findOrfail($id);
-        Log::debug(var_export($invoice,true));
+        Log::debug(var_export($invoice, true));
 
         $invoice_data = $invoice->toArray();
 
@@ -161,62 +157,61 @@ class InvoiceController extends Controller
         $class = Classes::findOrfail($invoice_data['class_id']);
         $user = User::findOrfail($invoice_data['created_by']);
 
-        $resource_path = dirname(app_path()).'/public/';
+        $resource_path = dirname(app_path()) . '/public/';
 
         $ary_css_files = [
-            $resource_path.'admin/bootstrap/css/bootstrap.min.css',
-            $resource_path.'admin/font-awesome/css/font-awesome.min.css',
-            $resource_path.'admin/Ionicons/css/ionicons.min.css',
-            $resource_path.'admin/css/AdminLTE.css',
+            $resource_path . 'admin/bootstrap/css/bootstrap.min.css',
+            $resource_path . 'admin/font-awesome/css/font-awesome.min.css',
+            $resource_path . 'admin/Ionicons/css/ionicons.min.css',
+            $resource_path . 'admin/css/AdminLTE.css',
         ];
 
         $css = '';
 
-        foreach($ary_css_files as $file) {
-            $css .= file_get_contents( $file) . "\n";
+        foreach ($ary_css_files as $file) {
+            $css .= file_get_contents($file) . "\n";
         }
 
         $last_printed_time = date('Y-m-d H:i:s');
-        
+
         $invoice_data['css'] = $css;
 
         $invoice_data['student_name'] = $student->name;
         $invoice_data['student_code'] = $student->student_code;
-        $invoice_data['payment_method'] =  $payment_methods[$invoice_data['payment_method']];
+        $invoice_data['payment_method'] = $payment_methods[$invoice_data['payment_method']];
 
         $invoice_data['class_name'] = $class->name;
-        $invoice_data['discount'] = $invoice_data['discount_type'] === 'p' ? (int) $invoice_data['discount'] . '%' : number_format ( $invoice_data['discount'] , 0 , '' , ',' ) . ' ' .$invoice_data['currency'];
+        $invoice_data['discount'] = $invoice_data['discount_type'] === 'p' ? (int) $invoice_data['discount'] . '%' : number_format($invoice_data['discount'], 0, '', ',') . ' ' . $invoice_data['currency'];
         $invoice_data['prepaid'] = $invoice_data['prepaid'] ? $invoice_data['prepaid'] : 0;
         $invoice_data['amount_text'] = $invoice_data['amount'] ? $this->number_to_words($invoice_data['amount']) : 0;
         $invoice_data['created_by_name'] = $user->name;
 
-        $invoice_data['amount'] = number_format ( $invoice_data['amount'] , 0 , '' , ',' );
-        $invoice_data['prepaid'] = number_format ( $invoice_data['prepaid'] , 0 , '' , ',' );
+        $invoice_data['amount'] = number_format($invoice_data['amount'], 0, '', ',');
+        $invoice_data['prepaid'] = number_format($invoice_data['prepaid'], 0, '', ',');
 
         if ($invoice_data['last_printed_time'] == null && $invoice_data['invoice_status'] > 0) {
             $invoice_data['last_printed_time'] = $invoice_data['updated_at'];
-        }
-        else if($invoice_data['last_printed_time'] == null && $invoice_data['invoice_status'] == 0){
-            $invoice_data['last_printed_time'] = 'Chưa in' ;
+        } else if ($invoice_data['last_printed_time'] == null && $invoice_data['invoice_status'] == 0) {
+            $invoice_data['last_printed_time'] = 'Chưa in';
         }
 
         if ($act == 'print') {
             $invoice_data['last_printed_time'] = $last_printed_time;
         }
-        
+
         $invoice_data['start_date'] = date('d/m/Y', strtotime($invoice_data['start_date']));
         $invoice_data['end_date'] = date('d/m/Y', strtotime($invoice_data['end_date']));
         $invoice_data['created_at'] = date('d/m/Y H:i', strtotime($invoice_data['created_at']));
         $invoice_data['act'] = $act;
-        $view = ((int)$invoice_data['type'] == 1) ? 'invoice/detail/tutorfee_print' : 'invoice/detail/otherfee_print';
-        $view_pdf = ((int)$invoice_data['type'] == 1) ? 'invoice/detail/tutorfee_print_pdf' : 'invoice/detail/otherfee_print';
+        $view = ((int) $invoice_data['type'] == 1) ? 'invoice/detail/tutorfee_print' : 'invoice/detail/otherfee_print';
+        $view_pdf = ((int) $invoice_data['type'] == 1) ? 'invoice/detail/tutorfee_print_pdf' : 'invoice/detail/otherfee_print';
 
-        $content = view( $view, $invoice_data);
-        $content_pdf = view( $view_pdf, $invoice_data);
+        $content = view($view, $invoice_data);
+        $content_pdf = view($view_pdf, $invoice_data);
 
         if ($act == 'print') {
             if ($invoice->printed_count >= config('constant.invoice_print_max_attemp')) {
-                return response()->json(['code' => 0, 'message'=> 'Hoá đơn số '. $invoice->invoice_number . ' đã được in '.$invoice->printed_count.' lần!'], 500);
+                return response()->json(['code' => 0, 'message' => 'Hoá đơn số ' . $invoice->invoice_number . ' đã được in ' . $invoice->printed_count . ' lần!'], 500);
             }
 
             if ($invoice->invoice_status == 0) {
@@ -234,11 +229,11 @@ class InvoiceController extends Controller
         if ($act == 'print') {
             //$this->send_invoice($invoice->id);
         }
-        
+
         return $content;
     }
 
-    public function send_invoice($id) 
+    public function send_invoice($id)
     {
         $payment_methods = config('constant.payment_method');
 
@@ -260,13 +255,13 @@ class InvoiceController extends Controller
         Mail::to($to)->send(new InvoicePrinted($invoice));
     }
 
-    public function calc_prepaid_tutor_fee ($student_id, $class_id)
+    public function calc_prepaid_tutor_fee($student_id, $class_id)
     {
         $data = Invoice::get_last_tutor_duration($student_id, $class_id);
         return response()->json(['code' => 0, 'data' => $data], 200);
     }
 
-    public function mark_delete_invoice (Request $request)
+    public function mark_delete_invoice(Request $request)
     {
         $input = $request->all();
         $invoice_id = $input['id'];
@@ -276,7 +271,7 @@ class InvoiceController extends Controller
         return response()->json(['code' => 0, 'data' => ['message' => 'OK']], 200);
     }
 
-    public function approve_invoice (Request $request)
+    public function approve_invoice(Request $request)
     {
         $input = $request->all();
         $invoice_id = $input['id'];
@@ -285,6 +280,149 @@ class InvoiceController extends Controller
         $invoice->invoice_status = 3;
         $invoice->save();
         return response()->json(['code' => 0, 'data' => ['message' => 'OK']], 200);
+    }
+
+    public function clean_export ($file) 
+    {
+        $path = public_path('/storage/'.$file);
+        if (empty($file) || !file_exists($path)) {
+            return response()->json(['code' => 1, 'data' => ['message' => 'file not found!']], 500);
+        }
+        else {
+            unlink($path);
+            return response()->json(['code' => 0, 'data' => ['message' => 'file is removed!']], 200);
+        }
+    }
+
+    public function export(Request $request)
+    {
+        $input = $request->all();
+        $start_date = $input['start_date'];
+        $end_date = $input['end_date'];
+        $type = $input['type'];
+        $status = $input['status'];
+        $branch_id = $input['branch_id'];
+        $class_id = $input['class_id'];
+
+        $where = [
+            'type' => $type,
+            'branch_id' => $branch_id != 0 ? $branch_id : null,
+            'invoice_status' => $status,
+            'class_id' => $class_id,
+        ];
+
+        $ary_data = [];
+        $date_range = '';
+
+        if (!empty($start_date) && empty($end_date)) {
+            $date_range = ' - from ' . date('d-m-Y',strtotime($start_date));
+            $start_date = date('Y-m-d 00:00:00', strtotime($start_date));
+            $where['created_at'] = $start_date;
+            
+        } else if (empty($start_date) && !empty($end_date)) {
+            $date_range = ' - from ' .date('d-m-Y',strtotime($end_date));
+            $end_date = date('Y-m-d 00:00:00', strtotime($end_date));
+            $where['created_at'] = $end_date;
+        } else if (!empty($start_date) && !empty($end_date)) {
+            $date_range = ' - from ' .date('d-m-Y',strtotime($start_date)). ' to '. date('d-m-Y',strtotime($end_date));
+            $start_date = date('Y-m-d 00:00:00', strtotime($start_date));
+            $end_date = date('Y-m-d 23:59:59', strtotime($end_date));
+            $where['created_at'] = [$start_date, $end_date];
+        }
+
+        $ary_title = [
+            'No.',
+            'Collecting Date',
+            'No of Recept',
+            'Code',
+            'Name',
+            'Parent Name',
+            'Payment Method',
+            'Course Name',
+            'Discount',
+            '',
+            '',
+            'Amount'
+        ];
+
+        $collection_data = Invoice::search_invoice($where);
+        if (!is_null($collection_data)) {
+            $payment_methods = config('constant.payment_method');
+            $collection_data->map(function ($obj, $key) use (&$ary_data, $payment_methods){
+                $ary_data[$key]['no'] = $key + 1;
+                $ary_tmp = (array)$obj;
+                foreach ($ary_tmp as $field => $value) {
+                    if (in_array($field,['id'])) {
+                        continue;
+                    }
+                    if ($field == 'payment_method') {
+                        $ary_data[$key][$field] = $payment_methods[$value];
+                    }
+                    else {
+                        $ary_data[$key][$field] = $value;
+                    }
+                }
+
+                $ary_data[$key]['discount_type'] = !empty($ary_data[$key]['discount']) ? ($ary_data[$key]['discount_type'] == 'p' ? 'Percent' : 'Cash') : '';
+            });
+        }
+
+        $file_name = 'Invoice_export_' . date('YmdHis');
+
+        $branch = !empty($input['branch_id']) ? Branch::findOrfail($branch_id) : null;
+
+        $branch_name = !is_null($branch) ? $branch->branch_code : 'All center';
+
+        $excel = Excel::create($file_name, function ($excel) use ($branch_name, $ary_title, $ary_data, $date_range) {
+
+            $excel->sheet('Invoice list', function ($sheet) use ($branch_name, $ary_title, $ary_data,  $date_range) {
+
+                $sheet->cell('A1', function ($cell) use ($branch_name, $date_range) {
+                    $cell->setValue($branch_name . ' - Invoice list'. $date_range);
+                });
+                $sheet->mergeCells('A1:L1');
+                $sheet->mergeCells('I2:K2');
+
+                $sheet->row(2, $ary_title);
+                $sheet->row(2, function($row) {
+                    $row->setBackground('#C0C0C0');
+                });
+
+                $sheet->cell('I2', function ($cell) {
+                    $cell->setAlignment('center'); 
+                });
+
+                $sheet->cell('I3', function ($cell) {
+                    $cell->setValue('Discount total');
+                });
+                $sheet->cell('J3', function ($cell) {
+                    $cell->setValue('Type');
+                });
+
+                $sheet->cell('K3', function ($cell) {
+                    $cell->setValue('Desc.');
+                });
+
+                if (is_array($ary_data)) {
+                    foreach ($ary_data as $key => $invoice) {
+                        $sheet->row($key + 4, $invoice);
+                    }
+                }
+
+                $sheet->setColumnFormat(array(
+                    'C' => '0%'
+                ));
+            });
+
+        })->store('xlsx', false, true);
+
+        if ($excel['full']) {
+            copy($excel['full'], public_path('/storage/' . $file_name . '.xlsx'));
+            unlink($excel['full']);
+            return response()->json(['code' => 0, 'data' => ['excel' => $file_name . '.xlsx']], 200);
+        } else {
+            return response()->json(['code' => 0, 'data' => ['result' => false, 'message' => 'Export fail!']], 500);
+        }
     }
 
     protected function number_to_words($number)
