@@ -3,6 +3,7 @@ $(function () {
 
     var frmTutorFee = $('FORM#frmTutorFee');
     var frmOtherFee = $('FORM#frmOtherFee');
+    var formExport = $('DIV#invoice-export-modal FORM#frmExportInvoice');
 
     var select2_tutor_studentid = null;
     var select2_tutor_classid = null;
@@ -156,7 +157,7 @@ $(function () {
             'duration': $(frmTutorFee).find('INPUT#duration').val(),
             'price': numeral($(frmTutorFee).find('INPUT#price').val()).value(),
             'discount': numeral($(frmTutorFee).find('INPUT#discount').val()).value(),
-            'discount_type': $(frmTutorFee).find('INPUT#discount-type')[0].checked === false ? 'p':'c', 
+            'discount_type': $(frmTutorFee).find('INPUT#discount-type')[0].checked === false ? 'p' : 'c',
             'prepaid': numeral($(frmTutorFee).find('INPUT#prepaid').val()).value()
         }
 
@@ -338,6 +339,11 @@ $(function () {
     }
 
     var invoice_list_init = () => {
+        $(formExport).find('INPUT#start_date,INPUT#end_date').datepicker({
+            autoclose: true,
+            format: 'yyyy-mm-dd'
+        });
+        
         if ($.fn.dataTable.isDataTable('TABLE#invoice-list')) {
             invoice_list_table = $('TABLE#invoice-list').DataTable();
         } else {
@@ -478,7 +484,7 @@ $(function () {
                 print_invoice(data.id, () => {
                     setTimeout(() => {
                         invoice_list_table.ajax.reload(() => {
-                            invoice_list_table.column('1:visible').order( 'desc' ).draw();
+                            invoice_list_table.column('1:visible').order('desc').draw();
                         })
                     }, 500);
                 });
@@ -498,7 +504,7 @@ $(function () {
                         data: JSON.stringify({ "id": data.id }),
                         success: function (response) {
                             alert('Đã huỷ!');
-                            invoice_list_table.column('1:visible').order( 'desc' ).draw();
+                            invoice_list_table.column('1:visible').order('desc').draw();
                         },
                         error: (xhr, status, err) => {
                             alert(err);
@@ -516,7 +522,7 @@ $(function () {
                         data: JSON.stringify({ "id": data.id }),
                         success: function (response) {
                             alert('Đã duyệt!');
-                            invoice_list_table.column('1:visible').order( 'desc' ).draw();
+                            invoice_list_table.column('1:visible').order('desc').draw();
                         },
                         error: (xhr, status, err) => {
                             alert(err);
@@ -535,6 +541,65 @@ $(function () {
             $(tab_headers).find('LI').removeClass('disabled');
             tab_activate($(tab_headers).find('A[data-tab="tutorfee-tab"]')[0]);
         });
+
+        $("DIV#invoice-export-modal BUTTON#btnModalExport").on('click', (e) => {
+            var url = 'api/invoice/export';
+            var invoice_type = $(formExport).find("input[name='invoice_type']:checked").val();
+            var invoice_status = $(formExport).find("input[name='invoice_status']:checked").val();
+
+            var data = {
+                "start_date": $(formExport).find('INPUT#start_date').val(),
+                "end_date": $(formExport).find('INPUT#end_date').val(),
+                "type": invoice_type,
+                "status": invoice_status,
+                "branch_id": $(formExport).find('SELECT#branch').val(),
+                "class_id": ""
+            };
+
+            var download_file = (filename) => {
+                var link = '/storage/' + filename;
+
+                $.ajax({
+                    url: link,
+                    method: 'GET',
+                    xhrFields: {
+                        responseType: 'blob'
+                    },
+                    success: function (data) {
+                        var a = document.createElement('a');
+                        var url = window.URL.createObjectURL(data);
+                        a.href = url;
+                        a.download = filename;
+                        document.body.append(a);
+                        a.onclick = () => {
+                            $.ajax('http://localhost:81/api/invoice/clean_export/' + filename, {
+                                method: 'GET',
+                                success: function (data) {
+                                    console.log('deleted', data);
+                                }
+                            });
+                        }
+                        a.click();
+                        a.remove();
+                        window.URL.revokeObjectURL(url);
+                    }
+                });
+            };
+
+            $.ajax(url, {
+                method: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (response, textStatus, request) {
+                    var file = response.data.excel;
+                    download_file(file);
+                    $('DIV#invoice-export-modal').modal('hide');
+                },
+                error: (xhr, status, err) => {
+                    console.log('Has error!', err);
+                }
+            });
+        });
     }
 
     var invoice_tutor_form_event_binding = () => {
@@ -552,7 +617,7 @@ $(function () {
 
         $(frmTutorFee).find('input#price,input#duration,input#prepaid,input#discount').on('blur', (e) => {
             var value = $(e.target).val().trim();
-            if (e.target.id == 'price' ||  e.target.id == 'prepaid') {
+            if (e.target.id == 'price' || e.target.id == 'prepaid') {
                 $(e.target).val(numeral(value).format('0,0'));
             }
             tuition_fee_calculate();
@@ -672,7 +737,6 @@ $(function () {
             var search_value = $.fn.dataTable.util.escapeRegex(
                 $(e.target).val()
             );
-            console.log(search_value);
             invoice_list_table.column(1).search(search_value ? '^' + search_value : '', true, false).draw();
         });
 
@@ -756,13 +820,13 @@ $(function () {
                 if ($(e.target).prop('id') == 'btnSaveInvoice') {
                     save_callback = () => {
                         tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
-                        invoice_list_table.column('1:visible').order( 'desc' ).draw();
+                        invoice_list_table.column('1:visible').order('desc').draw();
                     };
                 }
                 else if ($(e.target).prop('id') == 'btnPrintInvoice') {
                     save_callback = (invoce_id) => {
                         print_invoice(invoce_id, () => {
-                            invoice_list_table.column('1:visible').order( 'desc' ).draw();
+                            invoice_list_table.column('1:visible').order('desc').draw();
                         });
                         tab_activate($(tab_headers).find('A[data-tab="invoicelist-tab"]')[0]);
                     };

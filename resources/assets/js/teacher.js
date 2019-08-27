@@ -411,8 +411,13 @@ $(function () {
     if ($('FORM#frmTeacher').length > 0) {
         getCountries();
 
-        $('FORM#frmTeacher input#birthdate').datetimepicker({
-            format: 'Y-m-d'
+        // $('FORM#frmTeacher input#birthdate').datetimepicker({
+        //     format: 'Y-m-d'
+        // });
+
+        $('FORM#frmTeacher input#birthdate').datepicker({
+            autoclose: true,
+            format: 'yyyy-mm-dd'
         });
 
         $('DIV#modal-teacher-form DIV.modal-footer BUTTON#btnSave').on('click', (e) => {

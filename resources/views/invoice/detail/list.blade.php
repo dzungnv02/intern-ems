@@ -16,3 +16,4 @@
         </thead>
     </table>
 </div>
+@include('invoice.detail.export_modal')

@@ -44,6 +44,7 @@ try {
         }
     });
 
+    require('./lib/jquery.fileDownload.js');
     require('./student');
     require('./student_detail');
     require('./timetable');
