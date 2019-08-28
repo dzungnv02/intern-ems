@@ -10,6 +10,7 @@ use App\Parents;
 use App\Student;
 use App\StudentClass;
 use App\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -282,13 +283,12 @@ class InvoiceController extends Controller
         return response()->json(['code' => 0, 'data' => ['message' => 'OK']], 200);
     }
 
-    public function clean_export ($file) 
+    public function clean_export($file)
     {
-        $path = public_path('/storage/'.$file);
+        $path = public_path('/storage/' . $file);
         if (empty($file) || !file_exists($path)) {
             return response()->json(['code' => 1, 'data' => ['message' => 'file not found!']], 500);
-        }
-        else {
+        } else {
             unlink($path);
             return response()->json(['code' => 0, 'data' => ['message' => 'file is removed!']], 200);
         }
@@ -296,132 +296,138 @@ class InvoiceController extends Controller
 
     public function export(Request $request)
     {
-        $input = $request->all();
-        $start_date = $input['start_date'];
-        $end_date = $input['end_date'];
-        $type = $input['type'];
-        $status = $input['status'];
-        $branch_id = $input['branch_id'];
-        $class_id = $input['class_id'];
+        try {
+            $input = $request->all();
+            $start_date = $input['start_date'];
+            $end_date = $input['end_date'];
+            $type = $input['type'];
+            $status = $input['status'];
+            $branch_id = $input['branch_id'];
+            $class_id = $input['class_id'];
 
-        $where = [
-            'type' => $type,
-            'branch_id' => $branch_id != 0 ? $branch_id : null,
-            'invoice_status' => $status,
-            'class_id' => $class_id,
-        ];
+            $where = [
+                'type' => $type,
+                'branch_id' => $branch_id != 0 ? $branch_id : null,
+                'invoice_status' => $status,
+                'class_id' => $class_id,
+            ];
 
-        $ary_data = [];
-        $date_range = '';
+            $ary_data = [];
+            $date_range = '';
 
-        if (!empty($start_date) && empty($end_date)) {
-            $date_range = ' - from ' . date('d-m-Y',strtotime($start_date));
-            $start_date = date('Y-m-d 00:00:00', strtotime($start_date));
-            $where['created_at'] = $start_date;
+            if (!empty($start_date) && empty($end_date)) {
+                $date_range = ' - from ' . date('d-m-Y', strtotime($start_date));
+                $start_date = date('Y-m-d 00:00:00', strtotime($start_date));
+                $where['created_at'] = $start_date;
+
+            } else if (empty($start_date) && !empty($end_date)) {
+                $date_range = ' - from ' . date('d-m-Y', strtotime($end_date));
+                $end_date = date('Y-m-d 00:00:00', strtotime($end_date));
+                $where['created_at'] = $end_date;
+            } else if (!empty($start_date) && !empty($end_date)) {
+                $date_range = ' - from ' . date('d-m-Y', strtotime($start_date)) . ' to ' . date('d-m-Y', strtotime($end_date));
+                $start_date = date('Y-m-d 00:00:00', strtotime($start_date));
+                $end_date = date('Y-m-d 23:59:59', strtotime($end_date));
+                $where['created_at'] = [$start_date, $end_date];
+            }
+
+            $ary_title = [
+                'No.',
+                'Collecting Date',
+                'No of Recept',
+                'Code',
+                'Name',
+                'Parent Name',
+                'Payment Method',
+                'Course Name',
+                'Discount',
+                '',
+                '',
+                'Amount',
+            ];
+
+            $collection_data = Invoice::search_invoice($where);
+            if (!is_null($collection_data)) {
+                $payment_methods = config('constant.payment_method');
+                $collection_data->map(function ($obj, $key) use (&$ary_data, $payment_methods) {
+                    $ary_data[$key]['no'] = $key + 1;
+                    $ary_tmp = (array) $obj;
+                    foreach ($ary_tmp as $field => $value) {
+                        if (in_array($field, ['id'])) {
+                            continue;
+                        }
+                        if ($field == 'payment_method') {
+                            $ary_data[$key][$field] = $payment_methods[$value];
+                        } else {
+                            $ary_data[$key][$field] = $value;
+                        }
+                    }
+
+                    $ary_data[$key]['discount_type'] = !empty($ary_data[$key]['discount']) ? ($ary_data[$key]['discount_type'] == 'p' ? 'Percent' : 'Cash') : '';
+                });
+            }
+
+            $file_name = 'Invoice_export_' . date('YmdHis');
+
+            $branch = !empty($input['branch_id']) ? Branch::findOrfail($branch_id) : null;
+
+            $branch_name = !is_null($branch) ? $branch->branch_code : 'All center';
+
+            $excel = Excel::create($file_name, function ($excel) use ($branch_name, $ary_title, $ary_data, $date_range) {
+
+                $excel->sheet('Invoice list', function ($sheet) use ($branch_name, $ary_title, $ary_data, $date_range) {
+
+                    $sheet->cell('A1', function ($cell) use ($branch_name, $date_range) {
+                        $cell->setValue($branch_name . ' - Invoice list' . $date_range);
+                    });
+                    $sheet->mergeCells('A1:L1');
+                    $sheet->mergeCells('I2:K2');
+
+                    $sheet->row(2, $ary_title);
+                    $sheet->row(2, function ($row) {
+                        $row->setBackground('#C0C0C0');
+                    });
+
+                    $sheet->cell('I2', function ($cell) {
+                        $cell->setAlignment('center');
+                    });
+
+                    $sheet->cell('I3', function ($cell) {
+                        $cell->setValue('Discount total');
+                    });
+                    $sheet->cell('J3', function ($cell) {
+                        $cell->setValue('Type');
+                    });
+
+                    $sheet->cell('K3', function ($cell) {
+                        $cell->setValue('Desc.');
+                    });
+
+                    if (is_array($ary_data)) {
+                        foreach ($ary_data as $key => $invoice) {
+                            $sheet->row($key + 4, $invoice);
+                        }
+                    }
+
+                    $sheet->setColumnFormat(array(
+                        'C' => '0%',
+                    ));
+                });
+
+            })->store('xlsx', false, true);
+
+            if ($excel['full']) {
+                copy($excel['full'], public_path('/storage/' . $file_name . '.xlsx'));
+                unlink($excel['full']);
+                return response()->json(['code' => 0, 'data' => ['excel' => $file_name . '.xlsx']], 200);
+            } else {
+                return response()->json(['code' => 0, 'data' => ['result' => false, 'message' => 'Export fail!']], 500);
+            }
+        } catch (Exception $e) {
             
-        } else if (empty($start_date) && !empty($end_date)) {
-            $date_range = ' - from ' .date('d-m-Y',strtotime($end_date));
-            $end_date = date('Y-m-d 00:00:00', strtotime($end_date));
-            $where['created_at'] = $end_date;
-        } else if (!empty($start_date) && !empty($end_date)) {
-            $date_range = ' - from ' .date('d-m-Y',strtotime($start_date)). ' to '. date('d-m-Y',strtotime($end_date));
-            $start_date = date('Y-m-d 00:00:00', strtotime($start_date));
-            $end_date = date('Y-m-d 23:59:59', strtotime($end_date));
-            $where['created_at'] = [$start_date, $end_date];
-        }
-
-        $ary_title = [
-            'No.',
-            'Collecting Date',
-            'No of Recept',
-            'Code',
-            'Name',
-            'Parent Name',
-            'Payment Method',
-            'Course Name',
-            'Discount',
-            '',
-            '',
-            'Amount'
-        ];
-
-        $collection_data = Invoice::search_invoice($where);
-        if (!is_null($collection_data)) {
-            $payment_methods = config('constant.payment_method');
-            $collection_data->map(function ($obj, $key) use (&$ary_data, $payment_methods){
-                $ary_data[$key]['no'] = $key + 1;
-                $ary_tmp = (array)$obj;
-                foreach ($ary_tmp as $field => $value) {
-                    if (in_array($field,['id'])) {
-                        continue;
-                    }
-                    if ($field == 'payment_method') {
-                        $ary_data[$key][$field] = $payment_methods[$value];
-                    }
-                    else {
-                        $ary_data[$key][$field] = $value;
-                    }
-                }
-
-                $ary_data[$key]['discount_type'] = !empty($ary_data[$key]['discount']) ? ($ary_data[$key]['discount_type'] == 'p' ? 'Percent' : 'Cash') : '';
-            });
-        }
-
-        $file_name = 'Invoice_export_' . date('YmdHis');
-
-        $branch = !empty($input['branch_id']) ? Branch::findOrfail($branch_id) : null;
-
-        $branch_name = !is_null($branch) ? $branch->branch_code : 'All center';
-
-        $excel = Excel::create($file_name, function ($excel) use ($branch_name, $ary_title, $ary_data, $date_range) {
-
-            $excel->sheet('Invoice list', function ($sheet) use ($branch_name, $ary_title, $ary_data,  $date_range) {
-
-                $sheet->cell('A1', function ($cell) use ($branch_name, $date_range) {
-                    $cell->setValue($branch_name . ' - Invoice list'. $date_range);
-                });
-                $sheet->mergeCells('A1:L1');
-                $sheet->mergeCells('I2:K2');
-
-                $sheet->row(2, $ary_title);
-                $sheet->row(2, function($row) {
-                    $row->setBackground('#C0C0C0');
-                });
-
-                $sheet->cell('I2', function ($cell) {
-                    $cell->setAlignment('center'); 
-                });
-
-                $sheet->cell('I3', function ($cell) {
-                    $cell->setValue('Discount total');
-                });
-                $sheet->cell('J3', function ($cell) {
-                    $cell->setValue('Type');
-                });
-
-                $sheet->cell('K3', function ($cell) {
-                    $cell->setValue('Desc.');
-                });
-
-                if (is_array($ary_data)) {
-                    foreach ($ary_data as $key => $invoice) {
-                        $sheet->row($key + 4, $invoice);
-                    }
-                }
-
-                $sheet->setColumnFormat(array(
-                    'C' => '0%'
-                ));
-            });
-
-        })->store('xlsx', false, true);
-
-        if ($excel['full']) {
-            copy($excel['full'], public_path('/storage/' . $file_name . '.xlsx'));
-            unlink($excel['full']);
-            return response()->json(['code' => 0, 'data' => ['excel' => $file_name . '.xlsx']], 200);
-        } else {
-            return response()->json(['code' => 0, 'data' => ['result' => false, 'message' => 'Export fail!']], 500);
+            Log::debug('Export error:'. var_export($e->getTraceAsString()));
+            
+            return response()->json(['code' => 0, 'data' => ['result' => false, 'message' => 'Export fail!'. "\n". $e->getMessage()]], 500);
         }
     }
 
