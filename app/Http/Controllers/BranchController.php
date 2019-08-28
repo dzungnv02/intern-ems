@@ -27,8 +27,21 @@ class BranchController extends Controller
         return view('branch/branch_form');
     }
 
-    function list(Request $request) {
-        $branch_list = Branch::getBranchs();
+    function list(Request $request) 
+    {
+        $inputs = $request->input();
+        $filter = null;
+
+        if (!empty($inputs)) {
+            $filter = [];
+            foreach($inputs as $field => $where) {
+                if ($field == '_') continue;
+                $value = $where['value'] == "null" ? null : $where['value'];
+                $filter[] = [$field, $where['operator'], $value];
+            }
+        }
+
+        $branch_list = Branch::getBranchs($filter);
         return response()->json(['code' => 1, 'data' => $branch_list], 200);
     }
 

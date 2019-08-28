@@ -104,8 +104,6 @@
                                 <div class="form-group col-sm-4">
                                     <select type="text" id="branch" class="form-input">
                                         <option value="0">[Tất cả trung tâm]</option>
-                                        <option value="4">I Can Read Tô Hiến Thành</option>
-                                        <option value="3">I Can Read Hoàng Quốc Việt</option>
                                     </select>
                                 </div>
                                 

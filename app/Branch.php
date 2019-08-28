@@ -9,9 +9,13 @@ class Branch extends Model
 {
     protected $table = 'branch';
 
-    public static function getBranchs()
+    public static function getBranchs($filter = null)
     {
-        return DB::table('branch')->select('*')->orderBy('city', 'DESC')->get()->toArray();
+        $query = DB::table('branch')->select('*');
+        if ($filter !== null) {
+            $query->where($filter);
+        }
+        return $query->orderBy('city', 'DESC')->get()->toArray();
     }
 
     public static function getBranch($branch_id)

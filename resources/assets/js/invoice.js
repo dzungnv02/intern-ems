@@ -743,9 +743,30 @@ $(function () {
         return wrapper;
     }
 
+    var get_branch_list = () => {
+        $.ajax('/api/branch/list', {
+            method: 'GET',
+            data: {"crm_owner":{"operator":"!=","value":"null"}},
+            dataType: 'json',
+            contentType: 'application/json',
+            success: (response) => {
+                var select = $(formExport).find('SELECT#branch');
+                var list = response.data;
+                for (var i = 0; i < list.length; i++) {
+                    var opt = $('<option></option>', {
+                        value:list[i].id,
+                        text: list[i].branch_name
+                    });
+                    $(select).append(opt);
+                }
+            }
+        });
+    }
+
     var init = () => {
         invoice_list_init();
         invoice_list_event_binding();
+        get_branch_list();
 
         $('.help-block').hide();
         $('.has-error').removeClass('has-error');

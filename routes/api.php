@@ -120,7 +120,7 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::get('/list-teachers', 'TeacherController@index');
     Route::post('/delete-teacher', 'TeacherController@deleteTeacher');
 
-    Route::get('/branch/list', 'BranchController@list');
+    //Route::get('/branch/list', 'BranchController@list');
     Route::get('/branch/get', 'BranchController@getBranch');
     Route::post('/branch/insert', 'BranchController@insertBranch');
     Route::post('/branch/update', 'BranchController@updateBranch');
@@ -132,3 +132,5 @@ Route::group(['middleware' => 'api.headers'], function () {
 
     Route::get('/compensated/list','CompensatedClassController@index');
 });
+
+Route::get('/branch/list', 'BranchController@list');
