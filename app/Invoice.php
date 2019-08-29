@@ -176,7 +176,12 @@ class Invoice extends Eloquent
         }
 
         if (!empty($condition['invoice_status'])) {
-            $query->where('rev_n_exp.invoice_status', '=', $condition['invoice_status']);
+            if ($condition['invoice_status'] == 2) {
+                $query->whereIn('rev_n_exp.invoice_status', [1,2]);
+            }
+            else {
+                $query->where('rev_n_exp.invoice_status', '=', $condition['invoice_status']);
+            }
         }
 
         if (!empty($condition['branch_id'])) {
