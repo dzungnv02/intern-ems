@@ -18,7 +18,7 @@
     <div class="col-sm-2" style="height:40px;text-align:right;padding-left:0">
         <button style="height:42px" type="button" role="button" class="btn btn-lg btn-success" id="btnCreateInvoice">Tạo phiếu thu</button>
         <button style="height:42px" type="button" role="button" class="btn btn-lg btn-success" id="btnPrintInvoice">In phiếu thu</button>
-        <button style="height:42px" type="button" role="button" class="btn btn-lg btn-info" id="btnExportInvoice" data-toggle="modal" data-target="#invoice-export-modal"><i class="fa fa-file-excel-o"></i></button>
+        <button style="height:42px" type="button" role="button" class="btn btn-lg btn-info" id="btnExportInvoice" data-toggle="modal" data-target="#invoice-export-modal">Kết xuất</button>
         <button style="height:42px" type="button" role="button" class="btn btn-lg btn-info" id="btnSaveInvoice">Lưu</button>
     </div>
 </div>
