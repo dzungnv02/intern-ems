@@ -33,6 +33,7 @@ $(function () {
         if ($(actived_tab).prop('id') == 'invoicelist-tab') {
             $('BUTTON#btnSaveInvoice').css('display', 'none');
             $('BUTTON#btnPrintInvoice').css('display', 'none');
+            $('BUTTON#btnExportInvoice').css('display', 'inline');
             $('BUTTON#btnCreateInvoice').css('display', 'inline');
             $(frmTutorFee)[0].reset();
             $(frmOtherFee)[0].reset();
@@ -42,6 +43,7 @@ $(function () {
             $('BUTTON#btnSaveInvoice').css('display', 'inline');
             $('BUTTON#btnPrintInvoice').css('display', 'inline');
             $('BUTTON#btnCreateInvoice').css('display', 'none');
+            $('BUTTON#btnExportInvoice').css('display', 'none');
         }
     }
 
