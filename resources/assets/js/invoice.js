@@ -572,7 +572,7 @@ $(function () {
                         a.download = filename;
                         document.body.append(a);
                         a.onclick = () => {
-                            $.ajax('http://localhost:81/api/invoice/clean_export/' + filename, {
+                            $.ajax('api/invoice/clean_export/' + filename, {
                                 method: 'GET',
                                 success: function (data) {
                                     console.log('deleted', data);
