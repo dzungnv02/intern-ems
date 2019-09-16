@@ -82,13 +82,15 @@ class InvoiceController extends Controller
             $end_date = Invoice::calculate_enddate($start_date, $duration, $class_id);
         }
 
-        $amount = ($duration * $price) - $prepaid;
+        $amount = ($duration * $price);
 
         if ($discount > 0 && $discount_type === 'p') {
             $amount -= (($amount * $discount) / 100);
         } else if ($discount > 0 && $discount_type === 'c') {
             $amount -= $discount;
         }
+
+        $amount -= $prepaid;
 
         return response()->json(['code' => 0, 'data' => ['duration' => $duration, 'end_date' => $end_date, 'amount' => $amount, 'inputs' => $input]], 200);
     }
