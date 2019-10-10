@@ -157,7 +157,14 @@ class InvoiceController extends Controller
         $invoice_data = $invoice->toArray();
 
         $student = Student::findOrfail($invoice_data['student_id']);
-        $class = Classes::findOrfail($invoice_data['class_id']);
+        
+        if ($invoice_data['class_id']) {
+            $class = Classes::findOrfail($invoice_data['class_id']);
+        }
+        else {
+            $class = null;
+        }
+        
         $user = User::findOrfail($invoice_data['created_by']);
 
         $resource_path = dirname(app_path()) . '/public/';
@@ -183,7 +190,7 @@ class InvoiceController extends Controller
         $invoice_data['student_code'] = $student->student_code;
         $invoice_data['payment_method'] = $payment_methods[$invoice_data['payment_method']];
 
-        $invoice_data['class_name'] = $class->name;
+        $invoice_data['class_name'] = $class !== null ? $class->name : '';
         $invoice_data['discount'] = $invoice_data['discount_type'] === 'p' ? (int) $invoice_data['discount'] . '%' : number_format($invoice_data['discount'], 0, '', ',') . ' ' . $invoice_data['currency'];
         $invoice_data['prepaid'] = $invoice_data['prepaid'] ? $invoice_data['prepaid'] : 0;
         $invoice_data['amount_text'] = $invoice_data['amount'] ? $this->number_to_words($invoice_data['amount']) : 0;
