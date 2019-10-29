@@ -18,7 +18,7 @@ class syncClasses extends Command
      *
      * @var string
      */
-    protected $signature = 'zoho:classes {--getlist} {--schedule} {--map_student} {--owner=}';
+    protected $signature = 'zoho:classes {--getlist} {--schedule} {--map_student} {--clean} {--owner=}';
     //php artisan zoho:classes --getlist --owner=2666159000000213025
     //php artisan zoho:classes --schedule --owner=2666159000000213025
     //php artisan zoho:classes --map_student
@@ -55,10 +55,14 @@ class syncClasses extends Command
 
         $getlist = $this->option('getlist');
         $map_student = $this->option('map_student');
+        $is_clean = $this->option('clean');
         if ($getlist) {
             $this->info('start_sync_classes');
             $this->get_list($fillter_owner_id);
             $this->info('end_sync_classes');
+        }
+        else if ($is_clean) {
+            $this->clean_assigned_class();
         }
         else if ($map_student){
             $this->map_student();
@@ -191,7 +195,6 @@ class syncClasses extends Command
                     $class_data['branch_id'] = data_get($branch, 'id');
                     $class_data['updated_at'] = date('Y-m-d H:i:s');
                     Classes::updateOne($old_class->id, $class_data);
-                    //$old_class->branch_id = data_get($branch, 'id');
                 }
             }
         }
@@ -309,6 +312,31 @@ class syncClasses extends Command
             $this->info('Has error!');
             $this->info($e->getMessage());
         }
+    }
+
+    protected function clean_assigned_class() 
+    {
+        $list = DB::table('student_classes') 
+            ->select(DB::raw('student_id, count(class_id), max(id) as id'))
+            ->groupBy('student_id')
+            ->havingRaw('count(class_id) > 1')
+            ->get();
+
+        $student_list = [];
+        $where_ids = [];
+
+        if ($list) {
+            foreach($list as $item) {
+                array_push($student_list, data_get($item, 'student_id'));
+                array_push($where_ids, data_get($item, 'id'));
+            }
+        }
+
+        $cleaning = DB::table('student_classes')
+                    ->whereIn('student_id', $student_list)
+                    ->whereNotIn('id', $where_ids)
+                    ->delete();
+        $this->info('Deleted: '. $cleaning. ' record(s)');
     }
 
 }
