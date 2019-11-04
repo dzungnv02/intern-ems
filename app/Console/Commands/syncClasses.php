@@ -19,9 +19,7 @@ class syncClasses extends Command
      * @var string
      */
     protected $signature = 'zoho:classes {--getlist} {--schedule} {--map_student} {--clean} {--owner=}';
-    //php artisan zoho:classes --getlist --owner=2666159000000213025
-    //php artisan zoho:classes --schedule --owner=2666159000000213025
-    //php artisan zoho:classes --map_student
+    
     /**
      * The console command description.
      *
