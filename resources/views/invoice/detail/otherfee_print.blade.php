@@ -33,6 +33,8 @@
       body {
         width: 100%;
         height: 100%;
+        font-size:1.2em;
+        font-family:ICR-Verdana;!important
       };
     }
 
