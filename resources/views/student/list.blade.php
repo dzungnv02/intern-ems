@@ -8,6 +8,9 @@
 @section('content')
 	<div><button class="btn btn-info add-student hidden">Thêm học sinh</button></div><br>
 	<div class="card-body table-reponsive">
+		<div class="row">
+			<div class="col-xl-12">Hello filter</div>
+		</div>
 		<table class="table table-bordered table-striped" id="list-student">
 			<thead>
 				<tr>
@@ -22,7 +25,7 @@
 				</tr>
 			</thead>
 		</table>
-	</div></br>
+	</div>
 
 	<div class="modal fade" id="student-form-modal" role="dialog" aria-hidden="true">
 		<div class="modal-dialog" role="document" style="width:800px">
