@@ -33,9 +33,9 @@ class Staff extends Model
         return $staff;
     }
 
-    public static function search($keyword, $record_per_page, $page = 1)
+    public static function search($keyword, $record_per_page, $page = 1, $start = 0)
     {
-        $start = ($page - 1) * $record_per_page;
+        //$start = ($page - 1) * $record_per_page;
         $search = DB::table('staffs')
             ->leftJoin('branch', 'branch.id', '=', 'staffs.branch_id')
             ->select('staffs.id', 'staffs.email', 'staffs.name', 'staffs.role', 'staffs.branch_id', 'staffs.birth_date', 'staffs.gender', 'staffs.address', 'staffs.phone_number', 'branch.branch_name')

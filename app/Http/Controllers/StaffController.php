@@ -14,19 +14,12 @@ class StaffController extends Controller
      */
     public function getListStaff(Request $request)
     {
-        $record_per_page = $request->record;
-        $keyword = $request->keyword;
-        $page = $request->page;
-        if ($record_per_page == "") {
-            $record_per_page = 10;
-        }
-        $sum_row = count(Staff::all());
-        $sum_page = ceil($sum_row / $record_per_page);
-        if ($page > $sum_page || !is_numeric($page)) {
-            $page = 1;
-        }
-        $all = Staff::Search($keyword, $record_per_page, $page);
-        return response()->json(['code' => 1, 'message' => 'ket qua', 'data' => $all], 200);
+        $json = [
+            'code' => 1, 
+            'message' => 'Success',
+            'data' => Staff::all(),
+        ];
+        return response()->json($json, 200);
     }
     
     /**
