@@ -107,7 +107,12 @@ $(function () {
     }
 
     var get_payment_history = () => {
-
+        get('/api/student/get-payments', {
+            student_id: student_id
+        }, (data) => {
+            student_data.payment = data;
+            fill_payment_history(data);
+        });
     }
 
     var get_activities = () => {
@@ -298,7 +303,83 @@ $(function () {
     }
 
     var fill_payment_history = (data) => {
-
+        var table = $('DIV.box#box_payment > DIV.box-body > TABLE');
+        $(table).find('tbody').empty();
+        if (data.length > 0) {
+            for (var i = 0; i < data.length; i++) {
+                var obj = data[i];
+                                
+                var b_view = $("<button></button>", {
+                    class: "btn btn-info view-invoice",
+                    style:"margin-right: 2px;",
+                    title: "Xem",
+                    id: 'btnView_' + obj.inv_id,
+                    "data-invid": obj.inv_id
+                })
+                .append($('<i class="fa fa-eye" aria-hidden="true"></i>'));
+                
+                b_view.bind('click', { "inv_id": obj.inv_id} , (e) => {
+                    view_invoice(e.data.inv_id);
+                    e.preventDefault();
+                    e.stopPropagation();
+                })
+                
+                var tr = $('<TR></TR>');
+                var index_cell = $('<TH></TH>', {
+                    "text": i + 1,
+                    
+                });
+                
+                var class_cell = $('<TD></TD>', {
+                    text: obj.class_name,
+                });
+                
+                var reason_cell = $('<TD></TD>', {
+                    text: obj.type == 1 ? 'Học phí' : obj.reason
+                });
+                
+                var start_date_cell = $('<TD></TD>', {
+                    text: obj.start_date
+                });
+                var end_date_cell = $('<TD></TD>', {
+                    text: obj.end_date
+                });
+                var duration_cell = $('<TD></TD>', {
+                    text: obj.duration
+                });
+                var amount_cell = $('<TD></TD>', {
+                    text: obj.amount
+                });
+                
+                var branch_name_cell = $('<TD></TD>', {
+                    text: obj.branch_name
+                });
+                
+                var cashier_cell = $('<TD></TD>', {
+                    text: obj.cashier
+                });
+                var created_at_cell = $('<TD></TD>', {
+                    text: obj.created_at
+                });
+                
+                var act_cell = $('<TD></TD>').append(b_view);
+                
+                $(tr).append(index_cell,
+                            class_cell,
+                            reason_cell,
+                            start_date_cell,
+                            end_date_cell,
+                            duration_cell,
+                            amount_cell,
+                            branch_name_cell,
+                            cashier_cell,
+                            created_at_cell,
+                            act_cell
+                            );
+                            
+                $(table).find('tbody').append(tr);
+            }
+        }
     }
 
     var fill_attendance = (data) => {
@@ -376,6 +457,19 @@ $(function () {
         }
 
 
+    }
+    
+    var view_invoice = (invoice_id) => {
+        $.ajax({
+            url: '/invoice/print/' + invoice_id + '/view',
+            type: 'GET',
+            dataType: 'html',
+            success: function (response) {
+                $('DIV.modal#view-invoice').find('DIV.modal-body').empty();
+                $('DIV.modal#view-invoice').find('DIV.modal-body').append(response);
+                $('DIV.modal#view-invoice').modal('show');
+            }
+        });
     }
 
     var get = (end_point, data, callback) => {
