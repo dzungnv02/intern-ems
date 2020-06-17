@@ -14,6 +14,9 @@ use App\Assessment;
 use App\Teacher;
 use App\Classes;
 use App\TeacherSchedules;
+
+use App\Classes\Misc;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
@@ -264,7 +267,8 @@ class StudentController extends Controller
         $student_id = isset($inputs['student_id']) ? $inputs['student_id'] : null;
 
         if ($student_id) {
-            $list = Invoice::getPaymentHistoryOfStudent($student_id);
+            //$list = Invoice::getPaymentHistoryOfStudent($student_id);
+            $list = Misc::invoice_of_student($student_id);
             return response()->json(['code' => 1, 'data' => $list], 200);
         }
         return response()->json(['code' => 1, 'message' => 'no data'], 204);

@@ -1,0 +1,123 @@
+version: '3'
+
+services:
+    traefik:
+        image: traefik:alpine
+        ports:
+          - 1234:1234
+          - 80:80
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - ./stacks/traefik/traefik.toml:/etc/traefik/traefik.toml
+          - ./stacks/ca-generator/:/certs/
+        container_name: traefik-ems
+        labels:
+          - traefik.enable=true
+          - traefik.frontend.rule=Host:ems.localhost
+          - traefik.port=1234
+
+    ems_admin:
+        container_name: ems_admin
+        hostname: ems_admin
+        build: 
+            context: ./stacks
+            dockerfile: Dockerfile
+        restart: always
+        environment:
+            - WAIT_HOSTS_TIMEOUT=120
+            - WAIT_HOSTS=ems_db:3306
+            - DATABASE_DRIVER=mysql
+            - DATABASE_PORT=3306
+            - DATABASE_HOST=ems_db
+            - DATABASE_NAME=ems
+            - DATABASE_USER=ems
+            - DATABASE_PASSWORD=ems@123456
+        depends_on: 
+            - ems_db
+        volumes: 
+            - ./:/var/www/html
+            - /var/www/html/stacks
+
+    ems_admin_nginx:
+        container_name: ems_admin_nginx
+        build: 
+            context: ./stacks
+            dockerfile: Dockerfile_nginx
+        environment:
+            - WAIT_HOSTS=ems_admin:9000
+        volumes:
+            - ./:/var/www/html
+            - /var/www/html/stacks
+        ports:
+            - "8005:80"
+        depends_on:
+            - ems_admin
+            - ems_db
+        labels:
+            - "traefik.enable=true"
+            - "traefik.docker.network=ems.localhost"
+            - "traefik.frontend.rule=Host:admin.ems.localhost"
+
+    ems_db:
+        image: mysql:8.0
+        container_name: ems_db
+        hostname: ems_db
+        restart: unless-stopped
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=ems
+            - MYSQL_USER=ems
+            - MYSQL_PASSWORD=ems@123456
+        restart: unless-stopped
+        command: --innodb_use_native_aio=0
+        volumes:
+            - ems_db_vol:/var/lib/mysql
+        ports:
+            - 33062:3306
+
+    ems_phpmyadmin:
+        image: phpmyadmin/phpmyadmin:latest
+        container_name: ems_phpmyadmin
+        hostname: ems_phpmyadmin
+        environment:
+            - PMA_HOST=ems_db
+            - PMA_PORT=3306
+            - PMA_USER=ems
+            - PMA_PASSWORD=ems@123456
+            - MYSQL_PASSWORD=ems@123456
+            - MYSQL_ROOT_PASSWORD=root
+        ports:
+            - "8006:80"
+        depends_on:
+            - ems_admin
+            - ems_db
+        labels:
+            - "traefik.enable=true"
+            - "traefik.docker.network=ems.localhost"
+            - "traefik.frontend.rule=Host:phpmyadmin.ems.localhost"
+            
+    portainer:
+        image: portainer/portainer:1.24.0
+        container_name: ems_portainer
+        ports:
+          - "9000:9000"
+        command: -H unix:///var/run/docker.sock
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - portainer_ems:/data
+        labels:
+          - "traefik.enable=true"
+          - "traefik.docker.network=ems.localhost"
+          - "traefik.frontend.rule=Host:portainer.ems.localhost" 
+   
+volumes:
+    portainer_ems:
+    ems_db_vol:
+        external: true
+    ems_phpmyadmin_vol:
+        external: true
+
+networks:
+    default:
+        external:
+            name: ems.localhost
