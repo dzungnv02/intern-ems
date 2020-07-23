@@ -16,6 +16,63 @@ services:
           - traefik.frontend.rule=Host:ems.localhost
           - traefik.port=1234
 
+    message_rabbitmq:
+        container_name: message_rabbitmq
+        hostname: message_rabbitmq
+        build: 
+          context: ./stacks/message-brocker
+          dockerfile: Dockerfile
+        ports:
+          - 5673:5672
+          - 15672:15672
+        restart: always
+        environment:
+          - SERVICE_PORTS=5672
+          - TCP_PORTS=5672
+        volumes:
+        - "./stacks/message-brocker/enabled_plugins:/etc/rabbitmq/enabled_plugins"
+        
+    ems_zoho_sync_processing:
+        container_name: zoho_sync_processing
+        hostname: zoho_sync_processing
+        build: 
+            context: ./stacks/zoho_sync_processing
+            dockerfile: Dockerfile
+        restart: always
+        environment:
+            - WAIT_HOSTS_TIMEOUT=120
+            - WAIT_HOSTS=ems_db:3306
+            - DATABASE_DRIVER=mysql
+            - DATABASE_PORT=3306
+            - DATABASE_HOST=ems_db
+            - DATABASE_NAME=ems
+            - DATABASE_USER=ems
+            - DATABASE_PASSWORD=ems@123456
+        depends_on: 
+            - ems_db
+        volumes: 
+            - ./zoho_sync_processing:/var/www/html
+            
+            
+    ems_zoho_sync_processing_nginx:
+        container_name: ems_zoho_sync_processing_nginx
+        build: 
+            context: ./stacks/zoho_sync_processing
+            dockerfile: Dockerfile_nginx
+        environment:
+            WAIT_HOSTS: zoho_sync_processing:9000
+        volumes:
+            - ./zoho_sync_processing:/var/www/html
+        depends_on: message_queue_processor
+        ports:
+            - "8001:80"
+        depends_on:
+            - ems_zoho_sync_processing
+        labels:
+            - "traefik.enable=true"
+            - "traefik.docker.network=ems.localhost"
+            - "traefik.frontend.rule=Host:sync.ems.localhost"
+
     ems_admin:
         container_name: ems_admin
         hostname: ems_admin
@@ -37,6 +94,7 @@ services:
         volumes: 
             - ./:/var/www/html
             - /var/www/html/stacks
+            - /var/www/html/zoho_sync_processing
 
     ems_admin_nginx:
         container_name: ems_admin_nginx
