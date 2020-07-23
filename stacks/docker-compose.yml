@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  ems_app:
+    build: .
+    volumes:
+      - ../:/apps/ems
+    working_dir: /apps/ems
+    ports:
+      - 81:80
+    links:
+      - ems_db
+    environment:
+      MYSQL_DATABASE: ems
+      MYSQL_USER: ems
+      MYSQL_PASSWORD: ems@123456
+
+  ems_db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ems
+      MYSQL_USER: ems
+      MYSQL_PASSWORD: ems@123456
+    restart: unless-stopped
+    command: --innodb_use_native_aio=0
+    volumes:
+      - ~/projects/docker/ems-intern/mysqldata:/var/lib/mysql
+    ports:
+      - 33061:3306
+
+  ems_redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+
+networks:
+ default:
+    external:
+      name: ems-localhost

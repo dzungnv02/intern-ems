@@ -702,7 +702,7 @@ $(function () {
         var type_filter = $('<select></select>', { id: 'invoice-list-type-filter', class: 'form-control' });
 
         $(status_filter).append($('<option></option>', { 'value': -1, html: '[ Tất cả trạng thái ]' }));
-        var status = ['Lưu (chưa in)', 'Đã in lần 1', 'Đã in lần 2', 'Đã duyệt', 'Đã huỷ'];
+        var status = ['Lưu (chưa in)', 'Đã in', 'Đã duyệt', 'Đã huỷ'];
         for (var i = 0; i < status.length; i++) {
             $(status_filter).append(
                 $('<option></option>', { 'value': status[i], html: status[i] })
