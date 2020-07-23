@@ -1,0 +1,4 @@
+#!/bin/sh
+
+composer global require "laravel/lumen-installer"
+PATH=$PATH:~/.composer/vendor/bin

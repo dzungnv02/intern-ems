@@ -220,9 +220,9 @@ class InvoiceController extends Controller
         $content_pdf = view($view_pdf, $invoice_data);
 
         if ($act == 'print') {
-            if ($invoice->printed_count >= config('constant.invoice_print_max_attemp')) {
-                return response()->json(['code' => 0, 'message' => 'Hoá đơn số ' . $invoice->invoice_number . ' đã được in ' . $invoice->printed_count . ' lần!'], 500);
-            }
+            // if ($invoice->printed_count >= config('constant.invoice_print_max_attemp')) {
+            //     return response()->json(['code' => 0, 'message' => 'Hoá đơn số ' . $invoice->invoice_number . ' đã được in ' . $invoice->printed_count . ' lần!'], 500);
+            // }
 
             if ($invoice->invoice_status == 0) {
                 $invoice->invoice_status = 1;
