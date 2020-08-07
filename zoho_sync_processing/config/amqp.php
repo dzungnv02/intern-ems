@@ -24,7 +24,7 @@ return [
             'username'              => env('RABBITMQ_USER','guest'),
             'password'              => env('RABBITMQ_PASSWORD','guest'),
             'vhost'                 => '/',
-            'connect_options'       => [],
+            'connect_options'       => ['Persistent' => true],
             'ssl_options'           => [],
 
             'exchange'              => 'amq.topic',

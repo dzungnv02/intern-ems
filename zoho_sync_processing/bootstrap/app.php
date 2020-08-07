@@ -23,7 +23,7 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
-// $app->withFacades();
+$app->withFacades();
 
 // $app->withEloquent();
 
@@ -69,6 +69,9 @@ $app->configure('app');
 $app->configure('amqp');
 $app->register(Bschmitt\Amqp\LumenServiceProvider::class);
 
+$app->withFacades(true, [
+    'Bschmitt\Amqp\Facades\Amqp' => 'Amqp',
+]);
 /*
 |--------------------------------------------------------------------------
 | Register Middleware

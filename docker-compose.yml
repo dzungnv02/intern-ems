@@ -155,7 +155,7 @@ services:
             - "traefik.frontend.rule=Host:phpmyadmin.ems.localhost"
             
     portainer:
-        image: portainer/portainer:1.24.0
+        image: portainer/portainer:1.24.1
         container_name: ems_portainer
         ports:
           - "9000:9000"

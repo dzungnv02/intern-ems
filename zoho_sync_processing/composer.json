@@ -7,7 +7,8 @@
     "require": {
         "php": "^7.2.5",
         "bschmitt/laravel-amqp": "^2.0",
-        "laravel/lumen-framework": "^7.0"
+        "laravel/lumen-framework": "^7.0",
+        "maxsky/lumen-app-key-generator": "^1.0"
     },
     "require-dev": {
         "fzaninotto/faker": "^1.9.1",
