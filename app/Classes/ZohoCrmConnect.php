@@ -78,8 +78,8 @@ class ZohoCrmConnect
 
                 return $status_code == 200 ? $obj : false;
             } else {
-                Log::info('From session ' . $session->access_token);
-                Log::info('Expired at ' . date('Y-m-d H:i:s', $session->expired));
+                //Log::info('From session ' . $session->access_token);
+                //Log::info('Expired at ' . date('Y-m-d H:i:s', $session->expired));
                 return $session;
             }
         } catch (Exception $e) {

@@ -37,8 +37,8 @@ class TeacherHook implements ShouldQueue
     {
         $act = $event->input['act'];
 
-        var_dump($act);
+        //var_dump($act);
         $this->teacher_sync->$act($event->input['id']);
-        Log::debug('Teacher Event Listener fired!');
+        //Log::debug('Teacher Event Listener fired!');
     }
 }
