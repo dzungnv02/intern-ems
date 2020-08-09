@@ -407,10 +407,7 @@ $(function () {
                                     status = '<span class="label label-info">Lưu (chưa in)</span>';
                                     break;
                                 case 1:
-                                    // status = '<span class="label label-warning">Đã in lần 1</span>';
-                                    // break;
                                 case 2:
-                                    //status = '<span class="label label-warning">Đã in lần 2</span>';
                                     status = '<span class="label label-warning">Đã in' + last_printed_time + '</span>';
                                     break;
                                 case 3:
@@ -437,8 +434,6 @@ $(function () {
                                 branch: $('meta[name="user-branch_id"]').attr('content'),
                                 role: $('meta[name="user-role"]').attr('content')
                             }
-                            
-                            console.log(data)
 
                             var b_print = $('<button title="In phiếu thu" class="btn btn-primary print-invoice" style="margin-right: 2px;"><i class="fa fa-print" aria-hidden="true"></i></button>');
                             var b_view = $('<button title="Xem" class="btn btn-info view-invoice" style="margin-right: 2px;"><i class="fa fa-eye" aria-hidden="true"></i></button>');
@@ -448,12 +443,9 @@ $(function () {
                             var content = $('<span></span>');
                             content.append(b_view, b_print, b_accountant_locked, b_trash);
 
-                            // if (row.invoice_status >= 2) {
-                            //     $(b_print).prop('disabled', true);
-                            // }
-
                             if (row.invoice_status > 2) {
                                 $(b_trash).prop('disabled', true);
+                                $(b_print).prop('disabled', true);
                             }
 
                             if (user_info.role != 4) {
