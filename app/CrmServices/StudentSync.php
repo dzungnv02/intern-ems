@@ -49,7 +49,7 @@ class StudentSync
 
     public function edit_student($record_id)
     {
-        Log::info('Edit student');
+        //Log::info('Edit student');
 
         $crm_student = $this->zoho_crm->getRecordById($this->crm_module, $record_id);
 
@@ -68,7 +68,7 @@ class StudentSync
 
     public function delete_student($record_id)
     {
-        Log::info('Delete student: ' . $record_id);
+        //Log::info('Delete student: ' . $record_id);
         $ems_student = Student::getStudentByCrmID($record_id);
         if ($ems_student != null) {
             //$ems_student->delete();
@@ -240,7 +240,7 @@ class StudentSync
 
     protected function mapping_classes($crm_student, $is_sync_class = false)
     {
-        Log::debug('mapping_classes');
+        //Log::debug('mapping_classes');
         $is_synced = false;
 
         $student_stages = config('zoho.DEAL_STAGES');
@@ -253,7 +253,7 @@ class StudentSync
 
         if ($is_sync_class) {
             $is_synced = true;
-            Log::info('Syncronize Classes!');
+            //Log::info('Syncronize Classes!');
             $this->sync_crm_class($owner);
             $is_sync_class = false;
         }
@@ -301,7 +301,7 @@ class StudentSync
     protected function sync_crm_class($owner)
     {
         
-        Log::debug('sync_crm_class');
+        //Log::debug('sync_crm_class');
         
         Artisan::call('zoho:classes', [
             '--getlist' => true,

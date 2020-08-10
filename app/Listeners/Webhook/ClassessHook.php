@@ -16,7 +16,7 @@ class ClassesHook implements ShouldQueue
     use Queueable;
 
     protected $classes_sync;
-
+    public $timeout = 360;
     /**
      * Create the event listener.
      *
@@ -37,8 +37,8 @@ class ClassesHook implements ShouldQueue
     {
         $act = $event->input['act'];
 
-        var_dump($act);
+        //var_dump($act);
         $this->classes_sync->$act($event->input['id']);
-        Log::debug('Classes Event Listener fired!');
+        //Log::debug('Classes Event Listener fired!');
     }
 }

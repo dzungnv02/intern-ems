@@ -40,7 +40,7 @@ class ClassesSync
     {
         $ems_class = EmsClass::getClassByCrmId($record_id);
         if ($ems_class == null) {
-            dump('ADD for not exist!');
+            //dump('ADD for not exist!');
             $this->add_class($record_id);
             return;
         }
