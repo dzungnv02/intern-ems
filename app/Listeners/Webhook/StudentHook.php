@@ -15,6 +15,7 @@ class StudentHook implements ShouldQueue
 {
     use Queueable;
 
+    public $timeout = 360;
     protected $student_sync;
 
     /**
