@@ -190,6 +190,7 @@ class ZohoCrmConnect
 
     public function search($module, $field = '', $value = '', $criteria = '')
     {
+        $this->writeLog('[SEARCH FUNC] - [module]='.$module. ' - [field]='.$field .  ' - [value]='.$value .' - [criteria]='.$criteria);
         $page_limit = 0;
         try {
             $records = [];
@@ -224,7 +225,7 @@ class ZohoCrmConnect
 
                     $response = $this->zoho_crm_client->request('GET', $endpoint, $options);
                     $this->writeLog('[RESPONSE CODE] - '. $response->getStatusCode());
-                    
+
                     if ($response->getStatusCode() == 200) {
                         $data = json_decode($response->getBody());
                         $record_count = isset($data->data) ? count($data->data) : 0;
@@ -391,7 +392,6 @@ class ZohoCrmConnect
                 $uri = '/crm/v2/' . $module . '/' . $id . '/' . $related;
                 $access_token = $this->getAccessToken();
                 if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
-                    //Log::error(var_export($access_token, true));
                     $this->writeLog('[ERROR] - '. var_export($access_token, true));
                     return false;
                 }
