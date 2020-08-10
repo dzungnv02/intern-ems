@@ -16,7 +16,7 @@ class TeacherHook implements ShouldQueue
     use Queueable;
 
     protected $teacher_sync;
-
+    public $timeout = 360;
     /**
      * Create the event listener.
      *

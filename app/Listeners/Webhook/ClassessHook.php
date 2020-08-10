@@ -16,7 +16,7 @@ class ClassesHook implements ShouldQueue
     use Queueable;
 
     protected $classes_sync;
-
+    public $timeout = 360;
     /**
      * Create the event listener.
      *
