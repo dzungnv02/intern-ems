@@ -15,6 +15,7 @@ class StudentHook implements ShouldQueue
 {
     use Queueable;
 
+    public $timeout = 360;
     protected $student_sync;
 
     /**
@@ -37,8 +38,8 @@ class StudentHook implements ShouldQueue
     {
         $act = $event->input['act'];
 
-        var_dump($act);
+        //var_dump($act);
         $this->student_sync->$act($event->input['id']);
-        Log::debug('Student Event Listener fired!');
+        //Log::debug('Student Event Listener fired!');
     }
 }

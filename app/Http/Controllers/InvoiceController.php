@@ -148,12 +148,12 @@ class InvoiceController extends Controller
     public function print_invoice($id, $act)
     {
 
-        Log::debug('PRINTED - ID: '. $id . ' - act: . $act');
+        //Log::debug('PRINTED - ID: '. $id . ' - act: . $act');
 
         try {
             $payment_methods = config('constant.payment_method');
             $invoice = Invoice::findOrfail($id);
-            Log::debug(var_export($invoice, true));
+            //Log::debug(var_export($invoice, true));
 
             $invoice_data = $invoice->toArray();
 
