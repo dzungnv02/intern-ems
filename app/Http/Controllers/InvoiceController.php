@@ -148,99 +148,104 @@ class InvoiceController extends Controller
     public function print_invoice($id, $act)
     {
 
-        Log::debug('PRINTED');
+        //Log::debug('PRINTED - ID: '. $id . ' - act: . $act');
 
-        $payment_methods = config('constant.payment_method');
-        $invoice = Invoice::findOrfail($id);
-        Log::debug(var_export($invoice, true));
+        try {
+            $payment_methods = config('constant.payment_method');
+            $invoice = Invoice::findOrfail($id);
+            //Log::debug(var_export($invoice, true));
 
-        $invoice_data = $invoice->toArray();
+            $invoice_data = $invoice->toArray();
 
-        $student = Student::findOrfail($invoice_data['student_id']);
-        
-        if ($invoice_data['class_id']) {
-            $class = Classes::findOrfail($invoice_data['class_id']);
-        }
-        else {
-            $class = null;
-        }
-        
-        $user = User::findOrfail($invoice_data['created_by']);
-
-        $resource_path = dirname(app_path()) . '/public/';
-
-        $ary_css_files = [
-            $resource_path . 'admin/bootstrap/css/bootstrap.min.css',
-            $resource_path . 'admin/font-awesome/css/font-awesome.min.css',
-            $resource_path . 'admin/Ionicons/css/ionicons.min.css',
-            $resource_path . 'admin/css/AdminLTE.css',
-        ];
-
-        $css = '';
-
-        foreach ($ary_css_files as $file) {
-            $css .= file_get_contents($file) . "\n";
-        }
-
-        $last_printed_time = date('Y-m-d H:i:s');
-
-        $invoice_data['css'] = $css;
-
-        $invoice_data['student_name'] = $student->name;
-        $invoice_data['student_code'] = $student->student_code;
-        $invoice_data['payment_method'] = $payment_methods[$invoice_data['payment_method']];
-
-        $invoice_data['class_name'] = $class !== null ? $class->name : '';
-        $invoice_data['discount'] = $invoice_data['discount_type'] === 'p' ? (int) $invoice_data['discount'] . '%' : number_format($invoice_data['discount'], 0, '', ',') . ' ' . $invoice_data['currency'];
-        $invoice_data['prepaid'] = $invoice_data['prepaid'] ? $invoice_data['prepaid'] : 0;
-        $invoice_data['amount_text'] = $invoice_data['amount'] ? $this->number_to_words($invoice_data['amount']) : 0;
-        $invoice_data['created_by_name'] = $user->name;
-
-        $invoice_data['amount'] = number_format($invoice_data['amount'], 0, '', ',');
-        $invoice_data['prepaid'] = number_format($invoice_data['prepaid'], 0, '', ',');
-
-        if ($invoice_data['last_printed_time'] == null && $invoice_data['invoice_status'] > 0) {
-            $invoice_data['last_printed_time'] = $invoice_data['updated_at'];
-        } else if ($invoice_data['last_printed_time'] == null && $invoice_data['invoice_status'] == 0) {
-            $invoice_data['last_printed_time'] = 'Chưa in';
-        }
-
-        if ($act == 'print') {
-            $invoice_data['last_printed_time'] = $last_printed_time;
-        }
-
-        $invoice_data['start_date'] = date('d/m/Y', strtotime($invoice_data['start_date']));
-        $invoice_data['end_date'] = date('d/m/Y', strtotime($invoice_data['end_date']));
-        $invoice_data['created_at'] = date('d/m/Y H:i', strtotime($invoice_data['created_at']));
-        $invoice_data['act'] = $act;
-        $view = ((int) $invoice_data['type'] == 1) ? 'invoice/detail/tutorfee_print' : 'invoice/detail/otherfee_print';
-        $view_pdf = ((int) $invoice_data['type'] == 1) ? 'invoice/detail/tutorfee_print_pdf' : 'invoice/detail/otherfee_print';
-
-        $content = view($view, $invoice_data);
-        $content_pdf = view($view_pdf, $invoice_data);
-
-        if ($act == 'print') {
-            // if ($invoice->printed_count >= config('constant.invoice_print_max_attemp')) {
-            //     return response()->json(['code' => 0, 'message' => 'Hoá đơn số ' . $invoice->invoice_number . ' đã được in ' . $invoice->printed_count . ' lần!'], 500);
-            // }
-
-            if ($invoice->invoice_status == 0) {
-                $invoice->invoice_status = 1;
-            } else if ($invoice->invoice_status == 1) {
-                $invoice->invoice_status = 2;
+            $student = Student::findOrfail($invoice_data['student_id']);
+            
+            if ($invoice_data['class_id']) {
+                $class = Classes::findOrfail($invoice_data['class_id']);
             }
-            $invoice->printed_count++;
-            $invoice->last_printed_time = $last_printed_time;
+            else {
+                $class = null;
+            }
+            
+            $user = User::findOrfail($invoice_data['created_by']);
+
+            $resource_path = dirname(app_path()) . '/public/';
+
+            $ary_css_files = [
+                $resource_path . 'admin/bootstrap/css/bootstrap.min.css',
+                $resource_path . 'admin/font-awesome/css/font-awesome.min.css',
+                $resource_path . 'admin/Ionicons/css/ionicons.min.css',
+                $resource_path . 'admin/css/AdminLTE.css',
+            ];
+
+            $css = '';
+
+            foreach ($ary_css_files as $file) {
+                $css .= file_get_contents($file) . "\n";
+            }
+
+            $last_printed_time = date('Y-m-d H:i:s');
+
+            $invoice_data['css'] = $css;
+
+            $invoice_data['student_name'] = $student->name;
+            $invoice_data['student_code'] = $student->student_code;
+            $invoice_data['payment_method'] = $payment_methods[$invoice_data['payment_method']];
+
+            $invoice_data['class_name'] = $class !== null ? $class->name : '';
+            $invoice_data['discount'] = $invoice_data['discount_type'] === 'p' ? (int) $invoice_data['discount'] . '%' : number_format($invoice_data['discount'], 0, '', ',') . ' ' . $invoice_data['currency'];
+            $invoice_data['prepaid'] = $invoice_data['prepaid'] ? $invoice_data['prepaid'] : 0;
+            $invoice_data['amount_text'] = $invoice_data['amount'] ? $this->number_to_words($invoice_data['amount']) : 0;
+            $invoice_data['created_by_name'] = $user->name;
+
+            $invoice_data['amount'] = number_format($invoice_data['amount'], 0, '', ',');
+            $invoice_data['prepaid'] = number_format($invoice_data['prepaid'], 0, '', ',');
+
+            if ($invoice_data['last_printed_time'] == null && $invoice_data['invoice_status'] > 0) {
+                $invoice_data['last_printed_time'] = $invoice_data['updated_at'];
+            } else if ($invoice_data['last_printed_time'] == null && $invoice_data['invoice_status'] == 0) {
+                $invoice_data['last_printed_time'] = 'Chưa in';
+            }
+
+            if ($act == 'print') {
+                $invoice_data['last_printed_time'] = $last_printed_time;
+            }
+
+            $invoice_data['start_date'] = date('d/m/Y', strtotime($invoice_data['start_date']));
+            $invoice_data['end_date'] = date('d/m/Y', strtotime($invoice_data['end_date']));
+            $invoice_data['created_at'] = date('d/m/Y H:i', strtotime($invoice_data['created_at']));
+            $invoice_data['act'] = $act;
+            $view = ((int) $invoice_data['type'] == 1) ? 'invoice/detail/tutorfee_print' : 'invoice/detail/otherfee_print';
+            $view_pdf = ((int) $invoice_data['type'] == 1) ? 'invoice/detail/tutorfee_print_pdf' : 'invoice/detail/otherfee_print';
+
+            $content = view($view, $invoice_data);
+            $content_pdf = view($view_pdf, $invoice_data);
+
+            if ($act == 'print') {
+                // if ($invoice->printed_count >= config('constant.invoice_print_max_attemp')) {
+                //     return response()->json(['code' => 0, 'message' => 'Hoá đơn số ' . $invoice->invoice_number . ' đã được in ' . $invoice->printed_count . ' lần!'], 500);
+                // }
+
+                if ($invoice->invoice_status == 0) {
+                    $invoice->invoice_status = 1;
+                } else if ($invoice->invoice_status == 1) {
+                    $invoice->invoice_status = 2;
+                }
+                $invoice->printed_count++;
+                $invoice->last_printed_time = $last_printed_time;
+            }
+
+            $invoice->invoice_content = $content_pdf;
+            $invoice->save();
+
+            if ($act == 'print') {
+                //$this->send_invoice($invoice->id);
+            }
+
+            return $content;
+
+        } catch (Exception $e) {
+            Log::debug("PRINT ERROR: ". $e->getMessage());
         }
-
-        $invoice->invoice_content = $content_pdf;
-        $invoice->save();
-
-        if ($act == 'print') {
-            //$this->send_invoice($invoice->id);
-        }
-
-        return $content;
     }
 
     public function send_invoice($id)
