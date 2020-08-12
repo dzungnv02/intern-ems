@@ -164,6 +164,7 @@ return [
         Barryvdh\Snappy\ServiceProvider::class,
         Barryvdh\Debugbar\ServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        Bschmitt\Amqp\AmqpServiceProvider::class,
     ],
 
     /*
@@ -218,7 +219,7 @@ return [
         'SnappyImage' => Barryvdh\Snappy\Facades\SnappyImage::class,
         'Debugbar' => Barryvdh\Debugbar\Facade::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
-
+        'Amqp' => Bschmitt\Amqp\Facades\Amqp::class,
     ],
 
     'teacher_schedule_type' => [
