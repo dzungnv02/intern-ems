@@ -100,6 +100,11 @@ Route::group(['middleware' => 'auth'], function () {
     //Route::post('invoice/export', 'InvoiceController@export')->middleware('api.headers');
 });
 
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('invoicep', 'InvoicePController@index');
+    Route::get('invoicep/list', 'InvoicePController@getInvoiceList')->middleware('api.headers');
+});
+
 
 Route::get('invoice/print', function(){
     return view('invoice/invoice_print');

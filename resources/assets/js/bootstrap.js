@@ -57,6 +57,7 @@ try {
     require('./invoice');
     require('./branch');
     require('./weeklyschedule');
+    require('./invoicep');
     require('./main');
     
 } catch (e) {
