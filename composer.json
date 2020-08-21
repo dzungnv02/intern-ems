@@ -7,6 +7,7 @@
     "require": {
         "php": "^7.4",
         "barryvdh/laravel-snappy": "^0.4.4",
+        "bschmitt/laravel-amqp": "^2.0",
         "doctrine/dbal": "^2.8",
         "fideloper/proxy": "^4.0",
         "guzzlehttp/guzzle": "^6.3",
@@ -16,7 +17,8 @@
         "laravel/tinker": "^2.0",
         "laravel/ui": "^2.0",
         "maatwebsite/excel": "~3.1.0",
-        "webpatser/laravel-countries": "dev-master"
+        "webpatser/laravel-countries": "dev-master",
+        "yajra/laravel-datatables-oracle": "^9.10"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.2",
