@@ -7,6 +7,7 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\RegistersEventListeners;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 
@@ -14,7 +15,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
  * class InvoiceExport
  * see https://docs.laravel-excel.com/3.1/exports/collection.html
  */
-class InvoiceExport implements FromCollection, WithHeadings, WithEvents
+class InvoiceExport implements FromCollection, WithHeadings, WithEvents, ShouldAutoSize
 {
     use RegistersEventListeners;
 
