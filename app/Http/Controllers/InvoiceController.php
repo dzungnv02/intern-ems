@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel as Excel;
+use App\Exports\InvoiceExport;
 
 class InvoiceController extends Controller
 {
@@ -361,6 +362,7 @@ class InvoiceController extends Controller
             ];
 
             $collection_data = Invoice::search_invoice($where);
+
             if (!is_null($collection_data)) {
                 $payment_methods = config('constant.payment_method');
                 $collection_data->map(function ($obj, $key) use (&$ary_data, $payment_methods) {
@@ -378,65 +380,30 @@ class InvoiceController extends Controller
                     }
 
                     $ary_data[$key]['discount_type'] = !empty($ary_data[$key]['discount']) ? ($ary_data[$key]['discount_type'] == 'p' ? 'Percent' : 'Cash') : '';
+                    $ary_data[$key] = (object)$ary_data[$key];
                 });
             }
 
-            $file_name = 'Invoice_export_' . date('YmdHis');
+            $file_name = 'Invoice_export_' . date('YmdHis') . '.xlsx';
 
             $branch = !empty($input['branch_id']) ? Branch::findOrfail($branch_id) : null;
 
             $branch_name = !is_null($branch) ? $branch->branch_code : 'All center';
 
-            $excel = Excel::create($file_name, function ($excel) use ($branch_name, $ary_title, $ary_data, $date_range) {
+            $export_collection = collect($ary_data);
 
-                $excel->sheet('Invoice list', function ($sheet) use ($branch_name, $ary_title, $ary_data, $date_range) {
+            $export = new InvoiceExport($export_collection, $branch_name, $date_range);
+            $excel = Excel::store($export, $file_name);
 
-                    $sheet->cell('A1', function ($cell) use ($branch_name, $date_range) {
-                        $cell->setValue($branch_name . ' - Invoice list' . $date_range);
-                    });
-                    $sheet->mergeCells('A1:L1');
-                    $sheet->mergeCells('I2:K2');
-
-                    $sheet->row(2, $ary_title);
-                    $sheet->row(2, function ($row) {
-                        $row->setBackground('#C0C0C0');
-                    });
-
-                    $sheet->cell('I2', function ($cell) {
-                        $cell->setAlignment('center');
-                    });
-
-                    $sheet->cell('I3', function ($cell) {
-                        $cell->setValue('Discount total');
-                    });
-                    $sheet->cell('J3', function ($cell) {
-                        $cell->setValue('Type');
-                    });
-
-                    $sheet->cell('K3', function ($cell) {
-                        $cell->setValue('Desc.');
-                    });
-
-                    if (is_array($ary_data)) {
-                        foreach ($ary_data as $key => $invoice) {
-                            $sheet->row($key + 4, $invoice);
-                        }
-                    }
-
-                    $sheet->setColumnFormat(array(
-                        'C' => '0%',
-                    ));
-                });
-
-            })->store('xlsx', false, true);
-
-            if ($excel['full']) {
-                copy($excel['full'], public_path('/storage/' . $file_name . '.xlsx'));
-                unlink($excel['full']);
-                return response()->json(['code' => 0, 'data' => ['excel' => $file_name . '.xlsx']], 200);
-            } else {
+            if ($excel) {
+                copy(storage_path('app/').$file_name, public_path('/storage/' . $file_name));
+                unlink(storage_path('app/').$file_name);
+                return response()->json(['code' => 0, 'data' => ['excel' => $file_name ]], 200);
+            }
+            else {
                 return response()->json(['code' => 0, 'data' => ['result' => false, 'message' => 'Export fail!']], 500);
             }
+
         } catch (Exception $e) {
             
             Log::debug('Export error:'. var_export($e->getTraceAsString()));
