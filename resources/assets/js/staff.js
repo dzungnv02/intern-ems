@@ -1,17 +1,8 @@
-$(document).ready(function() {
-	$(document).ready(function() {
-		function uploadImg(selectorClick, selectorShow) {
-			$(document).on('change', '#' + selectorClick, function() {
-				if (this.files[0].name) {
-					var reader = new FileReader();
-					reader.onload = function(e) {
-						$('#' + selectorShow).attr('src', e.target.result);
-					}
-					reader.readAsDataURL(this.files[0]);
-				}
-			});
-		};
-		uploadImg('inputFile','showImg');
+import { finished } from "stream";
+
+$(document).ready(function () {
+
+
 	/**
 	*validate form add
 	*/
@@ -20,154 +11,262 @@ $(document).ready(function() {
 		return re.test(email);
 	}
 
+	function getBranchList(currentBranchId) {
+		if ($('FORM#frmStaff').length == 0 && $('FORM#frmEditStaff').length == 0) return;
+
+		$.ajax('/api/branch/list', {
+			type: 'GET',
+			success: function (response) {
+				var select = $('SELECT#branch_id');
+				$(select).find('OPTION').not(':first').remove();
+				var current_staff = localStorage.getItem('current_staff');
+				if (current_staff != undefined) {
+					currentBranchId = JSON.parse(current_staff).branch_id;
+				}
+				if (response.data.length > 0) {
+					for (var i = 0; i < response.data.length; i++) {
+						var branch = response.data[i];
+						var opt = $('<option></option>', { value: branch.id, text: branch.branch_name });
+						if (currentBranchId == branch.id) $(opt).prop('selected', 'selected');
+						$(select).append(opt);
+					}
+				}
+			},
+			error: function (e) {
+				console.log(e);
+			}
+		});
+	}
+
 	function validate() {
+		var isValid = false;
 		var $result = $("#errorEmail");
-		var email = $("#inputEmail3").val();
+		var email = $("#inputEmail").val();
 		var password = $('#inputPassword').val();
 		var password_1 = $('#inputPassword_1').val();
 		var name = $('#inputName').val();
-		var phoneNumber =$('#inputPhone').val();
-		
-		var img = $('#inputFile').val().split('.').pop().toLowerCase();
+		var phoneNumber = $('#inputPhone').val();
 
-		if (validateEmail(email)) {
-			$result.css("display", "none");
+		$('SPAN.bell [id^="error"]').addClass('hidden');
+		var emailValid = validateEmail(email);
+		if (emailValid) {
+			isValid = true;
+			$result.addClass('hidden');
 		} else {
-			$result.css("display", "block");
+			$result.removeClass('hidden');
+			isValid = false;
 		}
-		if(password.length <= 8 || password == ""){
-			$('#errorPassword').css('display','block');
-		}
-		else{
-			$('#errorPassword').css('display','none');
-		}
-		if (password != password_1) {
-			$('#errorPassword_1').css('display','block');
-		}else {
-			$('#errorPassword_1').css('display','none');
-		}
-		if (name) {
-			$('#errorName').css('display','none');
-		}else {
-			$('#errorName').css('display','block');
+		if ($('FORM#frmEditStaff').length == 0) {
+			if (password.length >= 8) {
+				$('#errorPassword').addClass('hidden');
+			}
+			else {
+				$('#errorPassword').removeClass('hidden');
+				isValid = false;
+			}
+
+			if (password != password_1) {
+				$('#errorPassword_1').removeClass('hidden');
+				isValid = false;
+			} else {
+				$('#errorPassword_1').addClass('hidden');
+			}
 		}
 
-		if(phoneNumber.length >=15 || phoneNumber == ""){
-			$('#errorPhone').css('display', 'block');
+		if (name) {
+			$('#errorName').addClass('hidden');
+		} else {
+			$('#errorName').removeClass('hidden');
+			isValid = false;
+		}
+
+		if (phoneNumber.length >= 15 || phoneNumber == "") {
+			$('#errorPhone').removeClass('hidden');
+			isValid = false;
 		}
 		else {
-			$('#errorPhone').css('display','none');
+			$('#errorPhone').addClass('hidden');
 		}
-		
-		if( img =="png" || img == "jpg" || img == "bmp" || img == "jpeg" || img == "gif"){
-			$('#errorImg').css('display', 'none');
-		}
-		else {
-			$('#errorImg').css('display', 'block');	
-		}
+
+		return isValid;
 	}
 
-	$("#addStaff").bind("click", validate);
-	});
 	/*
 	* validate form edit password
 	**/
 	function validateForm() {
 		var password = $("#newPassword").val();
 		var newPassword1 = $('#newPassword1').val();
-		if(!password || password.length < 8){
+		if (!password || password.length < 8) {
 			$("#errorPassword").css("display", "block");
 		}
 		else {
 			$("#errorPassword").css("display", "none");
 		}
-		if( password == newPassword1){
+		if (password == newPassword1) {
 			$("#q1").css("display", "none");
 		}
-		else{
+		else {
 			$("#errorPass_1").css("display", "block");
 		}
 	}
+
 	$("#submit").bind("click", validateForm);
+
 	/*
 	* ajax add staff
 	*/
-	$('#addStaff').click(function(event) {
-		var email = $('#inputEmail3').val();
+	$('BUTTON#addStaff').click(function (event) {
+
+		var isValided = validate();
+		if (!isValided) {
+			return false;
+		}
+
+		var email = $('#inputEmail').val();
 		var password = $('#inputPassword').val();
 		var password_1 = $('#inputPassword_1').val();
 		var name = $('#inputName').val();
+		var role = $('#role').val();
 		var gender = $('#inputGender').val();
 		var birthDate = $('#inputBirthDate').val();
 		var address = $('#inputAddress').val();
 		var phone = $('#inputPhone').val();
-		if(email !="" && password !="" && name !="" && gender!="" && birthDate !=""&& 
-			address !="" && password.length >= 8 && password == password_1 && $('#inputFile')[0].files[0]
-			){
-			var formData = new FormData();
+		var branch_id = $('SELECT#branch_id').val();
+
+		var formData = new FormData();
 		formData.append('email', email);
 		formData.append('password', password);
 		formData.append('name', name);
+		formData.append('role', role);
 		formData.append('gender', gender);
 		formData.append('birth_date', birthDate);
 		formData.append('address', address);
 		formData.append('phone_number', phone);
-		formData.append("file",$('#inputFile')[0].files[0]);
+		formData.append('branch_id', branch_id);
 
 		$.ajax({
 			url: '/api/add-staff',
-			type: 'POST',
-			contentType: false, 
+			method: "POST",
+			contentType: false,
 			processData: false,
 			data: formData,
 			success: function (response) {
-				location.reload();
+				//location.reload();
+				location.href = '/staff-list';
 				alert(response.message);
 			},
 			error: function (e) {
 				alert("Can not add staff !!");
 			}
 		})
-	}
-});
+	});
 
-	if ($('TABLE#staff_list').length == 0) return false;
+	getBranchList(null);
+
+	if ($('FORM#frmEditStaff').length > 0) {
+		var form = $('FORM#frmEditStaff');
+
+		var load_edit = () => {
+			var data = JSON.parse(localStorage.getItem('current_staff'));
+			$(form).find('INPUT#id').val(data.id);
+			$(form).find('INPUT#inputEmail').val(data.email);
+			$(form).find('SELECT#role').val(data.role);
+			$(form).find('INPUT#inputName').val(data.name);
+			$(form).find('INPUT#inputPhone').val(data.phone_number);
+			$(form).find('SELECT#inputGender').val(data.gender);
+			$(form).find('INPUT#inputBirthDate').val(data.birth_date);
+			$(form).find('INPUT#inputAddress').val(data.address);
+		}
+
+		$(form).find('BUTTON#btnSave').on('click', (e) => {
+			var isValided = validate();
+			if (!isValided) {
+				return false;
+			}
+
+			var id = $(form).find('INPUT#id').val();
+			var email = $('#inputEmail').val();
+			var name = $('#inputName').val();
+			var role = $('#role').val();
+			var gender = $('#inputGender').val();
+			var birthDate = $('#inputBirthDate').val();
+			var address = $('#inputAddress').val();
+			var phone = $('#inputPhone').val();
+			var branch_id = $('SELECT#branch_id').val();
+
+			var data = {
+				'id' : id,
+				'email': email,
+				'name': name,
+				'role': role,
+				'gender': gender,
+				'birth_date': birthDate,
+				'address': address,
+				'phone_number': phone,
+				'branch_id': branch_id
+			}
+
+			$.ajax({
+				url: '/update-staff',
+				method: "PATCH",
+				contentType: 'application/json',
+				data: JSON.stringify(data),
+				success: function (response) {
+					localStorage.removeItem('current_staff');
+					location.href = '/staff-list';
+				},
+				error: function (e) {
+					alert("Can not save staff !!");
+				}
+			})
+		});
+
+		load_edit();
+	}
+
+	if ($('TABLE#staff_list').length == 0) {
+		return false;
+	}
+
+	localStorage.removeItem('current_staff');
+
 	/*
 	* ajax get list staff
 	*/
-	var t = $('TABLE#staff_list').DataTable( {
+	var t = $('TABLE#staff_list').DataTable({
 		"ajax": 'api/get-list-staff',
 		"responsive": true,
 		"columns": [
 			{ "data": null },
 			{ "data": "name" },
 			{ "data": "email" },
-			{ 
-				"data": "gender", 
-					render : function(data, type, row){
-						var gender;
-						switch (row.gender) {
-							case 0:
-								gender = "Nữ";
-								break;
-							case 1:
-								gender = "Nam";
-								break;
-							case 2:
-								gender = "Khác";
-								break;
-							default:
-								gender = "";
-								break;
-							}
-							return gender;
-						}
-
-					},
-				{ 
-					"render": function (data, type, row, meta) {
-						return row.image ? '<img style=\"width:200px;\" src="'+img+row.image+'">' : '';
+			{
+				"data": "gender",
+				render: function (data, type, row) {
+					var gender;
+					switch (row.gender) {
+						case 0:
+							gender = "Nữ";
+							break;
+						case 1:
+							gender = "Nam";
+							break;
+						case 2:
+							gender = "Khác";
+							break;
+						default:
+							gender = "";
+							break;
 					}
+					return gender;
+				}
+
+			},
+			{
+				"render": function (data, type, row, meta) {
+					return row.image ? '<img style=\"width:200px;\" src="' + img + row.image + '">' : '';
+				}
 			},
 			{ "data": "birth_date" },
 			{ "data": "address" },
@@ -176,28 +275,43 @@ $(document).ready(function() {
 		],
 		// "columnDefs": [ ],
 		// "order": [[ 1, 'asc' ]],
-		"columnDefs": [ {
+		"columnDefs": [{
 			"searchable": false,
 			"orderable": false,
 			"targets": 0
-		} ,{
+		}, {
 			"targets": -1,
 			"data": null,
-			"defaultContent": "<a href=" + asset + "staff/edit" + " class=\"btn btn-warning _action fa fa-pencil-square-o\" title=\"Chỉnh sửa\" id=\"editStaffid\"></a>"
-			+"<a href=\"#\" class=\"btn btn-danger _action fa fa-trash\" title=\"Xoa\" type=\"button\" id=\"delete\" ></a>"
-			+"<a href=\"#\" title=\"Đôi mật khẩu\" class=\"btn btn-info _action fa fa-key\" data-toggle=\"modal\" data-target=\"#myModal\" id=\"editPassword\"></a>"
-		} ]
+			"defaultContent": "<button type='button' href=" + asset + "staff/edit" + " class=\"btn btn-warning _action fa fa-pencil-square-o\" title=\"Chỉnh sửa\" id=\"edit_staff\"></button>"
+				+ "&nbsp;<button title=\"Đôi mật khẩu\" class=\"btn btn-info _action fa fa-key\" data-toggle=\"modal\" data-target=\"#changePasswdModal\" id=\"change_password\"></button>"
+				+ "&nbsp;<button class=\"btn btn-danger _action fa fa-trash\" title=\"Xoa\" type=\"button\" id=\"delete\" ></button>"
+				
+		}]
 	});
-	// var t = $('#example').DataTable()
-	t.on( 'order.dt search.dt', function () {
-		t.column(0, {search:'applied', order:'applied'}).nodes().each( function (cell, i) {
-			cell.innerHTML = i+1;
-		} );
-	} ).draw();
 
-	$('TABLE#staff_list tbody').on( 'click', '#delete', function () {
-		var table = $('TABLE#staff_list').DataTable(); 
-		var data = table.row( $(this).parents('tr') ).data();
+	t.on('order.dt search.dt', function () {
+		t.column(0, { search: 'applied', order: 'applied' }).nodes().each(function (cell, i) {
+			cell.innerHTML = i + 1;
+		});
+	}).draw();
+
+	t.on('click', 'button#change_password', function () {
+		var data = t.row($(this).parents('tr')).data();
+		$('#changePasswdModal FORM#frmChangePasswd INPUT#staff_id').val(data.id);
+		$('#changePasswdModal DIV.modal-header SPAN#staff-name').text(data.name);
+		
+	});
+
+	$('TABLE#staff_list').on('click', '#edit_staff', function () {
+		var table = $('TABLE#staff_list').DataTable();
+		var data = table.row($(this).parents('tr')).data();
+		localStorage.setItem('current_staff', JSON.stringify(data));
+		location.href = '/staff-edit';
+	});
+
+	$('TABLE#staff_list tbody').on('click', '#delete', function () {
+		var table = $('TABLE#staff_list').DataTable();
+		var data = table.row($(this).parents('tr')).data();
 		data = data.id;
 		var formData = new FormData();
 		formData.append('id', data);
@@ -208,119 +322,71 @@ $(document).ready(function() {
 			buttons: true,
 			dangerMode: true,
 		})
-		.then((willDelete, data) => {
-			if (willDelete) {
-				$.ajax({
-					url: '/api/delete-staff',
-					type: 'POST',
-					contentType: false, 
-					processData: false,
-					data: formData,
-					success: function (response) {
-						location.reload();
-						toastr.warning(response.message);
-					},
-					error: function (response) {
-						toastr.warning(response.message);
-					}
-				});
-			}
-			else{
-				toastr.warning('Bạn đã hủy!');
-			}
-		})
-	})
-	$('TABLE#staff_list').on( 'click', '#editPassword', function () {
-		var table = $('#example').DataTable(); 
-		var data = table.row( $(this).parents('tr') ).data();
-		data = data.id;
-		editPassword(data);
+			.then((willDelete, data) => {
+				if (willDelete) {
+					$.ajax({
+						url: '/api/delete-staff',
+						method: "POST",
+						contentType: false,
+						processData: false,
+						data: formData,
+						success: function (response) {
+							location.reload();
+						}
+					});
+				}
+			})
 	});
 
-	function editPassword(data){
-		$('#formm').on( 'click', '#submit', function () {
-			var current_password_input 	= $('#currentPassword').val();
-			var new_password 			= $('#newPassword').val();
-			var new_password_1 			= $('#newPassword1').val();
-			if( new_password == new_password_1 && new_password.length >=8){
-				var formData = new FormData();
-				formData.append('id', data);
-				formData.append('currentPassword', current_password_input);
-				formData.append('newPassword', new_password);
-				$.ajax({
-					url: '/api/edit-password-staff',
-					type: 'POST',
-					contentType: false, 
-					processData: false,
-					data: formData,
-					success: function (response) {
-						alert(response.message);
-						location.reload();
-					},
-					error: function (response) {
-						alert('Can not edit info this !!');
-						location.reload();
-					}
-				})
-			}
-		})
-	}
-
-	/*
-	* ajax edit staff
-	*/
-	$('TABLE#staff_list').on( 'click', '#editStaffid', function () {
-		var table = $('#example').DataTable(); 
-		var data = table.row( $(this).parents('tr') ).data();
-		data = data.id;
-		if (typeof(Storage) !== "undefined") {
-			localStorage.setItem("id", data);
-		} else {
-			alert('Trình duyệt của bạn không hỗ trợ');
-		}
+	$('#changePasswdModal').on('show.bs.modal', (e) => {
+		$('#changePasswdModal').find('SPAN.bell').hide();
 	});
-});
 
-$('#editStaff_1').click(function(event) {
-	var id = localStorage.getItem("id");
-	var email = $('#inputEmail3').val();
-	var password = $('#inputPassword').val();
-	var password_1 = $('#inputPassword_1').val();
-	var name = $('#inputName').val();
-	var gender = $('#inputGender').val();
-	var birthDate = $('#inputBirthDate').val();
-	var address = $('#inputAddress').val();
-	var phone = $('#inputPhone').val();
-	if(email !="" && password !="" && name !="" && gender!="" && birthDate !=""&& 
-		address !="" && password.length >= 8 && password == password_1 && $('#inputFile')[0].files[0]
-		){
-		var formData = new FormData();
-	formData.append('id', id);
-	formData.append('email', email);
-	formData.append('password', password);
-	formData.append('name', name);
-	formData.append('gender', gender);
-	formData.append('birth_date', birthDate);
-	formData.append('address', address);
-	formData.append('phone_number', phone);
-	formData.append("file",$('#inputFile')[0].files[0]);
-	$.ajax({
-		url: '/api/edit-staff',
-		type: 'POST', 
-		contentType: false, 
-		processData: false,
-		data: formData,
-		success: function (response) {
-			location.reload();
-			alert(response.message);
-		},
-		error: function (e) {
-			alert("Can not edit staff !!");
+	$('#changePasswdModal').on('hide.bs.modal', (e) => {
+		$('#changePasswdModal FORM#frmChangePasswd')[0].reset();
+	});
+
+	$('#frmChangePasswd BUTTON#submit').on('click', function () {
+		var id = $('#changePasswdModal FORM#frmChangePasswd INPUT#staff_id').val();
+		var new_password = $('#changePasswdModal FORM#frmChangePasswd #newPassword').val();
+		var new_password_1 = $('#changePasswdModal FORM#frmChangePasswd #newPassword1').val();
+		if (new_password == new_password_1 && new_password.length >= 8) {
+			var formData = new FormData();
+			formData.append('id', id);
+			formData.append('newPassword', new_password);
+			$.ajax({
+				url: '/api/edit-password-staff',
+				method: "POST",
+				contentType: false,
+				processData: false,
+				data: formData,
+				success: function (response) {
+					$('#changePasswdModal').modal('hide');
+				},
+				error: function (response) {
+					alert('Can not edit info this !!');
+					location.reload();
+				}
+			})
+		}
+		else {
+			if (new_password.length < 8) {
+				$('#changePasswdModal').find('SPAN.bell#q1').show();
+			}
+			else {
+				$('#changePasswdModal').find('SPAN.bell#q1').hide();
+			}
+
+			if (new_password != new_password_1) {
+				$('#changePasswdModal').find('SPAN.bell#q2').show();
+			}
+			else {
+				$('#changePasswdModal').find('SPAN.bell#q2').hide();
+			}
 		}
 	})
-}else {
-	alert('Thong tin dien vao khong hop le !!!');
-}
+
+
 });
 
 

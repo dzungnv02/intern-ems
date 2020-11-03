@@ -41,6 +41,9 @@ class Kernel extends HttpKernel
             'throttle:60,1',
             'bindings',
         ],
+        'webhook' => [
+            \App\Http\Middleware\WebhookVerify::class
+        ]
     ];
 
     /**
@@ -60,5 +63,6 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'api.headers' => \App\Http\Middleware\GetApiHeader::class,
+        'clearcache' => \App\Http\Middleware\ClearCache::class,
     ];
 }

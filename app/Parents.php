@@ -4,31 +4,42 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\AccessControl\Scopes\CrmOwnerTrait;
 
 class Parents extends Model
 {
+    use CrmOwnerTrait;
     protected $table = 'parents';
 
     public static function insertOne($record)
     {
-        return DB::table('parents')->insertGetId($record);
+        return Parents::insertGetId($record);
     }
 
     public static function updateOne($id, $data)
     {
-        return DB::table('parents')->where('id', $id)->update($data);
+        return Parents::where('id', $id)->update($data);
     }
 
     public static function getParents()
     {
-        return DB::table('parents')->select('*')->get()->toArray();
+        return Parents::select('*')->get()->toArray();
     }
 
     public static function getParent($search_value, $field = 'id')
     {
-        return DB::table('parents')
-                ->select('*')
+        return Parents::select('*')
                 ->where($field, $search_value)
                 ->get()->toArray();
+    }
+
+    public static function getParentByCrmId($crm_id)
+    {
+        return DB::table('parents')->select('*')->where('crm_id', '=', $crm_id)->first();
+    }
+
+    public static function getParentByCrmContactId($crm_contact_id)
+    {
+        return DB::table('parents')->select('*')->where('crm_contact', '=', $crm_contact_id)->first();
     }
 }

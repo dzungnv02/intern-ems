@@ -184,6 +184,8 @@ class TeacherController extends Controller
             ]];
 
             foreach ($crm_mapping as $key => $field) {
+                if ($field == 'crm_owner') continue;
+                
                 if ($key == 'EMS_ID') {
                     $crm_data['data'][0][$key] = '' . $data['id'];
                 } else if ($key == 'EMS_SYNC_TIME') {
@@ -273,5 +275,18 @@ class TeacherController extends Controller
         else {
             return response()->json(['code' => 0, 'message' => 'No teachers'], 200);
         }
+    }
+
+    public function checkTeacherSchedule(Request $request) 
+    {
+        try {
+            $inputs = $request->all();
+            $is_busy = (bool)TeacherSchedules::check_teacher_busy( $inputs['teacher_id'], $inputs['assessment_date']);
+            return response()->json(['code' => 1, 'result' => $is_busy], 200);
+        }
+        catch(\Exception $e) {
+            return response()->json(['code' => 0, 'message' => $e->getMessage()], 200);
+        }
+        
     }
 }

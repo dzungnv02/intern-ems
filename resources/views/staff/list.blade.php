@@ -39,22 +39,17 @@
  	</tfoot>
  </table>
  {{-- modal --}}
- <div id="myModal" class="modal fade" role="dialog">
+ <div id="changePasswdModal" class="modal fade" role="dialog">
  	<div class="modal-dialog">
  		<!-- Modal content-->
  		<div class="modal-content">
  			<div class="modal-header">
  				<button type="button" class="close" data-dismiss="modal">&times;</button>
- 				<h4 class="modal-title">Đổi mật khẩu</h4>
+ 				<h4 class="modal-title">Đổi mật khẩu của nhân viên: <span id="staff-name" class="text-bold"></span></h4>
  			</div>
  			<div class="modal-body">
- 				<form action="" method="post" id="formm">
- 					<div class="form-group">
- 						<label for="exampleInputEmail1">Mật khẩu cũ</label>
- 						<input type="password" class="form-control"
- 						id="currentPassword" placeholder="Mật khẩu cũ" name="olderPassword"/>
- 						<span class="bell" id="errorPassword">Mật khẩu tối thiểu 8 kí tự</span>
- 					</div>
+ 				<form action="" method="post" id="frmChangePasswd">
+					<input type="hidden" id="staff_id">
  					<div class="form-group">
  						<label for="exampleInputPassword1">Mật khẩu mới</label>
  						<input type="password" class="form-control"
@@ -65,7 +60,7 @@
  						<label for="exampleInputPassword1">Nhập lại mật khẩu</label>
  						<input type="password" class="form-control"
  						id="newPassword1" placeholder="Nhập lại mật khẩu"/>
- 						<span class="bell" id="errorPass_1">Mật khẩu không khớp !!</span>
+ 						<span class="bell" id="q2">Mật khẩu không khớp !!</span>
  					</div>
  					<button type="button" class="btn btn-default changePassword" id="submit">Thay đổi</button>
  				</form>
@@ -79,7 +74,4 @@
  {{-- end modal --}}
  @endsection
  @section('footer')
-<script>
-console.log(img);
- </script>
-  @endsection
+ @endsection

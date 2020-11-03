@@ -15,15 +15,20 @@ class ZohoCrmConnect
 
     private function connect()
     {
-        $this->zoho_account_client = new \GuzzleHttp\Client([
-            'base_uri' => config('zoho.ZOHO_ACCOUNT_BASE_URL'),
-            'timeout' => 0,
-        ]);
+        $this->writeLog("CONNECTING ZOHO!");
+        try {
+            $this->zoho_account_client = new \GuzzleHttp\Client([
+                'base_uri' => config('zoho.ZOHO_ACCOUNT_BASE_URL'),
+                'timeout' => 0,
+            ]);
 
-        $this->zoho_crm_client = new \GuzzleHttp\Client([
-            'base_uri' => config('zoho.ZOHO_CRM_BASE_URL'),
-            'timeout' => 0,
-        ]);
+            $this->zoho_crm_client = new \GuzzleHttp\Client([
+                'base_uri' => config('zoho.ZOHO_CRM_BASE_URL'),
+                'timeout' => 0,
+            ]);
+        } catch (\Exception $e) {
+            $this->writeLog($e->getMessage());
+        }
     }
 
     public function getAccessToken()
@@ -38,9 +43,6 @@ class ZohoCrmConnect
         $session = strlen($content) > 0 ? json_decode($content) : null;
 
         $is_expired = $session != null ? (time() >= $session->expired) : true;
-
-        Log::info('SIZE: ' . var_export($fsize, true));
-        Log::info('SESSION: ' . var_export($content, true));
 
         $options = [
             'http_errors' => true,
@@ -70,31 +72,27 @@ class ZohoCrmConnect
                     if ($status_code == 200 && !property_exists($obj, 'error')) {
                         $retry_count = $retry;
                     }
-
-                    Log::info('Get access token attempt: ' . $retry_count . "\n" . 'Status code: ' . $status_code . "\n" . ' - OBJ: ' . var_export($obj, true));
                 }
 
                 $session->access_token = $obj->access_token;
                 $session->expired = time() + $obj->expires_in_sec;
-
-                Log::info('New session ' . $session->access_token);
-                Log::info('Expired at ' . date('Y-m-d H:i:s', $session->expired));
-
+                $this->writeLog('[ACCESS TOKEN] - '. $obj->access_token);
                 $f_handle = fopen($session_file_path, 'w');
                 fwrite($f_handle, json_encode($session));
                 fclose($f_handle);
 
                 return $status_code == 200 ? $obj : false;
             } else {
-                Log::info('From session ' . $session->access_token);
-                Log::info('Expired at ' . date('Y-m-d H:i:s', $session->expired));
+                //Log::info('From session ' . $session->access_token);
+                //Log::info('Expired at ' . date('Y-m-d H:i:s', $session->expired));
+                $this->writeLog('[CURRENT ACCESS TOKEN] - '. $session->access_token);
+
                 return $session;
             }
         } catch (Exception $e) {
-            Log::error($e->getMessage());
+            $this->writeLog($e->getMessage());
             return false;
         }
-
     }
 
     public function getAllRecords($module, $fields = '', $page_limit = 0)
@@ -106,7 +104,8 @@ class ZohoCrmConnect
                 $uri .= $fields != '' ? '&fields=' . $fields : '';
                 $access_token = $this->getAccessToken();
                 if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
-                    Log::error(var_export($access_token, true));
+                    //Log::error(var_export($access_token, true));
+                    $this->writeLog('[ERROR] - '. var_export($access_token, true));
                     return false;
                 }
 
@@ -121,11 +120,14 @@ class ZohoCrmConnect
                 $rec_per_page = config('zoho.ZOHO_API_MAX_RECORDS_PER_PAGE');
                 $page = 1;
                 $record_count = $rec_per_page;
-
+                $this->writeLog('[ENDPOINT REQUESTED] - '. $session->access_token);
+                $request_count = 0;
                 while ($record_count <= $rec_per_page && $record_count > 0) {
-
+                    $request_count ++;
                     $endpoint = sprintf($uri, $page, $rec_per_page);
+                    $this->writeLog('[ENDPOINT REQUESTED] - '. $endpoint. ' - [COUNT] - '.$request_count);
                     $response = $this->zoho_crm_client->request('GET', $endpoint, $options);
+                    $this->writeLog('[RESPONSE CODE] - '. $response->getStatusCode());
 
                     if ($response->getStatusCode() == 200) {
                         $data = json_decode($response->getBody());
@@ -148,7 +150,7 @@ class ZohoCrmConnect
                 return false;
             }
         } catch (Exception $e) {
-            Log::error($e->getMessage());
+            $this->writeLog($e->getMessage());
             return false;
         }
     }
@@ -160,7 +162,8 @@ class ZohoCrmConnect
             $uri = '/crm/v2/' . $module . '/' . $id;
             $access_token = $this->getAccessToken();
             if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
-                Log::error(var_export($access_token, true));
+                //Log::error(var_export($access_token, true));
+                $this->writeLog('[ERROR] - '. var_export($access_token, true));
                 return false;
             }
 
@@ -170,8 +173,9 @@ class ZohoCrmConnect
                     'Authorization' => 'Zoho-oauthtoken ' . $access_token->access_token,
                 ],
             ];
-
+            $this->writeLog('[ENDPOINT REQUESTED] - '. $uri);
             $response = $this->zoho_crm_client->request('GET', $uri, $options);
+            $this->writeLog('[RESPONSE CODE] - '. $response->getStatusCode());
             if ($response->getStatusCode() == 200) {
                 $data = json_decode($response->getBody());
                 $record = $data->data[0];
@@ -186,6 +190,7 @@ class ZohoCrmConnect
 
     public function search($module, $field = '', $value = '', $criteria = '')
     {
+        $this->writeLog('[SEARCH FUNC] - [module]='.$module. ' - [field]='.$field .  ' - [value]='.$value .' - [criteria]='.$criteria);
         $page_limit = 0;
         try {
             $records = [];
@@ -196,7 +201,8 @@ class ZohoCrmConnect
 
                 $access_token = $this->getAccessToken();
                 if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
-                    Log::error(var_export($access_token, true));
+                    //Log::error(var_export($access_token, true));
+                    $this->writeLog('[ERROR] - '. var_export($access_token, true));
                     return false;
                 }
 
@@ -211,11 +217,14 @@ class ZohoCrmConnect
                 $rec_per_page = config('zoho.ZOHO_API_MAX_RECORDS_PER_PAGE');
                 $page = 1;
                 $record_count = $rec_per_page;
-
+                $request_count = 0;
                 while ($record_count <= $rec_per_page && $record_count > 0) {
-
+                    $request_count ++;
                     $endpoint = sprintf($uri, $page, $rec_per_page);
+                    $this->writeLog('[ENDPOINT REQUESTED] - '. $endpoint. ' - [COUNT] - '.$request_count);
+
                     $response = $this->zoho_crm_client->request('GET', $endpoint, $options);
+                    $this->writeLog('[RESPONSE CODE] - '. $response->getStatusCode());
 
                     if ($response->getStatusCode() == 200) {
                         $data = json_decode($response->getBody());
@@ -238,7 +247,7 @@ class ZohoCrmConnect
                 return false;
             }
         } catch (Exception $e) {
-            Log::error($e->getMessage());
+            $this->writeLog($e->getMessage());
             return false;
         }
     }
@@ -261,12 +270,15 @@ class ZohoCrmConnect
                 $access_token = $this->getAccessToken();
 
                 if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
-                    Log::error(var_export($access_token, true));
+                    //Log::error(var_export($access_token, true));
+                    $this->writeLog('[ERROR] - '. var_export($access_token, true));
                     return false;
                 }
 
                 if (count($data['data']) > 100) {
                     $error = 'data too large';
+                    Log::error('$error: '. $error);
+                    $this->writeLog('[ERROR] - ' . $error);
                     throw new Exception($error);
                     return false;
                 }
@@ -282,19 +294,20 @@ class ZohoCrmConnect
                 $method = 'POST';
                 $response = $this->zoho_crm_client->request($method, $uri, $options);
 
-                if ($response->getStatusCode() == 201) {
+                if ($response->getStatusCode() == 201 || $response->getStatusCode() == 200) {
                     $data = json_decode($response->getBody());
-                    $record = $data->data[0];
+                    $record = $data->data[0]->code;
                     return $record;
                 } else {
+                    Log::error($response->getStatusCode() . ' - '. $response->getBody());
                     return false;
                 }
             } else {
                 return false;
             }
         } catch (Exception $e) {
-            Log::error($e->getMessage());
-            Log::debug('DATA: ' . var_export($data, true));
+            $this->writeLog($e->getMessage());
+            //Log::debug('DATA: ' . var_export($data, true));
             return false;
         }
     }
@@ -323,7 +336,7 @@ class ZohoCrmConnect
             }
 
         } catch (Exception $e) {
-            Log::error($e->getMessage());
+            $this->writeLog($e->getMessage());
             return false;
         }
     }
@@ -340,7 +353,8 @@ class ZohoCrmConnect
 
                 $access_token = $this->getAccessToken();
                 if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
-                    Log::error(var_export($access_token, true));
+                    //Log::error(var_export($access_token, true));
+                    $this->writeLog('[ERROR] - '. var_export($access_token, true));
                     return false;
                 }
 
@@ -365,7 +379,7 @@ class ZohoCrmConnect
                 return false;
             }
         } catch (Exception $e) {
-            Log::error($e->getMessage());
+            $this->writeLog($e->getMessage());
             return false;
         }
     }
@@ -378,7 +392,7 @@ class ZohoCrmConnect
                 $uri = '/crm/v2/' . $module . '/' . $id . '/' . $related;
                 $access_token = $this->getAccessToken();
                 if ($access_token == false || !is_object($access_token) || !property_exists($access_token, 'access_token')) {
-                    Log::error(var_export($access_token, true));
+                    $this->writeLog('[ERROR] - '. var_export($access_token, true));
                     return false;
                 }
 
@@ -401,7 +415,7 @@ class ZohoCrmConnect
                 return false;
             }
         } catch (GuzzleHttp\Exception\ClientException $e) {
-            Log::error($e->getMessage());
+            $this->writeLog($e->getMessage());
             return false;
         }
     }
@@ -411,6 +425,7 @@ class ZohoCrmConnect
         if (count($crm_data) == 0) {
             return false;
         }
+        $updated_id = [];
         $insert_list = [];
         $update_list = [];
 
@@ -423,37 +438,33 @@ class ZohoCrmConnect
                 }
 
                 foreach ($local_data as $local_obj) {
-                    if ($local_obj['crm_id'] == $crm_obj->id) {
-                        $update_list[$local_obj['id']] = $crm_obj;
+                    if ($local_obj->crm_id == $crm_obj->id) {
+                        $update_list[$local_obj->id] = $crm_obj;
+                        array_push($updated_id, $crm_obj->id);
                         break;
                     }
                 }
             }
-        }
 
-        foreach ($crm_data as $crm_obj) {
-            $filltered = ($fillter_field != '') ? data_get($crm_obj, $fillter_field) : null;
-            if ($filltered != null && $filltered != $fillter_value) {
-                continue;
-            }
-
-            if ($local_exists) {
-                $updated = false;
-                foreach ($update_list as $update_obj) {
-                    if ($update_obj->id == $crm_obj->id) {
-                        $updated = true;
-                        break;
-                    }
+            foreach ($crm_data as $crm_obj) {
+                $filltered = ($fillter_field != '') ? data_get($crm_obj, $fillter_field) : null;
+                if ($filltered != null && $filltered != $fillter_value) {
+                    continue;
                 }
 
-                if (!$updated) {
+                if (!in_array($crm_obj->id, $updated_id)) {
                     array_push($insert_list, $crm_obj);
                 }
-
-            } else {
-                array_push($insert_list, $crm_obj);
             }
         }
         return true;
+    }
+
+    protected function writeLog ($content) {
+        $content = '['. date('Y-m-d H:i:s') . '] - '. $content . "\n";
+        $log_file = dirname(config('zoho.ZOHO_SESSION_FILE')).DIRECTORY_SEPARATOR.'zoho_sync_'.date('Y-m-d').'.log';
+        $fh = fopen($log_file, 'a+');
+        fwrite($fh, $content);
+        fclose($fh);
     }
 }

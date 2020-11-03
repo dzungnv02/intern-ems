@@ -9,6 +9,7 @@ use \App\Classes\ZohoCrmConnect;
 use \App\Teacher;
 use App\Student;
 use \App\StudentClass;
+use Illuminate\Support\Facades\DB;
 
 class syncClasses extends Command
 {
@@ -17,7 +18,7 @@ class syncClasses extends Command
      *
      * @var string
      */
-    protected $signature = 'zoho:classes {--getlist} {--schedule} {--map_student} {--owner=}';
+    protected $signature = 'zoho:classes {--getlist} {--schedule} {--map_student} {--clean} {--owner=}';
     //php artisan zoho:classes --getlist --owner=2666159000000213025
     //php artisan zoho:classes --schedule --owner=2666159000000213025
     //php artisan zoho:classes --map_student
@@ -54,8 +55,14 @@ class syncClasses extends Command
 
         $getlist = $this->option('getlist');
         $map_student = $this->option('map_student');
+        $is_clean = $this->option('clean');
         if ($getlist) {
+            $this->info('start_sync_classes');
             $this->get_list($fillter_owner_id);
+            $this->info('end_sync_classes');
+        }
+        else if ($is_clean) {
+            $this->clean_assigned_class();
         }
         else if ($map_student){
             $this->map_student();
@@ -64,8 +71,8 @@ class syncClasses extends Command
 
     protected function get_list($fillter_owner_id)
     {
-        $ems_list = Classes::all()->toArray();
-
+        //$ems_list = Classes::all()->toArray();
+        $ems_list = DB::table('classes')->select('*')->get()->toArray();
         $crm_module = config('zoho.MODULES.ZOHO_MODULE_EMS_CLASS');
         $ems_fields = [];
         $crm_fields = [];
@@ -103,16 +110,31 @@ class syncClasses extends Command
                             $new_class->crm_schedule = json_encode($val, JSON_UNESCAPED_UNICODE);
                         }
                         continue;
-                    } else if ($c_field == 'teacher') {
+                    } else if ($c_field == 'Product_Active') {
+                        $val = data_get($crm_class, $c_field);
+                        $start_date =  data_get($crm_class, 'start_date');
+                        $now = date('Y-m-d');
+                        $status = 0;
+                        if ($val  == true && $start_date <= $now) {
+                            $status = 2;
+                        }
+                        else if ($val  == true && $start_date > $now) {
+                            $status = 1;
+                        }
+                        else {
+                            $status = 3;
+                        }
+                        $new_class->status = $status;
+                    }
+                    else if ($c_field == 'teacher') {
                         $val = data_get($crm_class, $c_field);
                         if ($val != null) {
-                            $teacher = Teacher::where('crm_id', data_get($val, 'id'))->first();
+                            $teacher = Teacher::getTeacherByCrmId(data_get($val, 'id'));  
                             $new_class->teacher_id = $teacher != null ? $teacher->id : null;
                             $new_class->crm_teacher = json_encode($val, JSON_UNESCAPED_UNICODE);
                         }
                         continue;
                     } else {
-                        $value = data_get($crm_class, $c_field);
                         $new_class->$e_field = data_get($crm_class, $c_field);
                     }
                 }
@@ -124,10 +146,11 @@ class syncClasses extends Command
 
         if (count($update_list)) {
             foreach ($update_list as $item) {
+                $class_data = [];
                 $branch = Branch::getBranchByCrmOwner($item->Owner->id);
 
                 $crm_class = $zoho_crm->getRecordById($crm_module, data_get($item, 'id'));
-                $old_class = Classes::where('crm_id', data_get($crm_class, 'id'))->first();
+                $old_class = Classes::getClassByCrmId(data_get($crm_class, 'id'));
                 for ($i = 0; $i < count($crm_fields); $i++) {
                     $c_field = $crm_fields[$i];
                     $e_field = $ems_fields[$i];
@@ -135,24 +158,43 @@ class syncClasses extends Command
                         $val = data_get($crm_class, $c_field);
                         if ($val != null) {
                             $schedule = json_decode(json_encode($val, JSON_UNESCAPED_UNICODE), true);
-                            $old_class->$e_field = $this->classes_schedule_render($schedule[0]);
-                            $old_class->crm_schedule = json_encode($val, JSON_UNESCAPED_UNICODE);
+                            $class_data[$e_field] = $this->classes_schedule_render($schedule[0]);
+                            $class_data['crm_schedule'] = json_encode($val, JSON_UNESCAPED_UNICODE);
                         }
                         continue;
-                    } else if ($c_field == 'teacher') {
+                    
+                    } else if ($c_field == 'Product_Active') {
+                        $val = data_get($crm_class, $c_field);
+                        $start_date =  data_get($crm_class, 'start_date');
+                        $now = date('Y-m-d');
+                        $status = 0;
+                        if ($val  == true && $start_date <= $now) {
+                            $status = 2;
+                        }
+                        else if ($val  == true && $start_date > $now) {
+                            $status = 1;
+                        }
+                        else {
+                            $status = 3;
+                        }
+                        $class_data['status'] = $status;
+                    }
+                    else if ($c_field == 'teacher') {
                         $val = data_get($crm_class, $c_field);
                         if ($val != null) {
-                            $teacher = Teacher::where('crm_id', data_get($val, 'id'))->first();
-                            $old_class->teacher_id = $teacher != null ? $teacher->id : null;
-                            $old_class->crm_teacher = json_encode($val, JSON_UNESCAPED_UNICODE);
+                            $teacher = Teacher::where('teachers.crm_id', data_get($val, 'id'))->first();
+                            $class_data['teacher_id'] = $teacher != null ? $teacher->id : null;
+                            $class_data['crm_teacher'] = json_encode($val, JSON_UNESCAPED_UNICODE);
+                            
                         }
                         continue;
                     } else {
                         $value = data_get($crm_class, $c_field);
-                        $old_class->$e_field = data_get($crm_class, $c_field);
+                        $class_data[$e_field] = $value;
                     }
-                    $old_class->branch_id = data_get($branch, 'id');
-                    $old_class->save();
+                    $class_data['branch_id'] = data_get($branch, 'id');
+                    $class_data['updated_at'] = date('Y-m-d H:i:s');
+                    Classes::updateOne($old_class->id, $class_data);
                 }
             }
         }
@@ -225,14 +267,14 @@ class syncClasses extends Command
 
         $tmp_time = $tmp['time_1'] != '' ? explode('-', $tmp['time_1']) : [];
         if (count($tmp_time) > 0) {
-            $time_1['start'] = trim($tmp_time[0]);
-            $time_1['finish'] = trim($tmp_time[1]);
+            $time_1['start'] = isset($tmp_time[0]) ? trim($tmp_time[0]) : '';
+            $time_1['finish'] = isset($tmp_time[1]) ? trim($tmp_time[1]) : '';
         }
 
         $tmp_time = $tmp['time_2'] != '' ? explode('-', $tmp['time_2']) : [];
         if (count($tmp_time) > 0) {
-            $time_2['start'] = trim($tmp_time[0]);
-            $time_2['finish'] = trim($tmp_time[1]);
+            $time_2['start'] = isset($tmp_time[0]) ? trim($tmp_time[0]) : '';
+            $time_2['finish'] = isset($tmp_time[1]) ? trim($tmp_time[1]) : '';
         }
 
         if ($weekday_1) {$schedule_rendered->$weekday_1 = $time_1;}
@@ -252,15 +294,15 @@ class syncClasses extends Command
                 $this->info($cls->name);
                 $crm_students = $zoho_crm->getRelatedList($crm_module, data_get($cls, 'crm_id'), 'Deal');
                 $count = $crm_students ? count($crm_students) : 0;
+
                 $this->info('Class '. $cls->name. ' has '. $count . ' student(s)');
+
                 if ($count) {
                     foreach($crm_students as $student) {
-                        $ems_student = Student::where('crm_id', data_get($student, 'id'))->first();
+                        $ems_student = Student::where('students.crm_id', data_get($student, 'id'))->first();
+
                         if ($ems_student != null) {
-                            $map = new StudentClass;
-                            $map->student_id = data_get($ems_student, 'id');
-                            $map->class_id = data_get($cls, 'id');
-                            $map->save();
+                            StudentClass::assignClass(data_get($cls, 'id'), data_get($ems_student, 'id'));
                         }
                     }
                 }
@@ -268,7 +310,33 @@ class syncClasses extends Command
         }
         catch(\Exception $e) {
             $this->info('Has error!');
+            $this->info($e->getMessage());
         }
+    }
+
+    protected function clean_assigned_class() 
+    {
+        $list = DB::table('student_classes') 
+            ->select(DB::raw('student_id, count(class_id), max(id) as id'))
+            ->groupBy('student_id')
+            ->havingRaw('count(class_id) > 1')
+            ->get();
+
+        $student_list = [];
+        $where_ids = [];
+
+        if ($list) {
+            foreach($list as $item) {
+                array_push($student_list, data_get($item, 'student_id'));
+                array_push($where_ids, data_get($item, 'id'));
+            }
+        }
+
+        $cleaning = DB::table('student_classes')
+                    ->whereIn('student_id', $student_list)
+                    ->whereNotIn('id', $where_ids)
+                    ->delete();
+        $this->info('Deleted: '. $cleaning. ' record(s)');
     }
 
 }

@@ -16,32 +16,12 @@
                             <th scope="col">Trung tâm</th>
                             <th scope="col">Người thu</th>
                             <th scope="col">Ngày thu</th>
+                            <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <th scope="row">1</th>
-                            <td>YH-003</td>
-                            <td>Học phí</td>
-                            <td>2018-11-01</td>
-                            <td>2018-11-30</td>
-                            <td>08</td>
-                            <td>2,000,000 VND</td>
-                            <td>I Can Read Yên Hoà</td>
-                            <td>Nguyễn Thị Vân</td>
-                            <td>2018-10-29</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>YH-003</td>
-                            <td>Chi phí đi dã ngoại ngày 2018-10-20</td>
-                            <td></td>
-                            <td></td>
-                            <td>01</td>
-                            <td>500,000 VND</td>
-                            <td>I Can Read Yên Hoà</td>
-                            <td>Nguyễn Thị Vân</td>
-                            <td>2018-10-15</td>
+                            <td scope="row" colspan="11">Chưa có dữ liệu</td>
                         </tr>
                     </tbody>
                 </table>
@@ -49,4 +29,19 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="view-invoice" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="width:1100px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+
 {{--  fa-check  --}}

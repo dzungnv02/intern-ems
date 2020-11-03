@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Staff;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class StaffController extends Controller
 {
@@ -13,20 +14,14 @@ class StaffController extends Controller
      */
     public function getListStaff(Request $request)
     {
-        $record_per_page = $request->record;
-        $keyword = $request->keyword;
-        $page = $request->page;
-        if ($record_per_page == "") {
-            $record_per_page = 10;
-        }
-        $sum_row = count(Staff::all());
-        $sum_page = ceil($sum_row / $record_per_page);
-        if ($page > $sum_page || !is_numeric($page)) {
-            $page = 1;
-        }
-        $all = Staff::Search($keyword, $record_per_page, $page);
-        return response()->json(['code' => 1, 'message' => 'ket qua', 'data' => $all], 200);
+        $json = [
+            'code' => 1, 
+            'message' => 'Success',
+            'data' => Staff::all(),
+        ];
+        return response()->json($json, 200);
     }
+    
     /**
      * Create a function deleteStaff
      *
@@ -44,6 +39,7 @@ class StaffController extends Controller
             }
         }
     }
+    
     /**
      * Create a function addStaff
      *
@@ -51,26 +47,16 @@ class StaffController extends Controller
      */
     public function addStaff(Request $request)
     {
-
-        if (($request->hasFile('file'))) {
-            //$destinationPath = 'app/public/';
-            $destinationPath = storage_path('app/public/');
-            $extension = $request->file('file')->getClientOriginalExtension();
-            $tempName = $request->file("file")->getClientOriginalName();
-            $fileName = uniqid("MW") . '.' . $extension;
-            $request->file('file')->move($destinationPath, $fileName);
-            $imagepath = $destinationPath . '/' . $fileName;
-        }
-
         $dataStaff = array(
             'email' => $request->email,
             'password' => $request->password,
             'name' => $request->name,
+            'role' => $request->role,
             'gender' => $request->gender,
             'birth_date' => $request->birth_date,
             'address' => $request->address,
             'phone_number' => $request->phone_number,
-            'image' => $fileName,
+            'branch_id' => $request->branch_id,
             'created_at' => date("Y-m-d"),
         );
 
@@ -83,38 +69,34 @@ class StaffController extends Controller
     public function editPasswordStaff(Request $request)
     {
         $id = $request->id;
-        $currentPassword = $request->currentPassword;
         $newPassword = $request->newPassword;
-        $editStaff = Staff::editPasswordStaff($id, $currentPassword, $newPassword);
+        $editStaff = Staff::editPasswordStaff($id, $newPassword);
         return response()->json(['code' => 1, 'message' => 'Cap nhat thanh cong'], 200);
     }
+
+    public function verifyPassword($password) 
+    {
+
+        return response()->json(['code' => 1, 'matched' => Staff::checkCurrentPassword(base64_decode($password), Auth::user()->id)], 200);
+    }
+
     /*
      * edit staff_id
      */
     public function editStaff(Request $request)
     {
         $id = $request->id;
-
-        if (($request->hasFile('file'))) {
-            $destinationPath = 'storage/files';
-            $extension = $request->file('file')->getClientOriginalExtension();
-            $tempName = $request->file("file")->getClientOriginalName();
-            $fileName = uniqid("MW") . '.' . $extension;
-            $request->file('file')->move($destinationPath, $fileName);
-            $imagepath = $destinationPath . '/' . $fileName;
-        }
         $data = array(
             'email' => $request->email,
-            'password' => $request->password,
             'name' => $request->name,
             'gender' => $request->gender,
-            'birthDate' => $request->birthDate,
+            'birth_date' => $request->birth_date,
             'address' => $request->address,
             'phone_number' => $request->phone_number,
-            'images' => $fileName,
-            'updated_at' => date("Y-m-d"),
+            'updated_at' => date("Y-m-d H:i:s"),
         );
-        $data = Staff::editStaff($data, $id);
-        return response()->json(['code' => 1, 'message' => 'Cap nhat thanh cong'], 200);
+
+        $result = Staff::editStaff($data, $id);
+        return response()->json(['code' => 1, 'message' => 'Cap nhat thanh cong', 'data' => $result], 200);
     }
 }

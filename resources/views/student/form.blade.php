@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-	Thông tin chi tiết học sinh
+	Hồ sơ chi tiết của học sinh
 @endsection
 @section('breadcrumb')
 	<li class="active">Danh sách học sinh</li>
@@ -12,6 +12,7 @@
         <ul class="nav nav-tabs" id="student_detail">
             <li class="active"><a data-tab="profile">Học sinh</a></li>
             <li><a data-tab="parents">Phụ huynh</a></li>
+            <li><a data-tab="attendance">Lịch sử đi học</a></li>
             <li><a data-tab="exam_results">Kết quả thi</a></li>
             <li><a data-tab="teacher_reports">Báo cáo của giáo viên</a></li>
             <li><a data-tab="payment_histories">Lịch sử học phí</a></li>
@@ -25,6 +26,9 @@
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="profile">
                 @include('student.detail.profile')
+            </div>
+            <div role="tabpanel" class="tab-pane" id="attendance">
+                @include('student.detail.attendance')
             </div>
             <div role="tabpanel" class="tab-pane" id="parents">
                 @include('student.detail.parent')

@@ -3,9 +3,12 @@ namespace App;
 
 use DB;
 use Illuminate\Database\Eloquent\Model;
+use App\AccessControl\Scopes\CrmOwnerTrait;
 
 class Teacher extends Model
 {
+    use CrmOwnerTrait;
+
     protected $table = 'teachers';
     protected $fillable = ['name', 'del_flg', 'birthdate', 'mobile', 'email', 'address', 'experience', 'certificate', 'description', 'nationality'];
 
@@ -74,6 +77,17 @@ class Teacher extends Model
     }
 
     /**
+     * Update.
+     *
+     * @param  array $data
+     * @return void
+     */
+    public static function updateTeacher($id, $data)
+    {
+        return DB::table('teachers')->where('id', '=', $id)->update($data);
+    }
+
+    /**
      * EDIT giáo viên.
      *
      * @param  int $id
@@ -108,5 +122,11 @@ class Teacher extends Model
                 'updated_at' => $data['updated_at'],
             ]);
         return $teacher;
+    }
+
+    public static function getTeacherByCrmId($crm_id)
+    {
+        //return Teacher::select('*')->where('crm_id', '=', $crm_id)->first();
+        return DB::table('teachers')->select('*')->where('crm_id', '=', $crm_id)->first();
     }
 }

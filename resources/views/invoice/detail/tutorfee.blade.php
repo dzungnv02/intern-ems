@@ -12,7 +12,32 @@
                             <span class="help-block"></span>
                         </div>
                     </div>
-
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Hình thức thanh toán: <i class="text-danger">*</i></label>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <div class="radio">
+                                  <label>
+                                    <input type="radio" name="payment_method" id="payment_method_0" value="0" checked="">
+                                    Tiền mặt
+                                  </label>
+                                </div>
+                                <div class="radio">
+                                  <label>
+                                    <input type="radio" name="payment_method" id="payment_method_1" value="1">
+                                    Chuyển khoản
+                                  </label>
+                                </div>
+                                <div class="radio">
+                                  <label>
+                                    <input type="radio" name="payment_method" id="payment_method_2" value="2">
+                                    Thẻ thanh toán
+                                  </label>
+                                </div>
+                              </div>
+                            <span class="help-block"></span>
+                        </div>
+                    </div>
                     <div class="form-group row">
                         <label for="student" class="col-sm-2 col-form-label">Học viên <i class="text-danger">*</i></label>
                         <div class="col-sm-3">
@@ -71,19 +96,27 @@
 
                     <div class="form-group row" id="group_discount">
                         <label class="col-sm-2 col-form-label">Chiết khấu: </label>
-                        <div class="col-sm-8">
+                        <div class="col-sm-2">
                             <div class="input-group input-group-sm">
-                                <span class="input-group-addon">%</span>
-                                <input type="text" class="form-control" id="discount" placeholder="" style="height:34px;width:40px" maxlength="2">
-                                <span class="help-block"></span>
+                                <span class="input-group-addon" id="discount-icon">
+                                    %
+                                </span>
+                                <input type="text" class="form-control" id="discount" placeholder="" style="height:34px;">
                             </div>
+                            <span class="help-block"></span>
+                        </div>
+                        <div class="checkbox col-sm-2">
+                            <label>
+                                <input type="checkbox" id="discount-type">
+                                Giảm trên số tiền
+                            </label>
                         </div>
                     </div>
 
                     <div class="form-group row" id="discount">
                         <label class="col-sm-2 col-form-label">Lý do: </label>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" id="discount-desc" placeholder="lý do chiết khấu" style="height:34px;width:100%">
+                            <input type="text" class="form-control" id="discount_desc" placeholder="lý do chiết khấu" style="height:34px;width:100%">
                             <span class="help-block"></span>
                         </div>
                     </div>

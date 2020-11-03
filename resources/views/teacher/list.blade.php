@@ -210,7 +210,7 @@
 	</div>
 	
 	<div class="modal fade" id="modal-teacher-schedule-add" role="dialog" aria-hidden="true">
-		<div class="modal-dialog modal-sm"  style="width:500px">
+		<div class="modal-dialog modal-sm"  style="width:650px">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -226,9 +226,14 @@
 									<select class="form-control select2" id="appoinment_type" name="appoinment_type">
 									</select>
 								</div>
-								<div class="form-group col-sm-6">
+								<div class="form-group col-sm-6" id="related_class">
 									<label for="desc" class="col-form-label">Lớp liên quan:</label>
 									<select style="width:100%" class="form-control select2" id="class_id" name="class_id">
+									</select>
+								</div>
+								<div class="form-group col-sm-6 hidden" id="related_student">
+									<label for="desc" class="col-form-label">Học sinh liên quan:</label>
+									<select style="width:100%" class="form-control select2" id="student_id" name="student_id">
 									</select>
 								</div>
 							</div>
@@ -236,11 +241,13 @@
 							<div class="row">
 								<div class="form-group col-sm-6">
 									<label for="start_time" class="col-form-label">Từ<i style="color:red">*</i></label>
-									<input type="datetime-local" class="form-control" id="start_time" name="start_time" placeholder="Bắt đầu">
+									{{--  <input type="datetime-local" class="form-control" id="start_time" name="start_time" placeholder="Bắt đầu">  --}}
+									<input type="text" class="form-control" id="start_time" name="start_time" placeholder="Bắt đầu">
 								</div>
 								<div class="form-group col-sm-6">
 									<label for="end_time" class="col-form-label">Đến<i style="color:red">*</i></label>
-									<input type="datetime-local" class="form-control" id="end_time" name="end_time" placeholder="Kết thúc">
+									{{--  <input type="datetime-local" class="form-control" id="end_time" name="end_time" placeholder="Kết thúc">  --}}
+									<input type="text" class="form-control" id="end_time" name="end_time" placeholder="Kết thúc">
 								</div>
 							</div>
 							<hr>
@@ -268,7 +275,8 @@
 	<script>
 		var base_url = "{{ url('/') }}/";
 		$('SELECT.select2[id="nationality"]').select2();
-		$('SELECT.select2[id="class_id"]').select2();
+		$('DIV#modal-teacher-schedule-add SELECT.select2[id="class_id"]').select2();
+		$('DIV#modal-teacher-schedule-add SELECT.select2[id="student_id"]').select2();
 		var schedule_type = {};
 		@foreach ($schedule_types as $index => $type) 
 		schedule_type[{{$index}}] = '{{$type}}';

@@ -1,4 +1,5 @@
 <br />
+
 <div class="table-reponsive">
     <table class="table table-bordered table-striped" id="invoice-list">
         <thead>
@@ -15,3 +16,4 @@
         </thead>
     </table>
 </div>
+@include('invoice.detail.export_modal')

@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\Student;
 
 class TeacherSchedules extends Model
 {
@@ -48,5 +49,32 @@ class TeacherSchedules extends Model
     public static function update_by_id($id, $data)
     {
         return DB::table('teacher_schedules')->where('id', $id)->update($data);
+    }
+
+    public static function update_assesment_schedule ($student_id, $teacher_id, $assessment_date) 
+    {
+        if (!$student_id || !$teacher_id) return false;
+        DB::table('teacher_schedules')->where('student_id', $student_id)->where('appoinment_type', 2)->delete();
+        $student = Student::find($student_id);
+        $note = 'Kiểm tra đầu vào cho học sinh '. $student->name;
+        $end_time = date('Y-m-d H:i', strtotime($assessment_date . ' +1hour'));
+        if ($teacher_id !== null) {
+            $data = ['teacher_id' => $teacher_id, 'start_time' =>  $assessment_date, 'end_time' => $end_time, 'student_id' => $student_id, 'desc' => $note, 'appoinment_type' => 2];
+            return self::insert($data);
+        }
+        return false;
+    }
+
+    public static function check_teacher_busy ($teacher_id, $appoinment_time) 
+    {
+        $appoinment_time = date('Y-m-d H:i', strtotime($appoinment_time));
+        $query = DB::table('teacher_schedules')->select('id', 'desc', 'start_time', 'end_time')
+                ->where('teacher_id', $teacher_id)
+                ->where(function($query) use ($appoinment_time) {
+                    $query->where('start_time', '<=', $appoinment_time);
+                    $query->where('end_time', '>=', $appoinment_time);
+                })
+                ->get()->toArray();
+        return count($query);
     }
 }

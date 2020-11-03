@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Support\Facades\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,8 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::get('/student/get-payments', 'StudentController@getPaymentHistory');
     Route::post('/student/save', 'StudentController@saveStudent');
     Route::post('/student/save-activity', 'StudentController@saveActivity');
+    Route::get('/student/attendance', 'AttendanceController@getAttendanceByStudent');
+
 
     // Parent
     Route::get('/parent/list', 'ParentController@getParentList');
@@ -110,7 +113,6 @@ Route::group(['middleware' => 'api.headers'], function () {
 
     Route::post('/delete-staff', 'StaffController@deleteStaff')->name('deleteStaff');
     Route::post('/edit-password-staff', 'StaffController@editPasswordStaff');
-    Route::post('/edit-staff', 'StaffController@editStaff');
 
     Route::post('/add-teacher', 'TeacherController@store');
     Route::get('/get-teacher', 'TeacherController@edit');
@@ -118,12 +120,17 @@ Route::group(['middleware' => 'api.headers'], function () {
     Route::get('/list-teachers', 'TeacherController@index');
     Route::post('/delete-teacher', 'TeacherController@deleteTeacher');
 
-    Route::get('/branch/list', 'BranchController@list');
+    //Route::get('/branch/list', 'BranchController@list');
     Route::get('/branch/get', 'BranchController@getBranch');
     Route::post('/branch/insert', 'BranchController@insertBranch');
     Route::post('/branch/update', 'BranchController@updateBranch');
     Route::post('/branch/delete', 'BranchController@deleteBranch');
 
     Route::get('invoice/get-last-invoice/{student_id}/{class_id}', 'InvoiceController@calc_prepaid_tutor_fee');
+    Route::post('invoice/export', 'InvoiceController@export');
+    Route::get('invoice/clean_export/{file}', 'InvoiceController@clean_export');
 
+    Route::get('/compensated/list','CompensatedClassController@index');
 });
+
+Route::get('/branch/list', 'BranchController@list');

@@ -180,14 +180,14 @@ class ClassController extends Controller
                     $crm_data['data'][0]['id'] = $class->crm_id;
                     $crm_data['data'][0]['EMS_ID'] = trim($id);
                     $crm_data['data'][0]['EMS_SYNC_TIME'] = date('Y-m-d H:i:s');
-                    $crm_data['data'][0]['teacher'] = ['id' => $teacher->crm_id, 'name' => $teacher->name];
+                    $crm_data['data'][0]['teacher'] = $teacher ? ['id' => $teacher->crm_id, 'name' => $teacher->name] : null;
                     $crm_data['data'][0]['Product_Name'] = $data['name'];
                     $crm_data['data'][0]['course_name'] = $data['course_name'];
                     $crm_data['data'][0]['Product_Active'] = $data['status'] == 2 ? true : false;
                     $crm_data['data'][0]['Owner'] = ['id' => $branch->crm_owner_id, 'name' => $branch->crm_owner_name];
 
                     if ($crm_class != false) {
-                        $crm_schedule_id = isset($crm_class->L_ch_h_c_trong_tu_n) ? $crm_class->L_ch_h_c_trong_tu_n[0]->id : null;
+                        $crm_schedule_id = isset($crm_class->L_ch_h_c_trong_tu_n) && count($crm_class->L_ch_h_c_trong_tu_n) ? $crm_class->L_ch_h_c_trong_tu_n[0]->id : null;
                     }
 
                     if (is_array($inputs['schedule'])) {

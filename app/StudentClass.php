@@ -12,7 +12,7 @@ class StudentClass extends Model
     protected $fillable = ['student_id','class_id'];
 
     public static function getClassOfStudent ($student_id) {
-        $query = DB::table('student_classes')->select(DB::raw('classes.id, classes.name, classes.class_code'))
+        $query = DB::table('student_classes')->select(DB::raw('classes.id, classes.name, classes.class_code, classes.price'))
         ->join('classes', 'student_classes.class_id', '=', 'classes.id')
         ->where('student_classes.student_id' ,'=', $student_id)
         ->get();
@@ -21,12 +21,18 @@ class StudentClass extends Model
 
     public static function assignClass($class_id, $student_id) 
     {
-        $joined = DB::table('student_classes')->select('id')
-                ->where('class_id', $class_id)
-                ->where('student_id', $student_id)
-                ->get()->toArray();
-        if (count($joined) > 0) return false;
+        $joined = DB::table('student_classes')
+                        ->where('class_id', $class_id)
+                        ->where('student_id', $student_id)
+                        ->count();
+                        
+        if ($joined > 0) {
+            return false;
+        }
 
+        DB::table('students')->where('id', '=', $student_id)->update(['current_class' => $class_id]);
+        $deleted = DB::table('student_classes')->where('student_id', $student_id)->delete();
+        dump($deleted);
         $data = [
             'student_id' => $student_id,
             'class_id' => $class_id,

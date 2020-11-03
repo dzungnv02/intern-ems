@@ -8,20 +8,24 @@
 @section('content')
 	<div><button class="btn btn-info add-student hidden">Thêm học sinh</button></div><br>
 	<div class="card-body table-reponsive">
+		<div class="row">
+			<div class="col-xl-12">Hello filter</div>
+		</div>
 		<table class="table table-bordered table-striped" id="list-student">
 			<thead>
 				<tr>
 					<th style="width:5%">#</th>
 					<th style="width:10%">Mã học sinh</th>
-					<th style="width:25%">Tên học sinh</th>
-					<th style="width:15%">Lớp đang học</th>
+					<th style="width:20%">Tên học sinh</th>
+					<th style="width:10%">Ngày sinh</th>
+					<th style="width:10%">Lớp đang học</th>
 					<th style="width:20%">Phụ huynh</th>
-					<th style="width:10%">Năm sinh</th>
+					<th style="width:10%">Trạng thái CRM</th>
 					<th style="width:10%"></th>
 				</tr>
 			</thead>
 		</table>
-	</div></br>
+	</div>
 
 	<div class="modal fade" id="student-form-modal" role="dialog" aria-hidden="true">
 		<div class="modal-dialog" role="document" style="width:800px">

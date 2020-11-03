@@ -159,7 +159,7 @@ $(function () {
         var url = mode == 'new' ? '/api/add-teacher' : '/api/edit-teacher';
 
         $.ajax(url, {
-            type: 'POST',
+            method:"POST",
             contentType: 'application/json',
             data: JSON.stringify(data),
             success: function (response) {
@@ -261,10 +261,7 @@ $(function () {
 
     var show_add_schedule_modal = () => {
         if ($(modal_teacher_schedule).is(':visible')) {
-            var teacher_id = $(modal_teacher_schedule).find('FORM#frmTeacher INPUT#teacher_id').val();
-
-            console.log('teacher_id', teacher_id);
-
+            var teacher_id = $(modal_teacher_schedule).find('FORM#frmTeacher INPUT#teacher_id').val(); 
             $(modal_teacher_schedule).removeClass("fade").modal("hide");
             $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val(teacher_id);
             $(modal_add_schedule).modal("show").addClass("fade");
@@ -311,7 +308,38 @@ $(function () {
                             $($(class_id).find('OPTION')[0]).attr('selected', 'selected');
                     }
                 }
-                
+            }
+        });
+    }
+
+    var get_student_list = (callback) => {
+        $(student_id).empty();
+        $.ajax('/invoice/student-list', {
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (response) {
+                var student_target = $(modal_add_schedule).find('SELECT#student_id');
+                if (response.code == 0) {
+                    var first_val = null;
+                    if (response.data.list.length > 0) {
+                        for (var i = 0; i < response.data.list.length; i++) {
+                            var student = response.data.list[i];
+                            
+                            first_val = (first_val == null) ? student.id : first_val;
+                                                        
+                            var display_text = (student.student_code ? 'Code: <span class="text-bold">' + student.student_code + '</span> - ' : 'NO CODE - ') + student.name;
+                            var opt = $('<option></option>', {
+                                value: student.id,
+                                html: display_text
+                            });
+                            $(student_target).append(opt);
+                        }
+                        if (callback != undefined) {
+                            callback();
+                        }
+                    }
+                    $(modal_add_schedule).find('SELECT#appoinment_type').change();
+                }
             }
         });
     }
@@ -321,7 +349,6 @@ $(function () {
         var form = $(modal_add_schedule).find('FORM#frmTeacherSchedule');
         var inputs = $(form).find('input,select,textarea');
         $(inputs).each((index, el) => {
-            console.log('el',el);
             data[el.id] = $(el).val();
         });
 
@@ -331,9 +358,7 @@ $(function () {
             data: JSON.stringify(data),
             contentType: 'application/json',
             success: (response) => {
-                console.log(response);
                 var teacher_id = $(form).find('INPUT#teacher_id').val();
-                
                 get_teacher_schedule(teacher_id, () => {
                     if ($(modal_add_schedule).is(':visible')) {
                         $(modal_add_schedule).removeClass("fade").modal("hide");
@@ -344,6 +369,19 @@ $(function () {
         });
     };
 
+    if ($(modal_add_schedule).length > 0) {
+        $(modal_add_schedule).find('SELECT#appoinment_type').on('change', (e) => {
+            var selected_type = $(e.target).children("option:selected").val();
+            if (selected_type == 2) {
+                $('DIV#related_class').addClass('hidden');
+                $('DIV#related_student').removeClass('hidden');
+            }
+            else {
+                $('DIV#related_student').addClass('hidden');
+                $('DIV#related_class').removeClass('hidden');
+            }
+        });
+    }
 
     if (table_teachers.length > 0) {
         getTeacherList('load');
@@ -373,8 +411,13 @@ $(function () {
     if ($('FORM#frmTeacher').length > 0) {
         getCountries();
 
-        $('FORM#frmTeacher input#birthdate').datetimepicker({
-            format: 'Y-m-d'
+        // $('FORM#frmTeacher input#birthdate').datetimepicker({
+        //     format: 'Y-m-d'
+        // });
+
+        $('FORM#frmTeacher input#birthdate').datepicker({
+            autoclose: true,
+            format: 'yyyy-mm-dd'
         });
 
         $('DIV#modal-teacher-form DIV.modal-footer BUTTON#btnSave').on('click', (e) => {
@@ -383,8 +426,12 @@ $(function () {
         });
 
         $(modal_add_schedule).on('show.bs.modal', (e) => {
+            var teacher_id = $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val();
+            $(modal_add_schedule).find('FORM#frmTeacherSchedule')[0].reset();
+            $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#teacher_id').val(teacher_id);
             schedule_type_select();
             get_class_list();
+            get_student_list();
         })
     }
 
@@ -392,6 +439,14 @@ $(function () {
         $(modal_add_schedule).find('DIV.modal-footer BUTTON#btnSave').on('click', (e) => {
             add_teacher_schedule();
         }) 
+
+        $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#start_time').datetimepicker({
+            format: 'Y-m-d H:i'
+        });
+
+        $(modal_add_schedule).find('FORM#frmTeacherSchedule INPUT#end_time').datetimepicker({
+            format: 'Y-m-d H:i'
+        });
     }
 
 });

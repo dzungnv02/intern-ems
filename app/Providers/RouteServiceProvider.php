@@ -15,6 +15,8 @@ class RouteServiceProvider extends ServiceProvider
      * @var string
      */
     protected $namespace = 'App\Http\Controllers';
+    protected $webhook_namespace = 'App\Http\Controllers\Webhook';
+
 
     /**
      * Define your route model bindings, pattern filters, etc.
@@ -38,6 +40,8 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapApiRoutes();
 
         $this->mapWebRoutes();
+
+        $this->mapWebhookRoutes();
 
         //
     }
@@ -69,5 +73,13 @@ class RouteServiceProvider extends ServiceProvider
              ->middleware('api')
              ->namespace($this->namespace)
              ->group(base_path('routes/api.php'));
+    }
+
+    protected function mapWebhookRoutes() 
+    {
+        Route::prefix('webhook')
+             ->middleware('webhook')
+             ->namespace($this->webhook_namespace)
+             ->group(base_path('routes/webhook.php'));
     }
 }

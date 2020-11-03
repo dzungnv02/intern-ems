@@ -6,11 +6,13 @@ use Course;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use TimeTable;
+use App\AccessControl\Scopes\CrmOwnerTrait;
 
 class Classes extends Model
 {
+    use CrmOwnerTrait;
     protected $table = 'classes';
-    protected $fillable = ['name', 'status', 'schedule', 'time', 'teacher_id', 'course_id', 'class_size', 'created_at', 'updated_at'];
+    protected $fillable = ['name', 'branch_id', 'status', 'schedule', 'time', 'teacher_id', 'course_id', 'course_name', 'price', 'max_seat', 'created_at', 'updated_at'];
 
     /**
      * Lấy danh sách lớp học.
@@ -21,8 +23,8 @@ class Classes extends Model
     public static function getListClass($keyword = null, $record = 0, $page = 1)
     {
         $start = ($page - 1) * $record;
-        $listClass = Classes::join('teachers', 'teachers.id', '=', 'classes.teacher_id')
-            ->leftJoin('branch','branch.id', '=', 'classes.branch_id' )
+        $listClass = Classes::leftJoin('teachers', 'teachers.id', '=', 'classes.teacher_id')
+            //->leftJoin('branch','branch.id', '=', 'classes.branch_id' )
             ->leftJoin('student_classes', 'student_classes.class_id', '=', 'classes.id')
             ->select('classes.*', 'teachers.name as teacher_name', 'branch.branch_name', DB::raw('count(student_id) as seat_count'))
             ->groupBy('classes.id');
@@ -128,7 +130,8 @@ class Classes extends Model
 
     public static function getEditClass($idClass)
     {
-        $infoClass = Classes::where('id', $idClass)->select("*")->first();
+        $infoClass = Classes::where('classes.id', $idClass)->select("classes.*")
+                    ->first();
         return $infoClass;
     }
 
@@ -170,7 +173,8 @@ class Classes extends Model
 
     public static function findStudentOfClass($class_id, $student_id)
     {
-        $result = StudentClass::where('student_id', $student_id)->where('class_id', $class_id)->get();
+        $result = StudentClass::where('student_id', $student_id)
+                    ->where('class_id', $class_id)->get();
         return $result->count();
     }
     /**
@@ -183,7 +187,9 @@ class Classes extends Model
 
     public static function createTimeTable($dataTimeTable, $classCode)
     {
-        $idClass = Classes::whereclass_code($classCode)->first();
+        $idClass = Classes::whereclass_code($classCode)
+                    ->join('branch', 'classes.branch_id', '=', 'branch.id')
+                    ->first();
         $timeTable = DB::table('timetables')->insert(
             [
                 'week_days' => $dataTimeTable['week_days'],
@@ -300,6 +306,19 @@ class Classes extends Model
                 'status' => $data['status'],
             ]);
         return $status;
+    }
+
+    public static function getClassByCrmId($crm_id)
+    {
+        return DB::table('classes')->select('*')->where('classes.crm_id', '=', $crm_id)->first();
+    }
+
+    public static function getClassByCrmOwner($crm_owner)
+    {
+        $result = DB::table('classes')->select('classes.*')
+            ->join('branch', 'branch.id', 'classes.branch_id')
+            ->where('branch.crm_owner', '=', $crm_owner)->get();
+        return $result;
     }
 
 }

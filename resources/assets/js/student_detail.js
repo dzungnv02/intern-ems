@@ -9,7 +9,8 @@ $(function () {
         activities: null,
         exams: null,
         teacher_reports: null,
-        payment: null
+        payment: null,
+        attendance: null
     }
 
     var assessment_status = {
@@ -28,9 +29,10 @@ $(function () {
         '1': 'Làm assessment',
         '2': 'Học thử',
         '3': 'Nhập học chính thức',
-        '4': 'Chuyển lớp',
-        '5': 'Kiểm tra',
-        '6': 'Kết thúc'
+        '4': 'Đã gửi nội dung học 2 tuần tới',
+        '5': 'Chuyển lớp',
+        '6': 'Kiểm tra',
+        '7': 'Kết thúc'
     };
 
     if (tab_headers.length == 0) return false;
@@ -61,7 +63,6 @@ $(function () {
     $('A#btnSaveActivity').on('click', (e) => {
         save_activities();
     });
-    
 
     var get_url_param = ($param_name) => {
         var hash;
@@ -106,7 +107,12 @@ $(function () {
     }
 
     var get_payment_history = () => {
-
+        get('/api/student/get-payments', {
+            student_id: student_id
+        }, (data) => {
+            student_data.payment = data;
+            fill_payment_history(data);
+        });
     }
 
     var get_activities = () => {
@@ -115,6 +121,13 @@ $(function () {
         }, (data) => {
             student_data.activities = data;
             fill_activities(data);
+        });
+    }
+
+    var get_attendance_history = () => {
+        get('/api/student/attendance', {student_id: student_id} ,(data) => {
+            student_data.attendance = data;
+            fill_attendance(data);
         });
     }
 
@@ -290,7 +303,173 @@ $(function () {
     }
 
     var fill_payment_history = (data) => {
+        var table = $('DIV.box#box_payment > DIV.box-body > TABLE');
+        $(table).find('tbody').empty();
+        if (data.length > 0) {
+            for (var i = 0; i < data.length; i++) {
+                var obj = data[i];
+                                
+                var b_view = $("<button></button>", {
+                    class: "btn btn-info view-invoice",
+                    style:"margin-right: 2px;",
+                    title: "Xem",
+                    id: 'btnView_' + obj.inv_id,
+                    "data-invid": obj.inv_id
+                })
+                .append($('<i class="fa fa-eye" aria-hidden="true"></i>'));
+                
+                b_view.bind('click', { "inv_id": obj.inv_id} , (e) => {
+                    view_invoice(e.data.inv_id);
+                    e.preventDefault();
+                    e.stopPropagation();
+                })
+                
+                var tr = $('<TR></TR>');
+                var index_cell = $('<TH></TH>', {
+                    "text": i + 1,
+                    
+                });
+                
+                var class_cell = $('<TD></TD>', {
+                    text: obj.class_name,
+                });
+                
+                var reason_cell = $('<TD></TD>', {
+                    text: obj.type == 1 ? 'Học phí' : obj.reason
+                });
+                
+                var start_date_cell = $('<TD></TD>', {
+                    text: obj.start_date
+                });
+                var end_date_cell = $('<TD></TD>', {
+                    text: obj.end_date
+                });
+                var duration_cell = $('<TD></TD>', {
+                    text: obj.duration
+                });
+                var amount_cell = $('<TD></TD>', {
+                    text: obj.amount
+                });
+                
+                var branch_name_cell = $('<TD></TD>', {
+                    text: obj.branch_name
+                });
+                
+                var cashier_cell = $('<TD></TD>', {
+                    text: obj.cashier
+                });
+                var created_at_cell = $('<TD></TD>', {
+                    text: obj.created_at
+                });
+                
+                var act_cell = $('<TD></TD>').append(b_view);
+                
+                $(tr).append(index_cell,
+                            class_cell,
+                            reason_cell,
+                            start_date_cell,
+                            end_date_cell,
+                            duration_cell,
+                            amount_cell,
+                            branch_name_cell,
+                            cashier_cell,
+                            created_at_cell,
+                            act_cell
+                            );
+                            
+                $(table).find('tbody').append(tr);
+            }
+        }
+    }
 
+    var fill_attendance = (data) => {
+        var container = $('DIV#box_attendance');
+        var table = $(container).find('TABLE > TBODY');
+        $(table).empty();
+
+        if (data.length > 0) {
+            for (var i = 0; i < data.length; i++) {
+                var cls = data[i];
+                
+                var class_cell = $('<td></td>', {
+                    'colspan': '6',
+                    'class': 'text-left',
+                    'html': '<h4>Lớp <b>' + cls.name + '</b></h4>'
+                });
+
+                var class_row = $('<tr></tr>').append(class_cell);
+
+                $(table).append(class_row);
+
+                if (cls.attendance.length > 0) {
+                    for (var x = 0; x < cls.attendance.length; x++) {
+                        var attend = cls.attendance[x];
+                        var attend_row = $('<tr></tr>');
+                        var td_num = $('<td></td>', {
+                            'text': x + 1
+                        });
+
+                        var td_date = $('<td></td>', {
+                            'text': attend.date
+                        });
+
+                        var td_present = $('<td></td>', {
+                            'html': attend.present !== '' ? '<i class="fa fa-check text-success" style="font-size: 1.5em"></i>' : ''
+                        });
+
+                        var td_absent = $('<td></td>', {
+                            'html': attend.absent !== '' ? '<i class="fa fa-check text-danger" style="font-size: 1.5em"></i>' : ''
+                        });
+
+                        var td_late = $('<td></td>', {
+                            'html': attend.late !== '' ? '<i class="fa fa-check text-warning" style="font-size: 1.5em"></i>' : ''
+                        });
+
+                        var td_note = $('<td></td>', {
+                            'text': attend.note
+                        });
+
+                        $(attend_row).append(td_num, td_date, td_present, td_absent, td_late, td_note);
+                        $(table).append(attend_row);
+                    }
+                }
+                else {
+                    var class_cell = $('<td></td>', {
+                        'colspan': '6',
+                        'class': 'text-center',
+                        'text': 'Không có dữ liệu'
+                    });
+        
+                    var class_row = $('<tr></tr>').append(class_cell);
+                    $(table).append(class_row);
+                }
+            }
+        }
+        else {
+            var class_cell = $('<td></td>', {
+                'colspan': '6',
+                'class': 'text-center',
+                'text': 'Không có dữ liệu'
+            });
+
+            var class_row = $('<tr></tr>').append(class_cell);
+            $(table).append(class_row);
+        }
+
+
+    }
+    
+    var view_invoice = (invoice_id) => {
+        $.ajax({
+            url: '/invoice/print/' + invoice_id + '/view',
+            type: 'GET',
+            dataType: 'html',
+            success: function (response) {
+                $('DIV.modal#view-invoice').find('DIV.modal-body').empty();
+                $('DIV.modal#view-invoice').find('DIV.modal-body').append(response);
+                $('DIV.modal#view-invoice').modal('show');
+            }
+        });
     }
 
     var get = (end_point, data, callback) => {
@@ -298,7 +477,7 @@ $(function () {
             url: end_point + '/?' + $.param(data, true),
             method: 'GET',
             dataType: 'json',
-            contentType: 'application/json',
+            //contentType: 'application/json',
             success: (response) => {
                 if (response.code == 1) {
                     callback(response.data);
@@ -330,6 +509,7 @@ $(function () {
         var form = $('FORM#frmStudent');
         var assessment_date = $(form).find('INPUT#assessment_date').val().trim();
         assessment_date = assessment_date == '' ? null : moment(assessment_date).format("YYYY-MM-DD HH:mm:ss");
+        console.log(assessment_date);
         var data = {
             'student_id': student_id,
             'student': {
@@ -410,6 +590,7 @@ $(function () {
             get_exam_results();
             get_teacher_reports();
             get_payment_history();
+            get_attendance_history();
         });
     }
 

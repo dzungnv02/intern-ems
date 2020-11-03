@@ -33,6 +33,17 @@
       body {
         width: 100%;
         height: 100%;
+        font-size:1.2em;
+        font-family:ICR-Verdana;!important
+      };
+    }
+
+    @media screen {
+      body {
+        width: 100%;
+        height: 100%;
+        font-size:1.2em;
+        font-family:ICR-Verdana;!important
       };
     }
 
@@ -71,13 +82,21 @@
       <div class="col-xs-12">
         <h2 class="page-header">
           <img style="width:100px" src="{{asset('images/logo.png')}}">
-          <small class="pull-right">Ngày in: {{date('d/m/Y H:i')}}</small>
+          <small class="pull-right">Ngày in: {{$last_printed_time}}</small>
         </h2>
       </div>
       <!-- /.col -->
     </div>
     <!-- info row -->
-    <p class="h4"><strong>I CAN READ SYSTEM IN VIETNAM</strong></p>
+    <div class="row">
+      <div class="col-xs-5">
+        <p class="h5"><strong style="font-family:ICR-Verdana;">I CAN READ SYSTEM IN VIETNAM</strong></p>
+      </div>
+      <div class="col-xs-5">
+        <p class="h4"><strong style="font-family:ICR-Verdana;">PHIẾU THU</strong></p>
+      </div>
+      <div class="col-xs-4"></div>
+    </div>
 
     <div class="row invoice-info">
       <div class="col-sm-2 invoice-col">
@@ -91,7 +110,8 @@
             <address>
               <strong>Tô Hiến Thành</strong>: 0961 305 885<br>
               <strong>Nguyễn Trãi</strong>: 0914 698 000<br>
-              <strong>Hoàng Quốc Việt</strong>: 0961 205 550
+              <strong>Hoàng Quốc Việt</strong>: 0961 205 550<br>
+              <strong>Minh Khai</strong>: 0966 055 905 
             </address>
           </div>
       <!-- /.col -->
@@ -126,7 +146,10 @@
         <tr> 
             <td>4. </td>
             <td>Lý do nộp</td>
-            <th colspan="4">{{$reason}}</th>
+            <th>{{$reason}}</th>
+            <td style="width:15px;">5. </td>
+            <td style="width:100px;">Số tiền phải thu</td>
+            <th><span id="amount_num">{{$amount}}</span> {{$currency}}</th>
         </tr>
         <tr>
             <td></td>
@@ -136,7 +159,7 @@
         <tr>
             <td>6. </td>
             <td>Phương thức thanh toán</td>
-            <th colspan="4">Tiền mặt</th>
+            <th colspan="4">{{$payment_method}}</th>
         </tr>
         <tr>
             <td>7. </td>

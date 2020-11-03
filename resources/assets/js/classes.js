@@ -337,11 +337,23 @@ $(function () {
                 if (data.schedule != '') {
                     var class_schedule = JSON.parse(data.schedule);
                     for (var wd in class_schedule) {
-                        class_schedule[wd].start = class_schedule[wd].start.length < 5 ? '0' + class_schedule[wd].start : class_schedule[wd].start;
-                        class_schedule[wd].finish = class_schedule[wd].finish.length < 5 ? '0' + class_schedule[wd].finish : class_schedule[wd].finish;
+                        console.log(class_schedule[wd]);
+                        class_schedule[wd].start = class_schedule[wd].start.length > 0 ? (class_schedule[wd].start.length < 5 ? '0' + class_schedule[wd].start : class_schedule[wd].start) : '';
+                        class_schedule[wd].finish = class_schedule[wd].finish.length > 0  ? (class_schedule[wd].finish.length < 5 ? '0' + class_schedule[wd].finish : class_schedule[wd].finish) : '';
                         $(form).find('INPUT#schedule_' + wd).prop('checked', true);
-                        $(form).find('INPUT#time_start_' + wd).val(class_schedule[wd].start);
-                        $(form).find('INPUT#time_end_' + wd).val(class_schedule[wd].finish);
+                        if (class_schedule[wd].start.length > 0) {
+                            $(form).find('INPUT#time_start_' + wd).val(moment('1900-01-01 ' + class_schedule[wd].start).format("LT"));
+                        }
+                        else {
+                            $(form).find('INPUT#time_start_' + wd).val('');
+                        }
+
+                        if (class_schedule[wd].finish.length > 0) {
+                            $(form).find('INPUT#time_end_' + wd).val(moment('1900-01-01 ' +class_schedule[wd].finish).format("LT"));
+                        }
+                        else {
+                            $(form).find('INPUT#time_end_' + wd).val('');
+                        }
                     }
 
                 }
@@ -597,7 +609,7 @@ $(function () {
                 };
 
                 if (id != '') data.id = id;
-
+               
                 $.ajax({
                     url: endpoint,
                     method: "POST",
@@ -605,7 +617,6 @@ $(function () {
                     success: (response) => {
                         table_classes.ajax.reload();
                         $('DIV#modal-class').modal("hide");
-                        toastr.success(response.message);
                     }
                 });
             }
@@ -740,8 +751,8 @@ $(function () {
                     var start_time = $(container).find('INPUT#' + weekday_time_start_prefix + wd).val();
                     var end_time = $(container).find('INPUT#' + weekday_time_end_prefix + wd).val();
                     schedule[wd] = {
-                        'start': start_time,
-                        'finish': end_time
+                        'start': moment(start_time, "h:mm A").format("HH:mm"),
+                        'finish': moment(end_time, "h:mm A").format("HH:mm")
                     };
                 } else {
                     schedule[wd] = {};
@@ -758,17 +769,15 @@ $(function () {
             }
             $.ajax({
                 url: "api/add-student-to-class",
-                type: "POST",
+                method: "POST",
                 data: data,
                 success: function (response) {
                     if (response.code == 0) {
                         get_student_not_assign(class_id);
                         get_student_of_class(class_id);
-                        toastr.error(response.message);
                     } else {
                         get_student_not_assign(class_id);
                         get_student_of_class(class_id);
-                        toastr.success(response.message);
                     }
                 }
             });
@@ -780,42 +789,6 @@ $(function () {
             placeholder: "Chọn học sinh",
             minimumInputLength: 3
         });
-
-        /* var modalConfirm = (callback, message) => {
-            if (message != undefined) {
-                $("#confirm-delete DIV.modal-header H5.modal-title").html(message);
-            }
-            $("#confirm-delete").modal('show');
-
-            $("#modal-btn-yes").unbind('click').bind("click", function () {
-                callback(true);
-                $("#confirm-delete").modal('hide');
-            });
-
-            $("#modal-btn-no").unbind('click').bind("click", function () {
-                callback(false);
-                $("#confirm-delete").modal('hide');
-            });
-
-            var delete_class = (class_id) => {
-                $.ajax({
-                    url: "api/delete-class",
-                    method: "GET",
-                    data: {
-                        id: class_id
-                    },
-                    success: function (response) {
-                        if (response.code == 1) {
-                            table_classes.ajax.reload();
-                            toastr.success(response.message);
-
-                        } else
-                            toastr.error(response.message);
-                    }
-                });
-            }
-        }; */
-
 
         var contaner = $('DIV#attendance-modal');
 
@@ -992,6 +965,20 @@ $(function () {
                     $("DIV#modal-class SELECT#teacher_id").append("<option value=" + this.id + ">" + this.name + "</option>")
                 });
             }
+        });
+
+        $(form).find('INPUT[type="text"][id^="time_start_"],INPUT[type="text"][id^="time_end_"]').timepicker({
+            showInputs: false,
+            template: 'dropdown',
+        }).on('show.timepicker', (e) => {
+            if ($(e.target).val() != '') {
+                $(e.target).timepicker('setTime', $(e.target).val());
+            }
+            else {
+                $(e.target).val(e.time.value); 
+            }
+        }).on('changeTime.timepicker', function(e) {
+            $(e.target).parent().find('label').remove();
         });
     }
 });

@@ -2,14 +2,27 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\AccessControl\Scopes\CrmOwnerTrait;
 use DB;
+use Illuminate\Database\Eloquent\Model as Eloquent;
 
-class Student extends Model
+class Student extends Eloquent
 {
-	protected $table = 'students';
-    protected $fillable = ['name','email','address','mobile','birthday','birthyear','parent_id','gender','created_at','updated_at'];
-    
+    use CrmOwnerTrait;
+
+    protected $table = 'students';
+    protected $fillable = ['name', 'email', 'address', 'mobile', 'birthday', 'birthyear', 'parent_id', 'gender', 'created_at', 'updated_at'];
+
+    protected static function boot()
+    {
+        parent::boot();
+    }
+
+    public function __construct($crm_owner = '', $attributes = [])
+    {
+        parent::__construct($attributes);
+    }
+
     /**
      * Hiển thị danh sách các bản ghi.
      *
@@ -18,70 +31,73 @@ class Student extends Model
      * @param  numeric $page
      * @return $search
      */
-	public static function search($keyword, $record,$page = 1){
-        $start = ($page - 1) * $record;
-        /* $search = Student::orderBy('id','desc')->where('name','like','%'.$keyword.'%')
-                                ->orwhere('email','like','%'.$keyword.'%')
-	                            ->orwhere('student_code','like','%'.$keyword.'%')
-	                            ->orwhere('address','like','%'.$keyword.'%')
-	                            ->orwhere('mobile','like','%'.$keyword.'%')
-                                ->get(); */
+    public static function search($keyword, $record, $page = 1)
+    {
+        //$start = ($page - 1) * $record;
 
-        
-        $search = DB::table('students')
-                    ->select('students.*', 'parents.fullname as parent_name', 'classes.name as class_name')
-                    ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
-                    ->leftJoin('classes', 'classes.id', '=', 'students.current_class')
-                    ->where('students.name','like','%'.$keyword.'%')
-                    ->orwhere('students.email','like','%'.$keyword.'%')
-                    ->orwhere('students.student_code','like','%'.$keyword.'%')
-                    ->orwhere('students.address','like','%'.$keyword.'%')
-                    ->orwhere('students.mobile','like','%'.$keyword.'%')
-                    ->orwhere('parents.fullname','like','%'.$keyword.'%')
-                    ->orwhere('classes.name','like','%'.$keyword.'%')
-                    ->orderBy('students.id','desc')->get();
+        $search = Student::select('students.*', 'parents.fullname as parent_name', 'classes.name as class_name')
+            ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
+            ->leftJoin('classes', 'classes.id', '=', 'students.current_class')
+            ->where('students.name', 'like', '%' . $keyword . '%')
+            ->orwhere('students.email', 'like', '%' . $keyword . '%')
+            ->orwhere('students.student_code', 'like', '%' . $keyword . '%')
+            ->orwhere('students.address', 'like', '%' . $keyword . '%')
+            ->orwhere('students.mobile', 'like', '%' . $keyword . '%')
+            ->orwhere('parents.fullname', 'like', '%' . $keyword . '%')
+            ->orwhere('classes.name', 'like', '%' . $keyword . '%')
+            ->orderBy('students.id', 'desc')->get();
 
-		return $search;
-	}
+        return $search;
+    }
 
-	/**
+    /**
      * Xóa một bản ghi dựa vào id.
      *
      * @param  int  $id
      * @return void
      */
-	public static function deleteStudent($id){
-		return DB::table('students')->where('id',$id)->delete();
-	}
+    public static function deleteStudent($id)
+    {
+        return DB::table('students')->where('id', $id)->delete();
+    }
 
-	/**
+    /**
      * Thêm mới một bản ghi.
      *
      * @param  array $data
      * @return void
      */
-	public static function store1($data){
-		$student = DB::table('students')->insert([
-    		['name' => $data['name'],
+    public static function store1($data)
+    {
+        $student = DB::table('students')->insert([
+            ['name' => $data['name'],
                 'email' => $data['email'],
-    			'student_code' => $data['student_code'],
-    			'address' => $data['address'],
-    			'mobile' => $data['mobile'],
-    			'birthday' => $data['birthday'],
-    			'gender' => $data['gender'],
-    			'created_at' => $data['created_at'],
-    			'updated_at' => $data['updated_at'],
-    		],
-		]);
-		return $student;
+                'student_code' => $data['student_code'],
+                'address' => $data['address'],
+                'mobile' => $data['mobile'],
+                'birthday' => $data['birthday'],
+                'gender' => $data['gender'],
+                'created_at' => $data['created_at'],
+                'updated_at' => $data['updated_at'],
+            ],
+        ]);
+        return $student;
     }
 
-    public static function getStudentByCrmID ($crm_id) 
+    public static function getStudentByCrmID($crm_id)
     {
-        return DB::table('students')->select('*')->where('crm_id',$crm_id)->get()->toArray();
+        // $result = Student::where('crm_id', $crm_id)->get();
+        // if (count($result)) {
+        //     return $result[0];
+        // } else {
+        //     return null;
+        // }
+
+        return DB::table('students')->select('*')->where('crm_id', $crm_id)->first();
+
     }
-    
-        /**
+
+    /**
      * Thêm mới một bản ghi.
      *
      * @param  array $data
@@ -113,19 +129,20 @@ class Student extends Model
      * @param  array  $data
      * @return void
      */
-    public static function update1($data, $id){
+    public static function update1($data, $id)
+    {
         $student = DB::table('students')->where('id', $id)
-                    ->update([
-                        'name' => $data['name'],
-                        'email' => $data['email'],
-                        'student_code' => $data['student_code'],
-                        'address' => $data['address'],
-                        'mobile' => $data['mobile'],
-                        'birthday' => $data['birthday'],
-                        'gender' => $data['gender'],
-                        'created_at' => $data['created_at'],
-                        'updated_at' => $data['updated_at'],
-                    ]);
+            ->update([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'student_code' => $data['student_code'],
+                'address' => $data['address'],
+                'mobile' => $data['mobile'],
+                'birthday' => $data['birthday'],
+                'gender' => $data['gender'],
+                'created_at' => $data['created_at'],
+                'updated_at' => $data['updated_at'],
+            ]);
         return $student;
     }
 

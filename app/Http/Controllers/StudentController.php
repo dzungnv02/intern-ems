@@ -13,7 +13,13 @@ use App\Invoice;
 use App\Assessment;
 use App\Teacher;
 use App\Classes;
+use App\TeacherSchedules;
+
+use App\Classes\Misc;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+
 
 
 class StudentController extends Controller
@@ -29,16 +35,21 @@ class StudentController extends Controller
         $record = $request->record;
         $keyword = $request->keyword;
         $page = $request->page;
+        
+        $student_model = new Student($request->logged_user->crm_owner);
+
         if ($record == "") {
             $record = 10;
         }
-        $sum_row = count(Student::all());
+
+        $sum_row = count($student_model->all());
         $sum_page = ceil($sum_row / $record);
         if ($page > $sum_page || !is_numeric($page)) {
             $page = 1;
         }
-        $all = Student::Search($keyword, $record, $page);
-        return response()->json(['code' => 1, 'message' => 'ket qua', 'data' => $all], 200);
+        $all = $student_model->search($keyword, $record, $page);
+
+        return response()->json(['code' => 1, 'message' => 'ket qua', 'data' => $all, 'user_info' => $request->logged_user], 200);
     }
 
     /**
@@ -189,17 +200,20 @@ class StudentController extends Controller
             $assessment = Assessment::getAssesmentOfStudent($inputs['student_id']);
             $assessment_data['student_id'] = $inputs['student_id'];
             $assessment_data['staff_id'] = $inputs['logged_user']->id;
+            
             if ($assessment) {
                 $result_assessment = Assessment::updateAssessment( $assessment->id, $assessment_data);
             }
             else {
                 $result_assessment = Assessment::insertAssessment($assessment_data);
             }
-
+           
         }
 
-        return response()->json(['code' => 1, 'data' => ['student'=>$result_student, 'assessment'=>$result_assessment], 'message' => 'Cap nhat thanh cong'], 200);
+        return response()->json(['code' => 1, 'data' => ['student'=>$result_student, 'assessment'=>$result_assessment, 'teacher_schedule' => $teacher_schedule], 'message' => 'Cap nhat thanh cong'], 200);
     }
+
+
     
     public function saveActivity (Request $request) 
     {
@@ -253,7 +267,8 @@ class StudentController extends Controller
         $student_id = isset($inputs['student_id']) ? $inputs['student_id'] : null;
 
         if ($student_id) {
-            $list = Invoice::getPaymentHistoryOfStudent($student_id);
+            //$list = Invoice::getPaymentHistoryOfStudent($student_id);
+            $list = Misc::invoice_of_student($student_id);
             return response()->json(['code' => 1, 'data' => $list], 200);
         }
         return response()->json(['code' => 1, 'message' => 'no data'], 204);

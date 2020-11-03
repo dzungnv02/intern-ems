@@ -33,6 +33,17 @@
       body {
         width: 100%;
         height: 100%;
+        font-size:1.2em;
+        font-family:ICR-Verdana;!important
+      };
+    }
+
+    @media screen {
+      body {
+        width: 100%;
+        height: 100%;
+        font-size:1.2em;
+        font-family:ICR-Verdana;!important
       };
     }
 
@@ -59,25 +70,35 @@
   <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
 
+  {{-- 
   <!-- Google Font -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic"> 
+  --}}
 </head>
 <body>
 <div class="wrapper">
   <!-- Main content -->
-  <section class="invoice">
+  <section class="invoice" style="font-family:ICR-Verdana;">
     <!-- title row -->
     <div class="row">
       <div class="col-xs-12">
         <h2 class="page-header">
           <img style="width:100px" src="{{asset('images/logo.png')}}">
-          <small class="pull-right">Ngày in: {{date('d/m/Y H:i')}}</small>
+          <small class="pull-right">Ngày in: {{$last_printed_time}}</small>
         </h2>
       </div>
       <!-- /.col -->
     </div>
     <!-- info row -->
-    <p class="h4"><strong>I CAN READ SYSTEM IN VIETNAM</strong></p>
+    <div class="row">
+      <div class="col-xs-5">
+        <p class="h5"><strong style="font-family:ICR-Verdana;">I CAN READ SYSTEM IN VIETNAM</strong></p>
+      </div>
+      <div class="col-xs-5">
+        <p class="h4"><strong style="font-family:ICR-Verdana;">PHIẾU THU</strong></p>
+      </div>
+      <div class="col-xs-4"></div>
+    </div>
 
     <div class="row invoice-info">
       <div class="col-sm-2 invoice-col">
@@ -91,7 +112,8 @@
             <address>
               <strong>Tô Hiến Thành</strong>: 0961 305 885<br>
               <strong>Nguyễn Trãi</strong>: 0914 698 000<br>
-              <strong>Hoàng Quốc Việt</strong>: 0961 205 550
+              <strong>Hoàng Quốc Việt</strong>: 0961 205 550<br>
+              <strong>Minh Khai</strong>: 0966 055 905 
             </address>
           </div>
       <!-- /.col -->
@@ -133,7 +155,7 @@
         <tr>
             <td></td>
             <td>Chiết khấu</td>
-            <th colspan="2">{{$discount}}%</th>
+            <th colspan="2">{{$discount}}</th>
             <td>Lý do chiết khấu</td>
             <th>{{$discount_desc}}</th>
         </tr>
@@ -154,20 +176,10 @@
             <td>Viết bằng chữ</td>
             <th colspan="4"><span id="amount_text">{{$amount_text}}</span> đồng chẵn</th>
         </tr>
-        {{--  <tr>
-            <td></td>
-            <td>Số tiền còn phải thu</td>
-            <th colspan="4"></th>
-        </tr>  --}}
-        {{--  <tr>
-            <td>6. </td>
-            <td>Chứng từ kèm theo</td>
-            <th colspan="4">Không có</th>
-        </tr>  --}}
         <tr>
             <td>6. </td>
             <td>Phương thức thanh toán</td>
-            <th colspan="4">Tiền mặt</th>
+            <th colspan="4">{{$payment_method}}</th>
         </tr>
         <tr>
             <td>7. </td>

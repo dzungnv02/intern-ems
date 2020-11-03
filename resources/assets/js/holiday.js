@@ -72,7 +72,7 @@ $(function () {
     	var holiday = $('#holiday').val();
     	if(formAddHoliday.valid()){
     		$.ajax({
-	            type: 'POST',
+	            method:"POST",
 	            url: 'api/add-holiday',
 	            data: {holiday: holiday},
 	            success: function(response){
@@ -81,7 +81,6 @@ $(function () {
 					    $(this).find('form')[0].reset();
 					});
 	            	tableHoliday.ajax.reload();
-	     			toastr.success('Thêm thành công!');
 	            }
 	        });
     	}
@@ -99,12 +98,11 @@ $(function () {
 	    .then((willDelete) => {
 	      	if (willDelete) {
       			$.ajax({
-		            type: 'post',
+		            method:"POST",
 		            url: 'api/delete-holiday',
 		            data: {id:id},
 		            success: function(response){
 		            	tableHoliday.ajax.reload();
-		                toastr.success('Xóa thành công!');
 		            }
 		        })
 	      	}

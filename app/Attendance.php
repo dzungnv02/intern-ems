@@ -73,4 +73,30 @@ class Attendance extends Model
 
         return $attendances;
     }
+
+    public static function getAttendanceByStudent ($student_id, $class_id = null)
+    {
+        $data = ['student_id' => $student_id];
+        $sql = "SELECT  attendance.`id`, 
+                        attendance.`student_id`, 
+                        timetables.`class_id`, 
+                        classes.`name` as class_name, 
+                        timetables.`date`, 
+                        IF (attendance.`status` = 1, 'x', '') as present,  
+                        IF (attendance.`status` = -1, 'x', '') as absent,  
+                        IF (attendance.`status` = -2, 'x', '') as late,
+                        attendance.`note`
+                FROM attendance 
+                        INNER JOIN timetables ON attendance.`timetable_id` = timetables.id
+                        INNER JOIN classes ON timetables.`class_id` = classes.id
+                WHERE attendance.`student_id` = :student_id";
+
+        if ($class_id !== null) {
+            $sql .= " AND timetables.`class_id` = :class_id";
+            $data['class_id'] = $class_id;
+        }
+
+        $sql .= " ORDER BY timetables.`date` ";
+        return DB::select($sql, $data);
+    }
 }
