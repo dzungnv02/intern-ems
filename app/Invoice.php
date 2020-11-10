@@ -40,7 +40,7 @@ class Invoice extends Eloquent
             ->where('type', '=', 1)
             ->where('created_at', '=', $max_created_at)
             ->get();
-        
+
             $start_date = $query[0]->start_date;
             $end_date = $query[0]->end_date;
             $class_id = $query[0]->class_id;
@@ -80,7 +80,7 @@ class Invoice extends Eloquent
         for ($i = 1; $i <= (int) $days_of_range + 1; $i++) {
             $day = strtotime('+' . ($i - 1) . ' days', $int_start_date);
             $wday = date('w', $day);
-            $full_day = date('Y-m-d', $day);            
+            $full_day = date('Y-m-d', $day);
             if (in_array($wday, $schedule_int) && !in_array($full_day, $holidays)) {
                 $duration++;
             }
@@ -103,7 +103,7 @@ class Invoice extends Eloquent
         for ($i = 1; $i <= (int) $duration + 1; $i++) {
             $day = strtotime('+' . ($i - 1) . ' days', $int_start_date);
             $wday = date('w', $day);
-            $full_day = date('Y-m-d', $day); 
+            $full_day = date('Y-m-d', $day);
 
             if(in_array($full_day, $holidays)) {
                 $duration ++;
@@ -119,7 +119,9 @@ class Invoice extends Eloquent
 
     public function getPaymentHistoryOfStudent($student_id)
     {
-        $list = DB::table('rev_n_exp')->select('*')->where('student_id', $student_id);
+        $list = DB::table('rev_n_exp')->select('*')
+                ->where('student_id', $student_id)
+                ->orderBy("created_by");
         return $list;
     }
 
@@ -165,12 +167,12 @@ class Invoice extends Eloquent
                         'rev_n_exp.discount_type',
                         'rev_n_exp.discount_desc',
                         'rev_n_exp.amount'
-                    )   
+                    )
                 ->join('staffs', 'rev_n_exp.created_by', '=', 'staffs.id')
                 ->join('branch', 'branch.id', '=', 'staffs.branch_id')
                 ->join('students', 'rev_n_exp.student_id', '=', 'students.id')
                 ->join('classes', 'rev_n_exp.class_id', '=', 'classes.id');
-        
+
         if (!empty($condition['type'])) {
             $query->where('rev_n_exp.type', '=', $condition['type']);
         }

@@ -308,7 +308,7 @@ $(function () {
         if (data.length > 0) {
             for (var i = 0; i < data.length; i++) {
                 var obj = data[i];
-                                
+
                 var b_view = $("<button></button>", {
                     class: "btn btn-info view-invoice",
                     style:"margin-right: 2px;",
@@ -317,53 +317,53 @@ $(function () {
                     "data-invid": obj.inv_id
                 })
                 .append($('<i class="fa fa-eye" aria-hidden="true"></i>'));
-                
+
                 b_view.bind('click', { "inv_id": obj.inv_id} , (e) => {
                     view_invoice(e.data.inv_id);
                     e.preventDefault();
                     e.stopPropagation();
                 })
-                
+
                 var tr = $('<TR></TR>');
                 var index_cell = $('<TH></TH>', {
                     "text": i + 1,
-                    
+
                 });
-                
+
                 var class_cell = $('<TD></TD>', {
                     text: obj.class_name,
                 });
-                
+
                 var reason_cell = $('<TD></TD>', {
                     text: obj.type == 1 ? 'Học phí' : obj.reason
                 });
-                
+
                 var start_date_cell = $('<TD></TD>', {
-                    text: obj.start_date
+                    text: moment(obj.start_date).format("DD-MM-YYYY")
                 });
                 var end_date_cell = $('<TD></TD>', {
-                    text: obj.end_date
+                    text: moment(obj.end_date).format("DD-MM-YYYY")
                 });
                 var duration_cell = $('<TD></TD>', {
-                    text: obj.duration
+                    text: obj.duration,
                 });
                 var amount_cell = $('<TD></TD>', {
-                    text: obj.amount
+                    text:  obj.amount ? numeral(obj.amount).format('0,0') + " VND" : ''
                 });
-                
+
                 var branch_name_cell = $('<TD></TD>', {
                     text: obj.branch_name
                 });
-                
+
                 var cashier_cell = $('<TD></TD>', {
                     text: obj.cashier
                 });
                 var created_at_cell = $('<TD></TD>', {
-                    text: obj.created_at
+                    text: moment(obj.created_at).format("DD-MM-YYYY kk:mm")
                 });
-                
+
                 var act_cell = $('<TD></TD>').append(b_view);
-                
+
                 $(tr).append(index_cell,
                             class_cell,
                             reason_cell,
@@ -376,7 +376,7 @@ $(function () {
                             created_at_cell,
                             act_cell
                             );
-                            
+
                 $(table).find('tbody').append(tr);
             }
         }
@@ -390,7 +390,7 @@ $(function () {
         if (data.length > 0) {
             for (var i = 0; i < data.length; i++) {
                 var cls = data[i];
-                
+
                 var class_cell = $('<td></td>', {
                     'colspan': '6',
                     'class': 'text-left',
@@ -439,7 +439,7 @@ $(function () {
                         'class': 'text-center',
                         'text': 'Không có dữ liệu'
                     });
-        
+
                     var class_row = $('<tr></tr>').append(class_cell);
                     $(table).append(class_row);
                 }
@@ -458,7 +458,7 @@ $(function () {
 
 
     }
-    
+
     var view_invoice = (invoice_id) => {
         $.ajax({
             url: '/invoice/print/' + invoice_id + '/view',
@@ -547,7 +547,7 @@ $(function () {
             'start_time': time == '' ? null : moment(time).format("YYYY-MM-DD HH:mm:ss"),
             'note': $(form).find('INPUT#note').val().trim()
         }
-        
+
         post('/api/student/save-activity', data, (response) => {
             get_activities();
         });
