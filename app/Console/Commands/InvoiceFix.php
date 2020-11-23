@@ -58,7 +58,7 @@ class InvoiceFix extends Command
         foreach($branchCodes as $branch) {
 
             // $branchCode->branch_code;
-            $invoiceBranchs = DB::table('rev_n_exp_bk1')->select('id')
+            $invoiceBranchs = DB::table('rev_n_exp')->select('id')
                                 ->where('invoice_number', 'like', "%".$branch->branch_code)
                                 ->whereNotIn('created_by', function ($query) {
                                     $query->select('id')->from('staffs');
@@ -69,7 +69,7 @@ class InvoiceFix extends Command
             if (count($invoiceBranchs)) {
                 foreach($invoiceBranchs as $invoice) {
                     var_dump('Invoice '. $invoice->id . ' transfer to '. $headOfBranch[0]->id);
-                    DB::table('rev_n_exp_bk1')
+                    DB::table('rev_n_exp')
                     ->where('id', $invoice->id)
                     ->update([
                         'created_by' => $headOfBranch[0]->id
