@@ -40,7 +40,8 @@ class Staff extends Model
             ->leftJoin('branch', 'branch.id', '=', 'staffs.branch_id')
             ->select('staffs.id', 'staffs.email', 'staffs.name', 'staffs.role', 'staffs.branch_id', 'staffs.birth_date', 'staffs.gender', 'staffs.address', 'staffs.phone_number', 'branch.branch_name')
             ->orderBy('staffs.id', 'desc')
-            ->where('staffs.name', 'like', '%' . $keyword . '%')
+            ->where('is_disabled', 0)
+            ->orwhere('staffs.name', 'like', '%' . $keyword . '%')
             ->orwhere('staffs.email', 'like', '%' . $keyword . '%')
             ->orwhere('staffs.address', 'like', '%' . $keyword . '%')
             ->orwhere('staffs.phone_number', 'like', '%' . $keyword . '%')
@@ -50,7 +51,8 @@ class Staff extends Model
 
     public static function deleteStaff($staff_id)
     {
-        return DB::table('staffs')->where('id', $staff_id)->delete();
+        return DB::table('staffs')->where('id', $staff_id)->update(['is_disabled' => 1]);
+        //return DB::table('staffs')->where('id', $staff_id)->delete();
     }
 
     public static function editPasswordStaff($id, $newPassword)
@@ -79,10 +81,10 @@ class Staff extends Model
         return $staff;
     }
 
-    public static function checkCurrentPassword ($password, $id) 
+    public static function checkCurrentPassword ($password, $id)
     {
         $staff = Staff::find($id);
-        
+
         if (Hash::check($password, $staff->password)) {
             return true;
         }
