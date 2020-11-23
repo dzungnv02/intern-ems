@@ -22,6 +22,7 @@ class Kernel extends ConsoleKernel
         Commands\syncStudentClasses::class,
         Commands\CleanClasses::class,
         Commands\EncryptPass::class,
+        Commands\InvoiceFix::class,
     ];
 
     /**
@@ -32,7 +33,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        /* 
+        /*
         $schedule->command('zoho:teacher --getlist')->hourly();
         $schedule->command('zoho:student --getlist')->everyFifteenMinutes();
         $schedule->command('zoho:parent --getlist')->hourly();

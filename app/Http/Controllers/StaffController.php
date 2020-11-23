@@ -15,13 +15,13 @@ class StaffController extends Controller
     public function getListStaff(Request $request)
     {
         $json = [
-            'code' => 1, 
+            'code' => 1,
             'message' => 'Success',
-            'data' => Staff::all(),
+            'data' => Staff::where('is_disabled', 0)->get(),
         ];
         return response()->json($json, 200);
     }
-    
+
     /**
      * Create a function deleteStaff
      *
@@ -39,7 +39,7 @@ class StaffController extends Controller
             }
         }
     }
-    
+
     /**
      * Create a function addStaff
      *
@@ -74,7 +74,7 @@ class StaffController extends Controller
         return response()->json(['code' => 1, 'message' => 'Cap nhat thanh cong'], 200);
     }
 
-    public function verifyPassword($password) 
+    public function verifyPassword($password)
     {
 
         return response()->json(['code' => 1, 'matched' => Staff::checkCurrentPassword(base64_decode($password), Auth::user()->id)], 200);
