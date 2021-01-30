@@ -159,14 +159,14 @@ class InvoiceController extends Controller
             $invoice_data = $invoice->toArray();
 
             $student = Student::findOrfail($invoice_data['student_id']);
-            
+
             if ($invoice_data['class_id']) {
                 $class = Classes::findOrfail($invoice_data['class_id']);
             }
             else {
                 $class = null;
             }
-            
+
             $user = User::findOrfail($invoice_data['created_by']);
 
             $resource_path = dirname(app_path()) . '/public/';
@@ -358,6 +358,7 @@ class InvoiceController extends Controller
                 'Discount',
                 '',
                 '',
+                'Status',
                 'Amount',
             ];
 
@@ -374,6 +375,8 @@ class InvoiceController extends Controller
                         }
                         if ($field == 'payment_method') {
                             $ary_data[$key][$field] = $payment_methods[$value];
+                        } else if ($field == 'invoice_status') {
+                            $ary_data[$key][$field] = config('constant.invoice_status')[$value];
                         } else {
                             $ary_data[$key][$field] = $value;
                         }
@@ -405,9 +408,9 @@ class InvoiceController extends Controller
             }
 
         } catch (Exception $e) {
-            
+
             Log::debug('Export error:'. var_export($e->getTraceAsString()));
-            
+
             return response()->json(['code' => 0, 'data' => ['result' => false, 'message' => 'Export fail!'. "\n". $e->getMessage()]], 500);
         }
     }

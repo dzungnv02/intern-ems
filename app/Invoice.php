@@ -166,6 +166,7 @@ class Invoice extends Eloquent
                         'rev_n_exp.discount',
                         'rev_n_exp.discount_type',
                         'rev_n_exp.discount_desc',
+                        'rev_n_exp.invoice_status',
                         'rev_n_exp.amount'
                     )
                 ->join('staffs', 'rev_n_exp.created_by', '=', 'staffs.id')

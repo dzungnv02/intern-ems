@@ -46,6 +46,7 @@ class InvoiceExport implements FromCollection, WithHeadings, WithEvents, ShouldA
                 'Discount',
                 '',
                 '',
+                'Status',
                 'Amount',
             ],
             [
@@ -59,7 +60,8 @@ class InvoiceExport implements FromCollection, WithHeadings, WithEvents, ShouldA
                 '',
                 'Discount total',
                 'Type',
-                'Desc.'
+                'Desc.',
+                ''
             ],
         ];
     }
@@ -71,10 +73,10 @@ class InvoiceExport implements FromCollection, WithHeadings, WithEvents, ShouldA
 
     public static function afterSheet(AfterSheet $e)
     {
-        $e->sheet->getDelegate()->mergeCells('A1:L1');
+        $e->sheet->getDelegate()->mergeCells('A1:M1');
         $e->sheet->getDelegate()->mergeCells('I2:K2');
 
-        $cellRange = 'A2:L3';
+        $cellRange = 'A2:M3';
         $e->sheet->getDelegate()
             ->getStyle($cellRange)
             ->getFill()

@@ -17,7 +17,7 @@ return [
             'fri' => 5,
             'sat' => 6,
             'sun' => 0,
-        ],  
+        ],
     ],
     'START_TIME_OF_DAY' => '08:00',
     'END_TIME_OF_DAY' => '20:30',
@@ -66,4 +66,11 @@ return [
         2 => 'Thẻ thanh toán'
     ],
     'invoice_print_max_attemp' => 2,
+    'invoice_status' => [
+        0 => 'Lưu (chưa in)',
+        1 => 'Đã in',
+        2 => 'Đã in',
+        3 => 'Đã duyệt',
+        4 => 'Đã huỷ'
+    ]
 ];
