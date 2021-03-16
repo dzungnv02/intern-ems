@@ -1,12 +1,12 @@
 <?php
 namespace App;
 
+use App\AccessControl\Scopes\CrmOwnerTrait;
+use App\Holiday;
+use App\Student;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Facades\DB;
-use App\AccessControl\Scopes\CrmOwnerTrait;
-use App\Student;
-use App\Holiday;
-
+use Illuminate\Support\Facades\Log;
 
 class Invoice extends Eloquent
 {
@@ -14,14 +14,83 @@ class Invoice extends Eloquent
 
     protected $table = 'rev_n_exp';
 
-    public static function get_list_invoice()
+    public static function get_list_invoice($keyword, $record, $start, $sort, $columns)
     {
 
-        return Student::select('rev_n_exp.*', 'students.name as std_name', 'students.student_code', 'classes.name as c_name')
-                        ->join('rev_n_exp', 'rev_n_exp.student_id', '=', 'students.id')
-                        ->leftjoin('classes', 'rev_n_exp.class_id', '=', 'classes.id')
-                        ->orderBy('created_at', 'DESC')
-                        ->get();
+        $filters = [];
+
+        foreach ($columns as $key => $column) {
+            if (!is_null($column['search']['value'])) {
+                Log::info('Invoice filter column: ' . var_export($column['search'], true));
+                $filters[$column['name']] = $column['search']['value'];
+            }
+        }
+
+        $totalRecord = Student::select(DB::raw('count(*) as total'))
+            ->join('rev_n_exp', 'rev_n_exp.student_id', '=', 'students.id')
+            ->leftjoin('classes', 'rev_n_exp.class_id', '=', 'classes.id')
+            ->get()->pluck('total')->toArray();
+
+        $totalRecordFilterd = Student::select(DB::raw('count(rev_n_exp.id) as total'))
+            ->join('rev_n_exp', 'rev_n_exp.student_id', '=', 'students.id')
+            ->leftjoin('classes', 'rev_n_exp.class_id', '=', 'classes.id');
+
+        $search = Student::select('rev_n_exp.*', 'students.name as std_name', 'students.student_code', 'classes.name as c_name')
+            ->join('rev_n_exp', 'rev_n_exp.student_id', '=', 'students.id')
+            ->leftjoin('classes', 'rev_n_exp.class_id', '=', 'classes.id');
+
+        if ($keyword) {
+            $totalRecordFilterd->orwhere('rev_n_exp.invoice_number', 'like', '%' . $keyword . '%')
+                ->orwhere('rev_n_exp.payer', 'like', '%' . $keyword . '%')
+                ->orwhere('std_name', 'like', '%' . $keyword . '%')
+                ->orwhere('students.student_code', 'like', '%' . $keyword . '%')
+                ->orwhere('c_name', 'like', '%' . $keyword . '%');
+
+            $search->orwhere('rev_n_exp.invoice_number', 'like', '%' . $keyword . '%')
+                ->orwhere('rev_n_exp.payer', 'like', '%' . $keyword . '%')
+                ->orwhere('std_name', 'like', '%' . $keyword . '%')
+                ->orwhere('students.student_code', 'like', '%' . $keyword . '%')
+                ->orwhere('c_name', 'like', '%' . $keyword . '%');
+        }
+
+        if (count($filters)) {
+            foreach ($filters as $field => $value) {
+                Log::info('Invoice filter: ' . var_export($field, true) . ': ' . var_export($value, true));
+
+                if ($field === 'invoice_status' && in_array($value, ['1', '2'])) {
+                    $totalRecordFilterd->orwhere(function ($query) {
+                        $query->where('invoice_status', 1)
+                            ->orwhere('invoice_status', 2);
+                    });
+                    $search->orwhere(function ($query) {
+                        $query->where('invoice_status', 1)
+                            ->orwhere('invoice_status', 2);
+                    });
+                } else {
+                    $totalRecordFilterd->orwhere($field, $value);
+                    $search->orwhere($field, $value);
+                }
+
+            }
+        }
+
+        $totalFiltered = $totalRecordFilterd->get()->pluck('total')->toArray();
+
+        if (count($sort) > 0) {
+            $search->orderBy($sort['name'], $sort['dir']);
+        }
+
+        $data = $search->offset($start)
+            ->limit($record)
+            ->get();
+
+        $result = [
+            "recordsTotal" => $totalRecord[0],
+            "recordsFiltered" => $totalFiltered[0],
+            "data" => $data,
+        ];
+
+        return $result;
     }
 
     public static function get_last_tutor_duration($student_id, $class_id)
@@ -41,17 +110,16 @@ class Invoice extends Eloquent
             ->where('created_at', '=', $max_created_at)
             ->get();
 
-            $start_date = $query[0]->start_date;
-            $end_date = $query[0]->end_date;
-            $class_id = $query[0]->class_id;
-            $old_duration = self::calculate_duration($start_date, $end_date, $class_id);
-            $current_duration = self::calculate_duration($start_date, date('Y-m-d'), $class_id);
-            if ($current_duration >=  $old_duration) {
-                return $result;
-            }
-            else {
-                return $old_duration - $current_duration;
-            }
+        $start_date = $query[0]->start_date;
+        $end_date = $query[0]->end_date;
+        $class_id = $query[0]->class_id;
+        $old_duration = self::calculate_duration($start_date, $end_date, $class_id);
+        $current_duration = self::calculate_duration($start_date, date('Y-m-d'), $class_id);
+        if ($current_duration >= $old_duration) {
+            return $result;
+        } else {
+            return $old_duration - $current_duration;
+        }
     }
 
     public static function calculate_duration($start_date, $end_date, $class_id)
@@ -96,7 +164,7 @@ class Invoice extends Eloquent
             ->first();
         $schedule = explode(',', substr($class->schedule, 0, -1));
         $int_start_date = strtotime($start_date);
-        $temp_end_date = date('Y-m-d', strtotime('+'. (int)($duration * 3) . ' days',$int_start_date));
+        $temp_end_date = date('Y-m-d', strtotime('+' . (int) ($duration * 3) . ' days', $int_start_date));
 
         $holidays = Holiday::getHolidayInRange($start_date, $temp_end_date);
 
@@ -105,8 +173,8 @@ class Invoice extends Eloquent
             $wday = date('w', $day);
             $full_day = date('Y-m-d', $day);
 
-            if(in_array($full_day, $holidays)) {
-                $duration ++;
+            if (in_array($full_day, $holidays)) {
+                $duration++;
             }
 
             if (in_array($wday, $schedule)) {
@@ -120,8 +188,8 @@ class Invoice extends Eloquent
     public function getPaymentHistoryOfStudent($student_id)
     {
         $list = DB::table('rev_n_exp')->select('*')
-                ->where('student_id', $student_id)
-                ->orderBy("created_by");
+            ->where('student_id', $student_id)
+            ->orderBy("created_by");
         return $list;
     }
 
@@ -132,7 +200,7 @@ class Invoice extends Eloquent
             ->where('invoice_number', 'like', $prefix . '-%-' . $branch_code)
             ->pluck('invoice_number');
 
-            $postfix = $branch_code;
+        $postfix = $branch_code;
 
         $max = $prefix . '-000-' . $postfix;
 
@@ -155,24 +223,24 @@ class Invoice extends Eloquent
     public static function search_invoice($condition = [])
     {
         $query = DB::table('rev_n_exp')
-                ->select('rev_n_exp.id',
-                        'rev_n_exp.created_at',
-                        'rev_n_exp.invoice_number',
-                        'students.student_code',
-                        'students.name',
-                        'rev_n_exp.payer',
-                        'rev_n_exp.payment_method',
-                        'classes.name as class',
-                        'rev_n_exp.discount',
-                        'rev_n_exp.discount_type',
-                        'rev_n_exp.discount_desc',
-                        'rev_n_exp.invoice_status',
-                        'rev_n_exp.amount'
-                    )
-                ->join('staffs', 'rev_n_exp.created_by', '=', 'staffs.id')
-                ->join('branch', 'branch.id', '=', 'staffs.branch_id')
-                ->join('students', 'rev_n_exp.student_id', '=', 'students.id')
-                ->join('classes', 'rev_n_exp.class_id', '=', 'classes.id');
+            ->select('rev_n_exp.id',
+                'rev_n_exp.created_at',
+                'rev_n_exp.invoice_number',
+                'students.student_code',
+                'students.name',
+                'rev_n_exp.payer',
+                'rev_n_exp.payment_method',
+                'classes.name as class',
+                'rev_n_exp.discount',
+                'rev_n_exp.discount_type',
+                'rev_n_exp.discount_desc',
+                'rev_n_exp.invoice_status',
+                'rev_n_exp.amount'
+            )
+            ->join('staffs', 'rev_n_exp.created_by', '=', 'staffs.id')
+            ->join('branch', 'branch.id', '=', 'staffs.branch_id')
+            ->join('students', 'rev_n_exp.student_id', '=', 'students.id')
+            ->join('classes', 'rev_n_exp.class_id', '=', 'classes.id');
 
         if (!empty($condition['type'])) {
             $query->where('rev_n_exp.type', '=', $condition['type']);
@@ -180,9 +248,8 @@ class Invoice extends Eloquent
 
         if (!empty($condition['invoice_status'])) {
             if ($condition['invoice_status'] == 2) {
-                $query->whereIn('rev_n_exp.invoice_status', [1,2]);
-            }
-            else {
+                $query->whereIn('rev_n_exp.invoice_status', [1, 2]);
+            } else {
                 $query->where('rev_n_exp.invoice_status', '=', $condition['invoice_status']);
             }
         }
@@ -198,8 +265,7 @@ class Invoice extends Eloquent
         if (!empty($condition['created_at'])) {
             if (!is_array($condition['created_at'])) {
                 $query->where('rev_n_exp.created_at', '=', $condition['created_at']);
-            }
-            else {
+            } else {
                 $query->whereBetween('rev_n_exp.created_at', $condition['created_at']);
             }
         }
