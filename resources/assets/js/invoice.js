@@ -345,7 +345,7 @@ $(function () {
             autoclose: true,
             format: 'yyyy-mm-dd'
         });
-        
+
         if ($.fn.dataTable.isDataTable('TABLE#invoice-list')) {
             invoice_list_table = $('TABLE#invoice-list').DataTable();
         } else {
@@ -695,10 +695,12 @@ $(function () {
         var type_filter = $('<select></select>', { id: 'invoice-list-type-filter', class: 'form-control' });
 
         $(status_filter).append($('<option></option>', { 'value': -1, html: '[ Tất cả trạng thái ]' }));
-        var status = ['Lưu (chưa in)', 'Đã in', 'Đã duyệt', 'Đã huỷ'];
-        for (var i = 0; i < status.length; i++) {
+        var status = {0: 'Lưu (chưa in)', 1: 'Đã in', 3: 'Đã duyệt', 4: 'Đã huỷ'};
+        var fields = Object.keys(status);
+
+        for (var i = 0; i < fields.length; i++) {
             $(status_filter).append(
-                $('<option></option>', { 'value': i, html: status[i] })
+                $('<option></option>', { 'value': fields[i], html: status[fields[i]] })
             );
         }
 
@@ -734,10 +736,9 @@ $(function () {
         });
 
         $(date_filter).on('change', (e) => {
-            var search_value = $.fn.dataTable.util.escapeRegex(
-                $(e.target).val()
-            );
-            invoice_list_table.column(1).search(search_value ? '^' + search_value : '', true, false).draw();
+            console.log('[Date search]', $(e.target).val());
+            var search_value =$(e.target).val();
+            invoice_list_table.column(1).search(search_value ? search_value : '', true, false).draw();
         });
 
         return wrapper;
