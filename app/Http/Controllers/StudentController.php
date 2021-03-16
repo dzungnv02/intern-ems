@@ -2,18 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Assessment;
-use App\Branch;
-use App\Classes\Misc;
-use App\Parents;
-use App\PointExam;
-use App\Staff;
 use App\Student;
-use App\StudentActivity;
 use App\StudentClass;
+use App\Parents;
+use App\Branch;
+use App\Staff;
+use App\StudentActivity;
+use App\PointExam;
+use App\Invoice;
+use App\Assessment;
 use App\Teacher;
+use App\Classes;
+use App\TeacherSchedules;
+
+use App\Classes\Misc;
+
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
+
+
 
 class StudentController extends Controller
 {
@@ -25,30 +32,24 @@ class StudentController extends Controller
      */
     public function index(Request $request)
     {
-        $record = $request->length;
-        $draw = $request->draw;
-        $search = $request->search;
-        $start = $request->start;
-        $columns = $request->columns;
-        $order = $request->order;
-
-        $keyword = $search['value'];
-        $sort = ['name'=> $columns[$order[0]['column']]['name'], 'dir' => $order[0]['dir']];
-
+        $record = $request->record;
+        $keyword = $request->keyword;
+        $page = $request->page;
+        
         $student_model = new Student($request->logged_user->crm_owner);
 
-        $result = $student_model->search($keyword, $record, $start, $sort);
+        if ($record == "") {
+            $record = 10;
+        }
 
-        return response()->json([
-            'code' => 1,
-            'message' => 'ket qua',
-            'data' => $result['data'],
-            'draw' => (int) $draw++,
-            "recordsTotal" => $result['recordsTotal'],
-            "recordsFiltered" => $result['recordsFiltered'],
-            'user_info' => $request->logged_user],
-            200
-        );
+        $sum_row = count($student_model->all());
+        $sum_page = ceil($sum_row / $record);
+        if ($page > $sum_page || !is_numeric($page)) {
+            $page = 1;
+        }
+        $all = $student_model->search($keyword, $record, $page);
+
+        return response()->json(['code' => 1, 'message' => 'ket qua', 'data' => $all, 'user_info' => $request->logged_user], 200);
     }
 
     /**
@@ -114,8 +115,8 @@ class StudentController extends Controller
         $id = $request->id;
         if ($id) {
             $student = Student::getStudent($id);
-
-            if ((bool) $student) {
+           
+            if ((bool)$student) {
                 $parent = Parents::find($student->parent_id);
                 $register_branch = Branch::find($student->register_branch_id);
                 $dependent_branch = Branch::find($student->dependent_branch_id);
@@ -123,25 +124,26 @@ class StudentController extends Controller
                 $assessment = Assessment::getAssesmentOfStudent($id);
                 $trial_class = null;
                 if ($assessment != null) {
-                    $assessment->status = $assessment->assessment_date == null ? -1 : ($assessment->assessment_result != null ? 1 : 0);
+                    $assessment->status = $assessment->assessment_date == null ? -1 : ($assessment->assessment_result != null ? 1:0);
                     $assessment->trial_status = $assessment->trial_start_date == null ? 0 : 1;
-                    if ($assessment->teacher_id != null) {
+                    if ($assessment->teacher_id != null ) {
                         $assessment_teacher = Teacher::find($assessment->teacher_id);
                         $assessment->teacher_name = $assessment_teacher->name;
                     }
                 }
 
                 return response()->json(['code' => 1, 'data' => [
-                    'student' => $student,
-                    'parent' => $parent,
-                    'register_branch' => $register_branch,
-                    'dependent_branch' => $dependent_branch,
+                    'student' => $student, 
+                    'parent' => $parent, 
+                    'register_branch' => $register_branch, 
+                    'dependent_branch' => $dependent_branch, 
                     'staff' => $staff,
                     'assessment' => $assessment,
-                ]], 200);
-            } else {
+                    ]], 200);
+            }
+            else {
                 return response()->json(['code' => 0, 'message' => 'khong ton tai hoc sinh nay'], 200);
-
+                
             }
         }
     }
@@ -180,7 +182,7 @@ class StudentController extends Controller
         return response()->json(['code' => 1, 'message' => 'Cap nhat thanh cong'], 200);
     }
 
-    public function saveStudent(Request $request)
+    public function saveStudent(Request $request) 
     {
         $inputs = $request->all();
 
@@ -190,7 +192,7 @@ class StudentController extends Controller
 
         if ($inputs['student_id']) {
             $student = Student::find($inputs['student_id']);
-            foreach ($student_data as $field => $value) {
+            foreach($student_data as $field => $value) {
                 $student->$field = $value;
             }
             $result_student = $student->update();
@@ -198,19 +200,22 @@ class StudentController extends Controller
             $assessment = Assessment::getAssesmentOfStudent($inputs['student_id']);
             $assessment_data['student_id'] = $inputs['student_id'];
             $assessment_data['staff_id'] = $inputs['logged_user']->id;
-
+            
             if ($assessment) {
-                $result_assessment = Assessment::updateAssessment($assessment->id, $assessment_data);
-            } else {
+                $result_assessment = Assessment::updateAssessment( $assessment->id, $assessment_data);
+            }
+            else {
                 $result_assessment = Assessment::insertAssessment($assessment_data);
             }
-
+           
         }
 
-        return response()->json(['code' => 1, 'data' => ['student' => $result_student, 'assessment' => $result_assessment, 'teacher_schedule' => $teacher_schedule], 'message' => 'Cap nhat thanh cong'], 200);
+        return response()->json(['code' => 1, 'data' => ['student'=>$result_student, 'assessment'=>$result_assessment, 'teacher_schedule' => $teacher_schedule], 'message' => 'Cap nhat thanh cong'], 200);
     }
 
-    public function saveActivity(Request $request)
+
+    
+    public function saveActivity (Request $request) 
     {
         $inputs = $request->all();
         $student_id = isset($inputs['student_id']) ? $inputs['student_id'] : null;
