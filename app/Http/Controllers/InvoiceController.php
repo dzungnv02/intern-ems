@@ -33,8 +33,28 @@ class InvoiceController extends Controller
 
     public function getInvoiceList(Request $request)
     {
-        $invoices = Invoice::get_list_invoice();
-        return response()->json(['code' => 0, 'data' => ['list' => $invoices]], 200);
+        $record = $request->length;
+        $draw = $request->draw;
+        $search = $request->search;
+        $start = $request->start;
+        $columns = $request->columns;
+        $order = $request->order;
+
+        $keyword = $search['value'];
+        $sort = ['name'=> $columns[$order[0]['column']]['name'], 'dir' => $order[0]['dir']];
+
+        $result = Invoice::get_list_invoice($keyword, $record, $start, $sort, $columns);
+
+        return response()->json([
+            'code' => 1,
+            'message' => 'ket qua',
+            'data' => $result['data'],
+            'draw' => (int) $draw++,
+            "recordsTotal" => $result['recordsTotal'],
+            "recordsFiltered" => $result['recordsFiltered'],
+            'user_info' => $request->logged_user],
+            200
+        );
     }
 
     public function getStudentList(Request $request)

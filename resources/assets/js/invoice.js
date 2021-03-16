@@ -360,8 +360,9 @@ $(function () {
                 }],
                 ajax: {
                     url: 'invoice/list',
-                    dataSrc: 'data.list',
+                    dataSrc: 'data',
                 },
+                "serverSide": true,
                 "order": [
                     [1, 'desc']
                 ],
@@ -694,10 +695,10 @@ $(function () {
         var type_filter = $('<select></select>', { id: 'invoice-list-type-filter', class: 'form-control' });
 
         $(status_filter).append($('<option></option>', { 'value': -1, html: '[ Tất cả trạng thái ]' }));
-        var status = ['Lưu (chưa in)', 'Đã in lần 1', 'Đã in lần 2', 'Đã duyệt', 'Đã huỷ'];
+        var status = ['Lưu (chưa in)', 'Đã in', 'Đã duyệt', 'Đã huỷ'];
         for (var i = 0; i < status.length; i++) {
             $(status_filter).append(
-                $('<option></option>', { 'value': status[i], html: status[i] })
+                $('<option></option>', { 'value': i, html: status[i] })
             );
         }
 
@@ -707,10 +708,11 @@ $(function () {
         })
 
         $(type_filter).append($('<option></option>', { 'value': -1, html: '[ Tất cả ]' }));
-        var type = ['Học phí', 'Thu khác'];
-        for (var i = 0; i < type.length; i++) {
+        var type = {1: 'Học phí', 2: 'Thu khác'};
+        fields = Object.keys(type);
+        for (var i = 0; i < fields.length; i++) {
             $(type_filter).append(
-                $('<option></option>', { 'value': type[i], html: type[i] })
+                $('<option></option>', { 'value': fields[i], html: type[fields[i]] })
             );
         }
 
