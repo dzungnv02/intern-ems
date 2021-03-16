@@ -33,16 +33,6 @@ class InvoiceController extends Controller
 
     public function getInvoiceList(Request $request)
     {
-        $record = $request->length;
-        $draw = $request->draw;
-        $search = $request->search;
-        $start = $request->start;
-        $columns = $request->columns;
-        $order = $request->order;
-
-        $keyword = $search['value'];
-        $sort = ['name'=> $columns[$order[0]['column']]['name'], 'dir' => $order[0]['dir']];
-
         $invoices = Invoice::get_list_invoice();
         return response()->json(['code' => 0, 'data' => ['list' => $invoices]], 200);
     }
