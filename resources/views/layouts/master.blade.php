@@ -117,8 +117,8 @@
             <i class="fa fa-dashboard"></i> <span>Dashboard</span>
           </a>
         </li>
-       
-        
+
+
         {{--  <li class="">
           <a href="{{ asset('course') }}">
             <i class="fa fa-book" aria-hidden="true"></i>
@@ -241,7 +241,7 @@
               <h3 class="modal-title" id="userchangepassword-modal-title">Đổi mật khẩu</h3>
           </div>
           <div class="modal-body">
-              <div class="row"> 
+              <div class="row">
                 <div class="col-sm-12">
                   <form id="frmChangePasswd">
                       <div class="form-group">
@@ -310,12 +310,15 @@
                   "first": "Đầu tiên",
                   "last": "Cuối cùng"
                 },
+                "processing": "Đang xử lý",
                 "emptyTable" : "Không có bản ghi nào!",
                 "info" : "Hiển thị từ _START_ đến _END_ trong tổng số _TOTAL_ bản ghi",
                 "infoEmpty": "Hiển thị 0 bản ghi",
                 "search": "Tìm kiếm:",
                 "zeroRecords": "Không tìm thấy bản ghi nào phù hợp!",
-                "lengthMenu":     "Hiển thị _MENU_ bản ghi"
+                "lengthMenu": "Hiển thị _MENU_ bản ghi",
+                "infoFiltered": "(Tìm trong tổng số _MAX_ bản ghi)",
+                "infoPostFix": "",
             };
 
   var daterange_locale =  {
