@@ -17,77 +17,81 @@ $(function () {
 				table_student = $('#list-student').DataTable({
 					language: datatable_language,
 					"columnDefs": [{
-							"searchable": false,
-							"orderable": false,
-							"targets": 0
-						},
-						{
-							targets: [7],
-							"data": null,
-							"visible": true,
-							"defaultContent": buttons
-						}
+						"searchable": true,
+						"orderable": true,
+						"targets": 0
+					},
+					{
+						targets: [7],
+						"data": null,
+						"visible": true,
+						"searchable": false,
+						"orderable": false,
+						"defaultContent": buttons
+					},
+					{ "visible": false, "targets": [8] }
 					],
 					"order": [
-						[1, 'asc']
+						[8, 'asc']
 					],
+					"serverSide": true,
 					ajax: {
 						url: 'api/get-list-student',
 						dataSrc: 'data',
 					},
 					columns: [{
-							data: null
-						},
-						{
-							data: 'student_code',
-							name: 'student_code'
-						},
-						{
-							data: 'name',
-							name: 'name'
-						},
-						{
-							data: 'birthday',
-							name: 'birthday',
-							render: (data, type, row, meta) => {
-								if (data != null ) {
-									data = moment(data).format("DD-MM-YYYY")
-								}
-								else if (row.birthyear != null){
-									data = row.birthyear;
-								}
-								else {
-									data = '';
-								}
-								
-								return data;
+						'data': 'id',
+						name: 'id'
+					},
+					{
+						data: 'student_code',
+						name: 'student_code'
+					},
+					{
+						data: 'name',
+						name: 'name'
+					},
+					{
+						data: 'birthday',
+						name: 'birthday',
+						render: (data, type, row, meta) => {
+							if (data != null) {
+								data = moment(data).format("DD-MM-YYYY")
 							}
-						},
-						{
-							data: 'class_name',
-							name: 'class_name'
-						},
-						{
-							data: 'parent_name',
-							name: 'parent_name'
-						},
-						{
-							data: 'stage',
-							name: 'stage'
-						},
-						{
-							'data': null
-						},
+							else if (row.birthyear != null) {
+								data = row.birthyear;
+							}
+							else {
+								data = '';
+							}
+
+							return data;
+						}
+					},
+					{
+						data: 'class_name',
+						name: 'class_name'
+					},
+					{
+						data: 'parent_name',
+						name: 'parent_name'
+					},
+					{
+						data: 'stage',
+						name: 'stage'
+					},
+					{
+						'data': null
+					},
+					{
+						'data': 'updated_at',
+						name: 'updated_at'
+					}
 					]
 				});
 
 				table_student.on('order.dt search.dt', function () {
-					table_student.column(0, {
-						search: 'applied',
-						order: 'applied'
-					}).nodes().each(function (cell, i) {
-						cell.innerHTML = i + 1;
-					});
+					console.log("[PAGE LEN]", table_student.page.len());
 				}).draw();
 
 				table_student.on('click', 'button.assign-to-class', function () {
@@ -127,9 +131,9 @@ $(function () {
 			})
 		}
 
-		var show_assign_class_modal = (student_id) => {}
-		var get_class_list_to_assign = (student_id) => {}
-		var assign_to_class = (student_id, class_id) => {}
+		var show_assign_class_modal = (student_id) => { }
+		var get_class_list_to_assign = (student_id) => { }
+		var assign_to_class = (student_id, class_id) => { }
 
 		var show_student_form = (student_id) => {
 			var modal_title = 'Thêm mới học sinh';
@@ -196,8 +200,7 @@ $(function () {
 			});
 		}
 
-		var validate = (data) => 
-		{
+		var validate = (data) => {
 			return true;
 			// var result = false;
 			// if (data.student.name == '') {
