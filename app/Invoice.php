@@ -55,20 +55,19 @@ class Invoice extends Eloquent
 
         if (count($filters)) {
             foreach ($filters as $field => $value) {
-                Log::info('Invoice filter: ' . var_export($field, true) . ': ' . var_export($value, true));
-
                 if ($field === 'invoice_status' && in_array($value, ['1', '2'])) {
-                    $totalRecordFilterd->orwhere(function ($query) {
-                        $query->where('invoice_status', 1)
-                            ->orwhere('invoice_status', 2);
-                    });
-                    $search->orwhere(function ($query) {
-                        $query->where('invoice_status', 1)
-                            ->orwhere('invoice_status', 2);
-                    });
+                    Log::info('Invoice invoice_status: ' . var_export($field, true) . ': ' . var_export($value, true));
+
+                    $totalRecordFilterd->whereIn('invoice_status', [1,2]);
+                    $search->whereIn('invoice_status', [1,2]);
+                } else if ($field === 'created_at') {
+                    $totalRecordFilterd->whereRaw("DATE_FORMAT(rev_n_exp.created_at, '%Y-%m-%d')=?", $value);
+                    $search->whereRaw("DATE_FORMAT(rev_n_exp.created_at, '%Y-%m-%d')=?", $value);
                 } else {
-                    $totalRecordFilterd->orwhere($field, $value);
-                    $search->orwhere($field, $value);
+                    Log::info('Invoice filter: ' . var_export($field, true) . ': ' . var_export($value, true));
+
+                    $totalRecordFilterd->where($field, $value);
+                    $search->where($field, $value);
                 }
 
             }
