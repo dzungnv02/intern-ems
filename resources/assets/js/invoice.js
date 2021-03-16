@@ -345,7 +345,7 @@ $(function () {
             autoclose: true,
             format: 'yyyy-mm-dd'
         });
-
+        
         if ($.fn.dataTable.isDataTable('TABLE#invoice-list')) {
             invoice_list_table = $('TABLE#invoice-list').DataTable();
         } else {
@@ -470,10 +470,6 @@ $(function () {
                     );
                 }
             });
-
-            invoice_list_table.on('order.dt search.dt', function () {
-                console.log("[ON SEARCH]", invoice_list_table.page.len());
-            }).draw();
 
             invoice_list_table.on('draw.dt', () => {
                 var user_role = $('meta[name="user-role"]').attr('content');

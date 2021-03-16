@@ -31,58 +31,23 @@ class Student extends Eloquent
      * @param  numeric $page
      * @return $search
      */
-    public static function search($keyword, $record, $start = 0, $sort=[])
+    public static function search($keyword, $record, $page = 1)
     {
-
-        $totalRecord = Student::select(DB::raw('count(*) as total'))
-            ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
-            ->leftJoin('classes', 'classes.id', '=', 'students.current_class')
-            ->get()->pluck('total')->toArray();
-
-        $totalRecordFilterd = $totalRecord;
+        //$start = ($page - 1) * $record;
 
         $search = Student::select('students.*', 'parents.fullname as parent_name', 'classes.name as class_name')
             ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
-            ->leftJoin('classes', 'classes.id', '=', 'students.current_class');
+            ->leftJoin('classes', 'classes.id', '=', 'students.current_class')
+            ->where('students.name', 'like', '%' . $keyword . '%')
+            ->orwhere('students.email', 'like', '%' . $keyword . '%')
+            ->orwhere('students.student_code', 'like', '%' . $keyword . '%')
+            ->orwhere('students.address', 'like', '%' . $keyword . '%')
+            ->orwhere('students.mobile', 'like', '%' . $keyword . '%')
+            ->orwhere('parents.fullname', 'like', '%' . $keyword . '%')
+            ->orwhere('classes.name', 'like', '%' . $keyword . '%')
+            ->orderBy('students.id', 'desc')->get();
 
-        if ($keyword) {
-
-            $totalRecordFilterd = Student::select(DB::raw('count(*) as total'))
-                ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
-                ->leftJoin('classes', 'classes.id', '=', 'students.current_class')
-                ->where('students.name', 'like', '%' . $keyword . '%')
-                ->orwhere('students.email', 'like', '%' . $keyword . '%')
-                ->orwhere('students.student_code', 'like', '%' . $keyword . '%')
-                ->orwhere('students.address', 'like', '%' . $keyword . '%')
-                ->orwhere('students.mobile', 'like', '%' . $keyword . '%')
-                ->orwhere('parents.fullname', 'like', '%' . $keyword . '%')
-                ->orwhere('classes.name', 'like', '%' . $keyword . '%')
-                ->get()->pluck('total')->toArray();
-
-            $search->where('students.name', 'like', '%' . $keyword . '%')
-                ->orwhere('students.email', 'like', '%' . $keyword . '%')
-                ->orwhere('students.student_code', 'like', '%' . $keyword . '%')
-                ->orwhere('students.address', 'like', '%' . $keyword . '%')
-                ->orwhere('students.mobile', 'like', '%' . $keyword . '%')
-                ->orwhere('parents.fullname', 'like', '%' . $keyword . '%')
-                ->orwhere('classes.name', 'like', '%' . $keyword . '%');
-        }
-
-        if (count($sort) > 0) {
-            $search->orderBy($sort['name'], $sort['dir'] );
-        }
-
-        $data = $search->offset($start)
-            ->limit($record)
-            ->get();
-
-        $result = [
-            "recordsTotal" => $totalRecord[0],
-            "recordsFiltered" => $totalRecordFilterd[0],
-            "data" => $data
-        ];
-
-        return $result;
+        return $search;
     }
 
     /**
