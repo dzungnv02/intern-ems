@@ -51,6 +51,7 @@ class Student extends Eloquent
                 ->leftJoin('parents', 'parents.id', '=', 'students.parent_id')
                 ->leftJoin('classes', 'classes.id', '=', 'students.current_class')
                 ->where('students.name', 'like', '%' . $keyword . '%')
+                ->orwhere('students.id', $keyword)
                 ->orwhere('students.email', 'like', '%' . $keyword . '%')
                 ->orwhere('students.student_code', 'like', '%' . $keyword . '%')
                 ->orwhere('students.address', 'like', '%' . $keyword . '%')
@@ -60,6 +61,7 @@ class Student extends Eloquent
                 ->get()->pluck('total')->toArray();
 
             $search->where('students.name', 'like', '%' . $keyword . '%')
+                ->orwhere('students.id', $keyword)
                 ->orwhere('students.email', 'like', '%' . $keyword . '%')
                 ->orwhere('students.student_code', 'like', '%' . $keyword . '%')
                 ->orwhere('students.address', 'like', '%' . $keyword . '%')
